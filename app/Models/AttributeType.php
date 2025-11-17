@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Product extends Model
+class AttributeType extends Model
 {
     use HasUuids, SoftDeletes;
 
@@ -16,13 +15,8 @@ class Product extends Model
 
     protected $guarded = [];
 
-    public function category()
+    public function attributes()
     {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function variants()
-    {
-        return $this->hasMany(ProductVariant::class);
+        return $this->hasMany(Attribute::class);
     }
 }
