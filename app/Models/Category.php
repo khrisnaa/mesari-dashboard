@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Product extends Model
+class Category extends Model
 {
     use HasUuids, SoftDeletes;
 
@@ -16,8 +16,18 @@ class Product extends Model
 
     protected $guarded = [];
 
-    public function category()
+    public function children()
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }

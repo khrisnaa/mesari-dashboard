@@ -21,6 +21,9 @@ return new class extends Migration
             $table->string('color')->nullable();
             $table->integer('stock')->default(0);
 
+            $table->uuid('category_id');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+
             $table->timestamps();
             $table->softDeletes();
         });
