@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FlashHelper;
 use App\Http\Requests\Category\CreateCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
@@ -59,10 +60,25 @@ class CategoryController extends Controller
         $data = $request->validated();
         $data['slug'] = Str::slug($data['name']);
 
+        $existing = Category::onlyTrashed()
+            ->where('name', $data['name'])
+            ->first();
+
+        if ($existing) {
+            $existing->restore();
+
+            $existing->update($data);
+
+            return redirect()
+                ->route('categories.index')
+                ->with('success', FlashHelper::stamp('Category restored successfully.'));
+        }
+
         Category::create($data);
 
-        return redirect()->route('categories.index')
-            ->with('success', 'Category created successfully. -#' . now() . '#');
+        return redirect()
+            ->route('categories.index')
+            ->with('success', FlashHelper::stamp('Category created successfully.'));
     }
 
     /**
@@ -85,7 +101,7 @@ class CategoryController extends Controller
         $category->update($request->validated());
 
         return redirect()->route('categories.index')
-            ->with('success', 'Category updated successfully. -#' . now() . '#');
+            ->with('success',  FlashHelper::stamp('Category updated successfully.'));
     }
 
     /**
@@ -94,11 +110,11 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         if ($category->products()->exists()) {
-            return redirect()->back()->with('error', 'Cannot delete category that has products.');
+            return redirect()->back()->with('error',  FlashHelper::stamp('Cannot delete category that has products.'));
         }
 
         $category->delete();
 
-        return redirect()->back()->with('success', 'Category deleted successfully.');
+        return redirect()->back()->with('success',  FlashHelper::stamp('Category deleted successfully.'));
     }
 }

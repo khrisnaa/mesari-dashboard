@@ -37,12 +37,12 @@ const Create = ({ categories: categoriesData }: PageProps) => {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Category" />
-            <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
+            <div className="mx-auto flex h-full w-full max-w-1/2 flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Create Category"
                     description="Add a new category to organize your products efficiently."
                 />
-                <div className="max-w-1/2">
+                <div>
                     <div className="gap-4 rounded-md border p-4">
                         <Form
                             {...categories.store.form()}

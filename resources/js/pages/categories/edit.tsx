@@ -18,7 +18,7 @@ import AppLayout from '@/layouts/app-layout';
 import categories from '@/routes/categories';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types.ts/category';
-import { Form, Head, router } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -40,21 +40,12 @@ const Edit = ({ category, categories: categoriesData }: PageProps) => {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Category" />
             <FlashToast />
-            <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
+            <div className="mx-auto flex h-full w-full max-w-1/2 flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Edit Category"
                     description="Update the category details to keep your catalog organized."
-                    actions={
-                        <Button
-                            onClick={() =>
-                                router.delete(`/categories/${category.id}`)
-                            }
-                        >
-                            Delete category
-                        </Button>
-                    }
                 />
-                <div className="max-w-1/2">
+                <div>
                     <div className="gap-4 rounded-md border p-4">
                         <Form
                             {...categories.update.form(category.id)}
@@ -142,7 +133,7 @@ const Edit = ({ category, categories: categoriesData }: PageProps) => {
                                             tabIndex={5}
                                         >
                                             {processing && <Spinner />}
-                                            Create category
+                                            Save changes
                                         </Button>
                                     </div>
                                 </>

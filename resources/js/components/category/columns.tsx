@@ -10,8 +10,9 @@ import {
 import { Category } from '@/types.ts/category';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Eye, MoreHorizontal, Pencil } from 'lucide-react';
+import { ArrowUpDown, Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import { useState } from 'react';
+import { ConfirmationDialog } from '../confirmation-dialog';
 import { DetailDialog } from './detail-dialog';
 
 export const columns: ColumnDef<Category>[] = [
@@ -77,13 +78,26 @@ export const columns: ColumnDef<Category>[] = [
         id: 'actions',
         cell: ({ row }) => {
             const category = row.original;
-            const [isOpen, setIsOpen] = useState(false);
+            const [isDetailOpen, setIsDetailOpen] = useState(false);
+            const [isDeleteOpen, setIsDeleteOpen] = useState(false);
             return (
                 <>
                     <DetailDialog
                         category={category}
-                        open={isOpen}
-                        onOpenChange={setIsOpen}
+                        open={isDetailOpen}
+                        onOpenChange={setIsDetailOpen}
+                    />
+                    <ConfirmationDialog
+                        open={isDeleteOpen}
+                        onOpenChange={setIsDeleteOpen}
+                        title="Delete Category?"
+                        description="This action cannot be undone. This category will be permanently removed."
+                        confirmLabel="Delete"
+                        cancelLabel="Cancel"
+                        variant="danger"
+                        onConfirm={() => {
+                            router.delete(`/categories/${category.id}`);
+                        }}
                     />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -102,10 +116,19 @@ export const columns: ColumnDef<Category>[] = [
                                     }
                                     variant="ghost"
                                     size="sm"
-                                    className="w-full"
+                                    className="w-full justify-between"
                                 >
-                                    <Pencil />
-                                    Edit
+                                    Edit <Pencil />
+                                </Button>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full justify-between"
+                                    onClick={() => setIsDetailOpen(true)}
+                                >
+                                    Show <Eye />
                                 </Button>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -113,11 +136,10 @@ export const columns: ColumnDef<Category>[] = [
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="w-full"
-                                    onClick={() => setIsOpen(true)}
+                                    className="w-full justify-between text-red-500 hover:text-red-600"
+                                    onClick={() => setIsDeleteOpen(true)}
                                 >
-                                    <Eye />
-                                    Show
+                                    Delete <Trash className="text-red-500" />
                                 </Button>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
