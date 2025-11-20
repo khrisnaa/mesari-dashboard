@@ -4,15 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $perPage = $request->input('per_page', 10);
+        $sort = $request->input('sort');
+        $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
+
+        $categories = Category::query()
+            ->with('parent')
+            ->when($request->search, function ($q, $search) {
+                $q->where('name', 'like', "%{$search}%");
+            })
+            ->when($sort, function ($q) use ($sort, $direction) {
+                $q->orderBy($sort, $direction);
+            }, function ($q) {
+                // Default sorting
+                $q->orderBy('created_at', 'desc');
+            })
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return Inertia::render('categories/index', [
+            'categories' => $categories,
+            'filters' => $request->only(['search', 'sort', 'direction', 'per_page']),
+        ]);
     }
 
     /**
