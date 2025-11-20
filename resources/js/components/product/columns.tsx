@@ -112,8 +112,6 @@ export const columns: ColumnDef<Product>[] = [
     {
         id: 'actions',
         cell: ({ row }) => {
-            const product = row.original;
-
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -124,16 +122,24 @@ export const columns: ColumnDef<Product>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                            <Button variant="ghost">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full"
+                            >
                                 <Pencil />
-                                Edit product
+                                Edit
                             </Button>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                            <Button variant="ghost">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full"
+                            >
                                 <Eye />
-                                Show details
+                                Show
                             </Button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

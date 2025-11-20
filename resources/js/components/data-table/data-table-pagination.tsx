@@ -118,44 +118,48 @@ export const DataTablePagination = <TData,>({
                 {selected.count} of {selected.total} row(s) selected.
             </div>
 
-            <div className="flex items-center justify-center space-x-2">
-                <p className="text-sm font-medium">Rows per page</p>
-                <Select
-                    value={`${table.getState().pagination.pageSize}`}
-                    onValueChange={(value) => {
-                        const size = Number(value);
-                        table.setPageSize(size);
-                        router.get(
-                            `?`,
-                            {
-                                ...filters,
-                                per_page: size,
-                            },
-                            {
-                                preserveState: true,
-                                preserveScroll: true,
-                                replace: true,
-                                only: ['products'],
-                            },
-                        );
-                    }}
-                >
-                    <SelectTrigger className="h-8 w-[70px]">
-                        <SelectValue
-                            placeholder={table.getState().pagination.pageSize}
-                        />
-                    </SelectTrigger>
-                    <SelectContent side="top">
-                        {[10, 20, 25, 30, 40, 50].map((pageSize) => (
-                            <SelectItem key={pageSize} value={`${pageSize}`}>
-                                {pageSize}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-
             <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="mr-4 flex items-center justify-center space-x-2">
+                    <p className="text-sm font-medium">Rows per page</p>
+                    <Select
+                        value={`${table.getState().pagination.pageSize}`}
+                        onValueChange={(value) => {
+                            const size = Number(value);
+                            table.setPageSize(size);
+                            router.get(
+                                `?`,
+                                {
+                                    ...filters,
+                                    per_page: size,
+                                },
+                                {
+                                    preserveState: true,
+                                    preserveScroll: true,
+                                    replace: true,
+                                    only: ['products'],
+                                },
+                            );
+                        }}
+                    >
+                        <SelectTrigger className="h-8 w-[70px]">
+                            <SelectValue
+                                placeholder={
+                                    table.getState().pagination.pageSize
+                                }
+                            />
+                        </SelectTrigger>
+                        <SelectContent side="top">
+                            {[10, 20, 25, 30, 40, 50].map((pageSize) => (
+                                <SelectItem
+                                    key={pageSize}
+                                    value={`${pageSize}`}
+                                >
+                                    {pageSize}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
                 {/* Prev */}
                 <Button
                     variant="outline"
