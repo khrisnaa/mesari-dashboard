@@ -1,12 +1,13 @@
 import { columns } from '@/components/category/columns';
 import { DataTable } from '@/components/data-table/data-table';
+import FlashToast from '@/components/flash-toast';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types.ts/category';
 import { PaginatedResponse } from '@/types.ts/pagination';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -23,14 +24,17 @@ interface PageProps {
 const Index = ({ categories }: PageProps) => {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Products" />
+            <Head title="Categories" />
+            <FlashToast />
             <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Categories"
                     description="Manage your categories efficiently and keep your products organized."
                     actions={
-                        <Button>
-                            <Plus /> Create Category
+                        <Button asChild>
+                            <Link href="/categories/create">
+                                <Plus /> Create category
+                            </Link>
                         </Button>
                     }
                 />
