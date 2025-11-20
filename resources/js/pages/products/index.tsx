@@ -1,5 +1,5 @@
+import { DataTable } from '@/components/data-table/data-table';
 import { columns } from '@/components/product/columns';
-import { DataTable } from '@/components/product/data-table';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { PaginatedResponse } from '@/types.ts/pagination';
@@ -18,7 +18,6 @@ interface PageProps {
 }
 
 const Index = ({ products }: PageProps) => {
-    console.log(products);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Products" />

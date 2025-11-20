@@ -12,28 +12,36 @@ import {
 } from '../ui/select';
 
 interface DataTablePaginationProps<TData> {
-    selected: number;
-    total: number;
+    selected: {
+        count: number;
+        total: number;
+    };
     table: Table<TData>;
     pagination: PaginationDetails;
 }
 
-const DataTablePagination = <TData,>({
+export const DataTablePagination = <TData,>({
     pagination,
-    total,
     selected,
     table,
 }: DataTablePaginationProps<TData>) => {
+    const { filters } = usePage().props as any as {
+        filters?: {
+            search?: string;
+            sort?: string;
+            direction?: string;
+            per_page?: number;
+        };
+    };
+
     const current = pagination.current_page;
     const last = pagination.last_page;
 
     const goTo = (page: number | string) => {
         if (typeof page !== 'number') return;
-
         router.get(
             `?`,
             {
-                //@ts-ignore
                 ...filters,
                 page,
             },
@@ -104,12 +112,10 @@ const DataTablePagination = <TData,>({
         );
     };
 
-    const { filters } = usePage().props;
-
     return (
         <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-                {selected} of {total} row(s) selected.
+                {selected.count} of {selected.total} row(s) selected.
             </div>
 
             <div className="flex items-center justify-center space-x-2">
@@ -119,17 +125,18 @@ const DataTablePagination = <TData,>({
                     onValueChange={(value) => {
                         const size = Number(value);
                         table.setPageSize(size);
-
-                        // update URL
-                        const params = new URLSearchParams(
-                            window.location.search,
-                        );
-                        params.set('per_page', size.toString());
-                        params.set('page', '1'); // reset ke page 1
                         router.get(
-                            `?${params.toString()}`,
-                            {},
-                            { preserveScroll: true },
+                            `?`,
+                            {
+                                ...filters,
+                                per_page: size,
+                            },
+                            {
+                                preserveState: true,
+                                preserveScroll: true,
+                                replace: true,
+                                only: ['products'],
+                            },
                         );
                     }}
                 >
@@ -154,22 +161,10 @@ const DataTablePagination = <TData,>({
                     variant="outline"
                     size="sm"
                     disabled={!pagination.prev_page_url}
-                    onClick={() =>
-                        pagination.prev_page_url &&
-                        router.get(
-                            pagination.prev_page_url,
-                            {
-                                //@ts-ignore
-                                ...filters,
-                                page: pagination.current_page - 1,
-                            },
-                            {
-                                preserveState: true,
-                                preserveScroll: true,
-                                replace: true,
-                            },
-                        )
-                    }
+                    onClick={() => {
+                        if (!pagination.prev_page_url) return;
+                        goTo(pagination.current_page - 1);
+                    }}
                 >
                     Previous
                 </Button>
@@ -182,22 +177,10 @@ const DataTablePagination = <TData,>({
                     variant="outline"
                     size="sm"
                     disabled={!pagination.next_page_url}
-                    onClick={() =>
-                        pagination.next_page_url &&
-                        router.get(
-                            pagination.next_page_url,
-                            {
-                                //@ts-ignore
-                                ...filters,
-                                page: pagination.current_page + 1,
-                            },
-                            {
-                                preserveState: true,
-                                preserveScroll: true,
-                                replace: true,
-                            },
-                        )
-                    }
+                    onClick={() => {
+                        if (!pagination.next_page_url) return;
+                        goTo(pagination.current_page + 1);
+                    }}
                 >
                     Next
                 </Button>
@@ -205,5 +188,3 @@ const DataTablePagination = <TData,>({
         </div>
     );
 };
-
-export default DataTablePagination;

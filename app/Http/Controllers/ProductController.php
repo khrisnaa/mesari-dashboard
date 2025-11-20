@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,26 +15,35 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
+        $sort = $request->input('sort');
+        $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
         $products = Product::query()
             ->with(['category', 'variants.attributes'])
             ->when($request->search, function ($q, $search) {
                 $q->where('name', 'like', "%{$search}%");
             })
-            ->when($request->sort, function ($q) use ($request) {
-                $direction = $request->direction === 'asc' ? 'asc' : 'desc';
-                $q->orderBy($request->sort, $direction)
-                    ->orderBy('id');
-            }, function ($q) {
-                $q->orderBy('created_at', 'desc')
-                    ->orderBy('id', 'desc');
+            ->when(in_array($sort, ['price', 'stock']), function ($q) use ($sort, $direction) {
+                $q->orderBy(
+                    ProductVariant::select($sort)
+                        ->whereColumn('product_id', 'products.id')
+                        ->orderBy($sort, $direction)
+                        ->limit(1),
+                    $direction
+                );
+            }, function ($q) use ($sort, $direction) {
+                if ($sort) {
+                    $q->orderBy($sort, $direction)->orderBy('id');
+                } else {
+                    $q->orderBy('created_at', 'desc')->orderBy('id', 'desc');
+                }
             })
             ->paginate($perPage)
             ->withQueryString();
 
         return Inertia::render('products/index', [
             'products' => $products,
-            'filters'  => $request->only(['search', 'sort', 'direction', 'per_page']),
+            'filters' => $request->only(['search', 'sort', 'direction', 'per_page']),
         ]);
     }
 

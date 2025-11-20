@@ -2,7 +2,7 @@ import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Input } from '../ui/input';
 
-const DataTableSearch = () => {
+export const DataTableFilter = () => {
     const { filters } = usePage().props as any;
     const [search, setSearch] = useState(filters.search || '');
     const handleSearch = (value: string) => {
@@ -27,4 +27,3 @@ const DataTableSearch = () => {
         />
     );
 };
-export default DataTableSearch;

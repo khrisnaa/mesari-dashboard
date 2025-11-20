@@ -1,12 +1,10 @@
 import {
     ColumnDef,
-    ColumnFiltersState,
     OnChangeFn,
     SortingState,
     VisibilityState,
     flexRender,
     getCoreRowModel,
-    getFilteredRowModel,
     getPaginationRowModel,
     useReactTable,
 } from '@tanstack/react-table';
@@ -30,15 +28,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { PaginationDetails } from '@/types.ts/pagination';
 import { router, usePage } from '@inertiajs/react';
-import DataTablePagination from './data-table-pagination';
-import DataTableSearch from './data-table-search';
-
-interface Filters {
-    sort?: string;
-    direction?: 'asc' | 'desc';
-    search?: string;
-    [key: string]: any;
-}
+import { DataTableFilter } from './data-table-filter';
+import { DataTablePagination } from './data-table-pagination';
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -51,27 +42,30 @@ export function DataTable<TData extends { id: string }, TValue>({
     data,
     pagination,
 }: DataTableProps<TData, TValue>) {
-    // const [sorting, setSorting] = useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const { filters } = usePage().props as any as {
+        filters?: {
+            search?: string;
+            sort?: string;
+            direction?: string;
+            per_page?: number;
+        };
+    };
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
         {},
     );
     const [rowSelection, setRowSelection] = useState({});
     const [paginationRow, setPaginationRow] = useState({
         pageIndex: 0,
-        pageSize: pagination.per_page,
+        pageSize: filters?.per_page ?? 10,
     });
-    const { filters } = usePage().props;
-
     const [sorting, setSorting] = useState<SortingState>(() => {
-        //@ts-ignore
-        if (filters.sort) {
+        const sort = filters?.sort;
+        const direction = filters?.direction;
+        if (sort) {
             return [
                 {
-                    //@ts-ignore
-                    id: filters.sort,
-                    //@ts-ignore
-                    desc: filters.direction === 'desc',
+                    id: sort,
+                    desc: direction === 'desc',
                 },
             ];
         }
@@ -82,13 +76,13 @@ export function DataTable<TData extends { id: string }, TValue>({
         setSorting((old) => {
             const next = typeof updater === 'function' ? updater(old) : updater;
 
-            const sort = next[0]?.id ?? null;
-            const direction = next[0]?.desc ? 'desc' : 'asc';
+            const first = next[0];
+            const sort = first?.id ?? null;
+            const direction = first?.desc ? 'desc' : 'asc';
 
             router.get(
                 '/products',
                 {
-                    //@ts-ignore
                     ...filters,
                     sort,
                     direction,
@@ -108,21 +102,15 @@ export function DataTable<TData extends { id: string }, TValue>({
     const table = useReactTable({
         data,
         columns,
-        enableRowSelection: true,
-        enableMultiRowSelection: true,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-        // getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
         onSortingChange: handleSortingChange,
-        onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
         onPaginationChange: setPaginationRow,
         getRowId: (row) => row.id,
         state: {
             sorting,
-            columnFilters,
             columnVisibility,
             rowSelection,
             pagination: paginationRow,
@@ -132,7 +120,7 @@ export function DataTable<TData extends { id: string }, TValue>({
     return (
         <div>
             <div className="flex items-center py-4">
-                <DataTableSearch />
+                <DataTableFilter />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
@@ -216,8 +204,10 @@ export function DataTable<TData extends { id: string }, TValue>({
             </div>
             <DataTablePagination
                 pagination={pagination}
-                selected={table.getSelectedRowModel().rows.length}
-                total={table.getFilteredRowModel().rows.length}
+                selected={{
+                    count: table.getSelectedRowModel().rows.length,
+                    total: table.getFilteredRowModel().rows.length,
+                }}
                 table={table}
             />
         </div>
