@@ -11,11 +11,32 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
-        return Inertia::render('products/index', compact('products'));
+        $perPage = $request->input('per_page', 10);
+
+        $products = Product::query()
+            ->with(['category', 'variants.attributes'])
+            ->when($request->search, function ($q, $search) {
+                $q->where('name', 'like', "%{$search}%");
+            })
+            ->when($request->sort, function ($q) use ($request) {
+                $direction = $request->direction === 'asc' ? 'asc' : 'desc';
+                $q->orderBy($request->sort, $direction)
+                    ->orderBy('id');
+            }, function ($q) {
+                $q->orderBy('created_at', 'desc')
+                    ->orderBy('id', 'desc');
+            })
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return Inertia::render('products/index', [
+            'products' => $products,
+            'filters'  => $request->only(['search', 'sort', 'direction', 'per_page']),
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

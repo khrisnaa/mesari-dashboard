@@ -3,11 +3,35 @@ export interface Product {
     name: string;
     slug: string;
     description?: string;
-    price: number;
-    size?: string;
-    color?: string;
-    stock: number;
+    variants: ProductVariant[];
     created_at: string;
     updated_at: string;
     deleted_at?: string | null;
+}
+
+export interface ProductVariant {
+    id: string;
+    price: number;
+    stock: number;
+    product_id: string;
+    attributes?: Attribute[];
+    created_at: string;
+    updated_at: string;
+    deleted_at?: string | null;
+}
+
+export interface Attribute {
+    id: string;
+    name: string;
+    hex?: string | null;
+    attribute_type_id: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at?: string | null;
+    pivot?: ProductVariantAttributePivot;
+}
+
+export interface ProductVariantAttributePivot {
+    product_variant_id: string;
+    attribute_id: string;
 }

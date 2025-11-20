@@ -2,6 +2,7 @@ import { columns } from '@/components/product/columns';
 import { DataTable } from '@/components/product/data-table';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+import { PaginatedResponse } from '@/types.ts/pagination';
 import { Product } from '@/types.ts/product';
 import { Head } from '@inertiajs/react';
 
@@ -13,10 +14,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface PageProps {
-    products: Product[];
+    products: PaginatedResponse<Product>;
 }
 
 const Index = ({ products }: PageProps) => {
+    console.log(products);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Products" />
@@ -35,7 +37,11 @@ const Index = ({ products }: PageProps) => {
                     </div>
                 </div>
                 <div className="container mx-auto">
-                    <DataTable columns={columns} data={products} />
+                    <DataTable
+                        columns={columns}
+                        data={products.data}
+                        pagination={(({ data, ...rest }) => rest)(products)}
+                    />
                 </div>
             </div>
         </AppLayout>

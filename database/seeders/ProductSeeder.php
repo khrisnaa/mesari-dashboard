@@ -113,43 +113,43 @@ class ProductSeeder extends Seeder
         $productsData = [
             'Men' => [
                 'T-Shirts' => [
-                    ['name' => 'Classic Cotton Tee', 'description' => 'Soft cotton t-shirt for everyday wear', 'base_price' => 25.99],
-                    ['name' => 'V-Neck Essential', 'description' => 'Versatile v-neck t-shirt', 'base_price' => 27.99],
-                    ['name' => 'Graphic Print Tee', 'description' => 'Trendy graphic design t-shirt', 'base_price' => 29.99],
-                    ['name' => 'Striped Casual Tee', 'description' => 'Classic striped pattern t-shirt', 'base_price' => 28.99],
+                    ['name' => 'Classic Cotton Tee', 'description' => 'Soft cotton t-shirt for everyday wear', 'base_price' => 25990],
+                    ['name' => 'V-Neck Essential', 'description' => 'Versatile v-neck t-shirt', 'base_price' => 27990],
+                    ['name' => 'Graphic Print Tee', 'description' => 'Trendy graphic design t-shirt', 'base_price' => 29990],
+                    ['name' => 'Striped Casual Tee', 'description' => 'Classic striped pattern t-shirt', 'base_price' => 28990],
                 ],
                 'Shirts' => [
-                    ['name' => 'Oxford Button-Down', 'description' => 'Classic oxford shirt for formal occasions', 'base_price' => 49.99],
-                    ['name' => 'Slim Fit Dress Shirt', 'description' => 'Modern slim fit dress shirt', 'base_price' => 55.99],
-                    ['name' => 'Linen Casual Shirt', 'description' => 'Breathable linen shirt for summer', 'base_price' => 45.99],
-                    ['name' => 'Checkered Flannel', 'description' => 'Warm flannel shirt with check pattern', 'base_price' => 42.99],
-                    ['name' => 'Denim Chambray Shirt', 'description' => 'Casual denim chambray shirt', 'base_price' => 48.99],
+                    ['name' => 'Oxford Button-Down', 'description' => 'Classic oxford shirt for formal occasions', 'base_price' => 49990],
+                    ['name' => 'Slim Fit Dress Shirt', 'description' => 'Modern slim fit dress shirt', 'base_price' => 55990],
+                    ['name' => 'Linen Casual Shirt', 'description' => 'Breathable linen shirt for summer', 'base_price' => 45990],
+                    ['name' => 'Checkered Flannel', 'description' => 'Warm flannel shirt with check pattern', 'base_price' => 42990],
+                    ['name' => 'Denim Chambray Shirt', 'description' => 'Casual denim chambray shirt', 'base_price' => 48990],
                 ],
                 'Polos' => [
-                    ['name' => 'Classic Pique Polo', 'description' => 'Traditional pique polo shirt', 'base_price' => 39.99],
-                    ['name' => 'Performance Golf Polo', 'description' => 'Moisture-wicking polo for sports', 'base_price' => 44.99],
-                    ['name' => 'Slim Fit Polo', 'description' => 'Modern slim fit polo shirt', 'base_price' => 41.99],
+                    ['name' => 'Classic Pique Polo', 'description' => 'Traditional pique polo shirt', 'base_price' => 39990],
+                    ['name' => 'Performance Golf Polo', 'description' => 'Moisture-wicking polo for sports', 'base_price' => 44990],
+                    ['name' => 'Slim Fit Polo', 'description' => 'Modern slim fit polo shirt', 'base_price' => 41990],
                 ],
             ],
             'Women' => [
                 'Blouses' => [
-                    ['name' => 'Silk Elegance Blouse', 'description' => 'Luxurious silk blouse for special occasions', 'base_price' => 65.99],
-                    ['name' => 'Ruffled Collar Blouse', 'description' => 'Feminine blouse with ruffled details', 'base_price' => 52.99],
-                    ['name' => 'Chiffon Flow Blouse', 'description' => 'Light and airy chiffon blouse', 'base_price' => 48.99],
-                    ['name' => 'Button-Front Office Blouse', 'description' => 'Professional button-front blouse', 'base_price' => 45.99],
+                    ['name' => 'Silk Elegance Blouse', 'description' => 'Luxurious silk blouse for special occasions', 'base_price' => 65990],
+                    ['name' => 'Ruffled Collar Blouse', 'description' => 'Feminine blouse with ruffled details', 'base_price' => 52990],
+                    ['name' => 'Chiffon Flow Blouse', 'description' => 'Light and airy chiffon blouse', 'base_price' => 48990],
+                    ['name' => 'Button-Front Office Blouse', 'description' => 'Professional button-front blouse', 'base_price' => 45990],
                 ],
                 'Tops' => [
-                    ['name' => 'Crop Jersey Top', 'description' => 'Trendy cropped jersey top', 'base_price' => 32.99],
-                    ['name' => 'Wrap Style Top', 'description' => 'Flattering wrap-style top', 'base_price' => 38.99],
-                    ['name' => 'Peplum Hem Top', 'description' => 'Stylish peplum hem top', 'base_price' => 42.99],
-                    ['name' => 'Off-Shoulder Top', 'description' => 'Fashionable off-shoulder design', 'base_price' => 36.99],
-                    ['name' => 'Tunic Length Top', 'description' => 'Comfortable tunic length top', 'base_price' => 40.99],
+                    ['name' => 'Crop Jersey Top', 'description' => 'Trendy cropped jersey top', 'base_price' => 32990],
+                    ['name' => 'Wrap Style Top', 'description' => 'Flattering wrap-style top', 'base_price' => 38990],
+                    ['name' => 'Peplum Hem Top', 'description' => 'Stylish peplum hem top', 'base_price' => 42990],
+                    ['name' => 'Off-Shoulder Top', 'description' => 'Fashionable off-shoulder design', 'base_price' => 36990],
+                    ['name' => 'Tunic Length Top', 'description' => 'Comfortable tunic length top', 'base_price' => 40990],
                 ],
                 'Tank Tops' => [
-                    ['name' => 'Basic Racerback Tank', 'description' => 'Essential racerback tank top', 'base_price' => 22.99],
-                    ['name' => 'Loose Fit Tank', 'description' => 'Relaxed loose fit tank top', 'base_price' => 24.99],
-                    ['name' => 'Fitted Cami Tank', 'description' => 'Sleek fitted camisole tank', 'base_price' => 26.99],
-                    ['name' => 'Athletic Performance Tank', 'description' => 'Moisture-wicking athletic tank', 'base_price' => 28.99],
+                    ['name' => 'Basic Racerback Tank', 'description' => 'Essential racerback tank top', 'base_price' => 22990],
+                    ['name' => 'Loose Fit Tank', 'description' => 'Relaxed loose fit tank top', 'base_price' => 24990],
+                    ['name' => 'Fitted Cami Tank', 'description' => 'Sleek fitted camisole tank', 'base_price' => 26990],
+                    ['name' => 'Athletic Performance Tank', 'description' => 'Moisture-wicking athletic tank', 'base_price' => 28990],
                 ],
             ],
         ];
@@ -183,7 +183,7 @@ class ProductSeeder extends Seeder
                                 default => 1.0
                             };
 
-                            $variantPrice = round($productData['base_price'] * $sizeMultiplier, 2);
+                            $variantPrice = round($productData['base_price'] * $sizeMultiplier);
 
                             $variant = ProductVariant::create([
                                 'id' => Str::uuid(),

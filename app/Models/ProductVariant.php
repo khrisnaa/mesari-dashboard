@@ -14,6 +14,9 @@ class ProductVariant extends Model
     public $incrementing = false;
 
     protected $guarded = [];
+    protected $casts = [
+        'price' => 'float',
+    ];
 
     public function product()
     {
