@@ -19,19 +19,26 @@ class ProductController extends Controller
         $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
         $products = Product::query()
-            ->with(['category', 'variants.attributes'])
+            ->withSum('variants as total_stock', 'stock')
+            ->with(['category', 'variants' => function ($query) {
+                $query->with('attributes')->orderBy('price', 'asc');
+            }])
             ->when($request->search, function ($q, $search) {
                 $q->where('name', 'like', "%{$search}%");
             })
-            ->when(in_array($sort, ['price', 'stock']), function ($q) use ($sort, $direction) {
+            ->when($sort === 'stock', function ($q) use ($direction) {
+                $q->orderBy('total_stock', $direction);
+            })
+            ->when($sort === 'price', function ($q) use ($direction) {
                 $q->orderBy(
-                    ProductVariant::select($sort)
+                    ProductVariant::select('price')
                         ->whereColumn('product_id', 'products.id')
-                        ->orderBy($sort, $direction)
+                        ->orderBy('price', 'asc')
                         ->limit(1),
                     $direction
                 );
-            }, function ($q) use ($sort, $direction) {
+            })
+            ->when(!in_array($sort, ['price', 'stock']), function ($q) use ($sort, $direction) {
                 if ($sort) {
                     $q->orderBy($sort, $direction)->orderBy('id');
                 } else {

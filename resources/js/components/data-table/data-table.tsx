@@ -35,12 +35,14 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     pagination: PaginationDetails;
+    name?: string;
 }
 
 export function DataTable<TData extends { id: string }, TValue>({
     columns,
     data,
     pagination,
+    name,
 }: DataTableProps<TData, TValue>) {
     const { filters } = usePage().props as any as {
         filters?: {
@@ -81,7 +83,7 @@ export function DataTable<TData extends { id: string }, TValue>({
             const direction = first?.desc ? 'desc' : 'asc';
 
             router.get(
-                '/products',
+                '?',
                 {
                     ...filters,
                     sort,
@@ -120,7 +122,7 @@ export function DataTable<TData extends { id: string }, TValue>({
     return (
         <div>
             <div className="flex items-center py-4">
-                <DataTableFilter />
+                <DataTableFilter placeholder={name} />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">

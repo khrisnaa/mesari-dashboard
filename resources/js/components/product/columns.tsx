@@ -89,24 +89,21 @@ export const columns: ColumnDef<Product>[] = [
         ),
     },
     {
-        id: 'stock',
-        accessorFn: (row) => row.variants[0].stock,
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === 'asc')
-                    }
-                >
-                    Stock
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
+        accessorKey: 'total_stock',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
+            >
+                Total Stock
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => (
-            <span className="px-2.5">{row.original.variants[0].stock}</span>
+            <span className="px-4">{row.original.total_stock}</span>
         ),
     },
     {

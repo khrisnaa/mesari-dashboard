@@ -4,6 +4,7 @@ export interface Product {
     slug: string;
     description?: string;
     variants: ProductVariant[];
+    total_stock: number;
     created_at: string;
     updated_at: string;
     deleted_at?: string | null;

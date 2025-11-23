@@ -2,7 +2,10 @@ import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Input } from '../ui/input';
 
-export const DataTableFilter = () => {
+interface DataTableFilterProps {
+    placeholder?: string;
+}
+export const DataTableFilter = ({ placeholder }: DataTableFilterProps) => {
     const { filters } = usePage().props as any;
     const [search, setSearch] = useState(filters.search || '');
     const handleSearch = (value: string) => {
@@ -14,13 +17,12 @@ export const DataTableFilter = () => {
                 preserveScroll: true,
                 preserveState: true,
                 replace: true,
-                only: ['products'],
             },
         );
     };
     return (
         <Input
-            placeholder="Filter products..."
+            placeholder={`Filter ${placeholder ?? 'items'}...`}
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             className="max-w-sm"

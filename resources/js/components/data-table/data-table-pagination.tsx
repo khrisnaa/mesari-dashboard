@@ -49,7 +49,6 @@ export const DataTablePagination = <TData,>({
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
-                only: ['products'],
             },
         );
     };
@@ -122,7 +121,7 @@ export const DataTablePagination = <TData,>({
                 <div className="mr-4 flex items-center justify-center space-x-2">
                     <p className="text-sm font-medium">Rows per page</p>
                     <Select
-                        value={`${table.getState().pagination.pageSize}`}
+                        value={`${filters?.per_page}`}
                         onValueChange={(value) => {
                             const size = Number(value);
                             table.setPageSize(size);
@@ -136,7 +135,6 @@ export const DataTablePagination = <TData,>({
                                     preserveState: true,
                                     preserveScroll: true,
                                     replace: true,
-                                    only: ['products'],
                                 },
                             );
                         }}
@@ -149,7 +147,7 @@ export const DataTablePagination = <TData,>({
                             />
                         </SelectTrigger>
                         <SelectContent side="top">
-                            {[10, 20, 25, 30, 40, 50].map((pageSize) => (
+                            {[2, 10, 20, 25, 30, 40, 50].map((pageSize) => (
                                 <SelectItem
                                     key={pageSize}
                                     value={`${pageSize}`}
