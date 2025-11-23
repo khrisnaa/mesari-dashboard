@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { PaginatedResponse } from '@/types.ts/pagination';
 import { Product } from '@/types.ts/product';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -29,8 +29,10 @@ const Index = ({ products }: PageProps) => {
                     title="Products"
                     description="Track your products seamlessly, ensuring smooth organization and effortless control."
                     actions={
-                        <Button>
-                            <Plus /> Create Product
+                        <Button asChild>
+                            <Link href="/products/create">
+                                <Plus /> Create product
+                            </Link>
                         </Button>
                     }
                 />

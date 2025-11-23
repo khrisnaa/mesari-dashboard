@@ -22,7 +22,6 @@ class CategoryController extends Controller
         $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
         $categories = Category::query()
-            ->with('parent')
             ->when($request->search, function ($q, $search) {
                 $q->where('name', 'like', "%{$search}%");
             })

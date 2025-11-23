@@ -15,15 +15,9 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->text('description')->nullable();
-            $table->uuid('parent_id')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
-        });
-
-        Schema::table('categories', function (Blueprint $table) {
-            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('set null');
         });
     }
 

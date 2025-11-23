@@ -24,8 +24,6 @@ class CreateCategoryRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')->whereNull('deleted_at')],
-            'description' => ['nullable', 'string', 'max:1000'],
-            'parent_id' => ['nullable', 'uuid', 'exists:categories,id'],
         ];
     }
 
@@ -36,12 +34,6 @@ class CreateCategoryRequest extends FormRequest
             'name.string' => 'Category name must be a valid string.',
             'name.max' => 'Category name cannot exceed 255 characters.',
             'name.unique' => 'This category name is already taken.',
-
-            'description.string' => 'Description must be a valid text.',
-            'description.max' => 'Description cannot exceed 1000 characters.',
-
-            'parent_id.uuid' => 'Parent category ID must be a valid UUID.',
-            'parent_id.exists' => 'Selected parent category does not exist.',
         ];
     }
 }

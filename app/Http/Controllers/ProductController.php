@@ -60,7 +60,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('products/create');
     }
 
     /**
@@ -68,7 +68,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request);
     }
 
     /**
