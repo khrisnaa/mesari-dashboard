@@ -1,11 +1,12 @@
 import {
     Dialog,
     DialogContent,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
 import { Category } from '@/types.ts/category';
+import { Button } from '../ui/button';
 import { Label } from '../ui/label';
 
 interface DetailDialogProps {
@@ -23,25 +24,35 @@ export const DetailDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle className="mb-4">Category Details</DialogTitle>
+                </DialogHeader>
+                <div className="rounded-md border px-4 py-6">
                     <div className="flex flex-col gap-6">
-                        <div className="grid gap-2">
-                            <Label>Name</Label>
-                            <div className={cn('text-sm')}>{category.name}</div>
-                        </div>
-                        <div className="grid gap-2">
-                            <Label>Description</Label>
-                            <div className={cn('text-sm')}>
-                                {category.description}
+                        <div className="grid gap-6">
+                            <div className="grid gap-2">
+                                <Label htmlFor="name">Name</Label>
+                                <p className="rounded-md border px-3 py-2 text-sm">
+                                    {category.name}
+                                </p>
                             </div>
-                        </div>
-                        <div className="grid gap-2">
-                            <Label>Parent</Label>
-                            <div className={cn('text-sm')}>
-                                {category.parent?.name}
+                            <div className="grid gap-2">
+                                <Label htmlFor="description">Description</Label>
+                                <p className="min-h-16 rounded-md border px-3 py-2 text-sm">
+                                    {category.description}
+                                </p>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="parent_id">Parent</Label>
+                                <p className="rounded-md border px-3 py-2 text-sm">
+                                    {category.parent?.name}
+                                </p>
                             </div>
                         </div>
                     </div>
-                </DialogHeader>
+                </div>
+                <DialogFooter>
+                    <Button onClick={() => onOpenChange(false)}>Close</Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
