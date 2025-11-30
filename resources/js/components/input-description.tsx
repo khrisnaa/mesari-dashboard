@@ -15,7 +15,7 @@ export const InputDescription = ({
         <p
             data-slot="form-description"
             id={formDescriptionId}
-            className={cn('text-sm text-muted-foreground', className)}
+            className={cn('text-xs text-muted-foreground', className)}
             {...props}
         />
     );
