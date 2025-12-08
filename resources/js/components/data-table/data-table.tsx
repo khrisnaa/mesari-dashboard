@@ -26,7 +26,7 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PaginationDetails } from '@/types.ts/pagination';
+import { PaginationDetails } from '@/types/pagination';
 import { router, usePage } from '@inertiajs/react';
 import { DataTableFilter } from './data-table-filter';
 import { DataTablePagination } from './data-table-pagination';

@@ -4,8 +4,8 @@ import { columns } from '@/components/product/columns';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { PaginatedResponse } from '@/types.ts/pagination';
-import { Product } from '@/types.ts/product';
+import { PaginatedResponse } from '@/types/pagination';
+import { Product } from '@/types/product';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 

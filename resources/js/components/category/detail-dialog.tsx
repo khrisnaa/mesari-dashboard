@@ -5,7 +5,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Category } from '@/types.ts/category';
+import { Category } from '@/types/category';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';
 

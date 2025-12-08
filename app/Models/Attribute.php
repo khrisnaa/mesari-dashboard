@@ -17,7 +17,7 @@ class Attribute extends Model
 
     public function type()
     {
-        return $this->belongsTo(AttributeType::class);
+        return $this->belongsTo(AttributeType::class, 'attribute_type_id');
     }
 
     public function variants()

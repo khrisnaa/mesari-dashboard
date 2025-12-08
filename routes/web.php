@@ -29,6 +29,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
         Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
         Route::put('/{product}', [ProductController::class, 'update'])->name('update');
         Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
+        Route::post('/variant', [ProductController::class, 'storeVariant'])->name('store.variant');
     });
 
     Route::prefix('categories')->name('categories.')->group(function () {
@@ -38,6 +39,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
         Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
         Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
         Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
+        Route::post('/modal', [CategoryController::class, 'storeForModal'])->name('store.modal');
     });
 });
 

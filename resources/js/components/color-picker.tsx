@@ -329,7 +329,7 @@ export const ColorPickerDialog = ({
     const handleOnSave = () => {
         onOpenChange(false);
         if (!onColorSelect) return;
-        onColorSelect({ label: colorLabel, hex });
+        onColorSelect({ name: colorLabel, hex });
     };
 
     return (
@@ -345,19 +345,19 @@ export const ColorPickerDialog = ({
                     <section className="grid grid-cols-2 gap-6">
                         <div className="grid gap-2">
                             <Label
-                                htmlFor="color-hex"
+                                htmlFor="hex"
                                 className="text-xs text-muted-foreground"
                             >
                                 Color Hex
                             </Label>
                             <div className="relative">
                                 <Input
-                                    id="color-hex"
+                                    id="hex"
                                     value={hex}
                                     onChange={handleHexInputChange}
                                     type="text"
                                     autoComplete="off"
-                                    name="color_hex"
+                                    name="hex"
                                     placeholder="#000000"
                                     className="pl-8"
                                 />
@@ -369,18 +369,18 @@ export const ColorPickerDialog = ({
                         </div>
                         <div className="grid gap-2">
                             <Label
-                                htmlFor="color-label"
+                                htmlFor="name"
                                 className="text-xs text-muted-foreground"
                             >
                                 Color label
                             </Label>
                             <Input
-                                id="color-label"
+                                id="name"
                                 onChange={(e) => setColorLabel(e.target.value)}
                                 type="text"
                                 autoFocus
                                 autoComplete="off"
-                                name="color_label"
+                                name="name"
                                 placeholder="Black"
                             />
                         </div>

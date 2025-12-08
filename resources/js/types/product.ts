@@ -21,18 +21,26 @@ export interface ProductVariant {
     deleted_at?: string | null;
 }
 
+export interface ProductVariantAttributePivot {
+    product_variant_id: string;
+    attribute_id: string;
+}
+
+export interface AttributeType {
+    id: string;
+    name: string;
+    created_at?: string;
+    updated_at?: string;
+    deleted_at?: string | null;
+}
+
 export interface Attribute {
     id: string;
     name: string;
     hex?: string | null;
     attribute_type_id: string;
-    created_at: string;
-    updated_at: string;
+    type?: AttributeType;
+    created_at?: string;
+    updated_at?: string;
     deleted_at?: string | null;
-    pivot?: ProductVariantAttributePivot;
-}
-
-export interface ProductVariantAttributePivot {
-    product_variant_id: string;
-    attribute_id: string;
 }

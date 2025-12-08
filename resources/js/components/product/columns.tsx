@@ -1,4 +1,4 @@
-import { Product } from '@/types.ts/product';
+import { Product } from '@/types/product';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Eye, MoreHorizontal, Pencil } from 'lucide-react';
 

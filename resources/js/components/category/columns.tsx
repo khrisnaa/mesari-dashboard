@@ -6,7 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Category } from '@/types.ts/category';
+import { Category } from '@/types/category';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';

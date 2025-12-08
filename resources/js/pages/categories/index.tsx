@@ -5,8 +5,8 @@ import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Category } from '@/types.ts/category';
-import { PaginatedResponse } from '@/types.ts/pagination';
+import { Category } from '@/types/category';
+import { PaginatedResponse } from '@/types/pagination';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 

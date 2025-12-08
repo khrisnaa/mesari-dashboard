@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import categories from '@/routes/categories';
 import { BreadcrumbItem } from '@/types';
-import { Category } from '@/types.ts/category';
+import { Category } from '@/types/category';
 import { Form, Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { PaginationDetails } from '@/types.ts/pagination';
+import { PaginationDetails } from '@/types/pagination';
 import { router, usePage } from '@inertiajs/react';
 import { Table } from '@tanstack/react-table';
 import { Button } from '../ui/button';

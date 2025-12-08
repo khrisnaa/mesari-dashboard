@@ -116,4 +116,34 @@ class CategoryController extends Controller
 
         return redirect()->back()->with('success',  FlashHelper::stamp('Category deleted successfully.'));
     }
+
+
+    /**
+     * Store a newly created resource in storage without redirect to index.
+     */
+    public function storeForModal(CreateCategoryRequest $request)
+    {
+        $data = $request->validated();
+        $data['slug'] = Str::slug($data['name']);
+
+        $existing = Category::onlyTrashed()
+            ->where('name', $data['name'])
+            ->first();
+
+        if ($existing) {
+            $existing->restore();
+
+            $existing->update($data);
+
+            return redirect()
+                ->route('categories.index')
+                ->with('success', FlashHelper::stamp('Category restored successfully.'));
+        }
+
+        Category::create($data);
+
+        return redirect()
+            ->back()
+            ->with('success', FlashHelper::stamp('Category created successfully.'));
+    }
 }

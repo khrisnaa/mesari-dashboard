@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attribute;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Http\Request;
@@ -60,7 +62,27 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return Inertia::render('products/create');
+        $categories = Category::all();
+
+        $colors = Attribute::whereHas(
+            'type',
+            fn($q) =>
+            $q->where('name', 'color')
+        )->get();
+
+
+        $sizes = Attribute::whereHas(
+            'type',
+            fn($q) => $q->where('name', 'size')
+        )
+            ->orderByRaw("FIELD(name, 'xs', 's', 'm', 'l', 'xl', 'xxl')")
+            ->get();
+
+        return Inertia::render('products/create', [
+            'categories' => $categories,
+            'colors' => $colors,
+            'sizes' => $sizes,
+        ]);
     }
 
     /**
@@ -68,7 +90,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request);
+        dd($request->all());
     }
 
     /**
@@ -101,5 +123,10 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         //
+    }
+
+    public function storeVariant(Request $request)
+    {
+        dd($request->all());
     }
 }
