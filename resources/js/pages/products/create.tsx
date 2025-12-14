@@ -1,5 +1,7 @@
 import { ColorPickerDialog } from '@/components/color-picker';
 import FlashToast from '@/components/flash-toast';
+import { ImageUploader } from '@/components/product/form/image-uploader';
+import { MultiImageUploader } from '@/components/product/form/multi-image-uploader';
 import { MultiplePricesDialog } from '@/components/product/form/multiple-prices';
 import { NewCategoryDialog } from '@/components/product/form/new-category';
 import { Button } from '@/components/ui/button';
@@ -13,13 +15,17 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import {
-    CreateProductInput,
-    createProductSchema,
-} from '@/schemas/createProductSchema';
+import { CreateProductInput, createProductSchema } from '@/schemas/createProductSchema';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
 import { Attribute } from '@/types/product';
@@ -62,19 +68,11 @@ interface PageProps {
     colors: Attribute[];
 }
 
-export interface Color {
-    id?: string;
-    hex: string;
-    name: string;
-    isCustom?: boolean;
-}
-
-const mapAttributeToColor = (attr: Attribute): Color => ({
-    id: attr.id,
-    name: attr.name,
-    hex: attr.hex ?? '#000000',
-    isCustom: false,
-});
+type ImageFile = {
+    file: File;
+    type: 'thumbnail' | 'gallery';
+    preview: string;
+};
 
 const Create = ({ categories, colors, sizes }: PageProps) => {
     const form = useForm<CreateProductInput>({
@@ -83,11 +81,23 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
             name: '',
             description: '',
             variants: [],
+            images: [],
+            category_id: '',
         },
     });
 
-    const onSubmit = () => {
-        console.log('DATA => ', form.watch());
+    const onSubmit = (data: CreateProductInput) => {
+        const formData = new FormData();
+        imageFiles.forEach((img, index) => {
+            formData.append(`images[${index}][type]`, img.type);
+            formData.append(`images[${index}][file]`, img.file);
+        });
+
+        console.log('FormData contents:');
+        for (const [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+        console.log('DATA => ', data);
     };
 
     // select sizes handler
@@ -95,33 +105,29 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     const toggleSize = (size: Attribute) => {
         setSelectedSizes((prev) => {
             const exists = prev.some((s) => s.id === size.id);
-
-            if (exists) {
-                return prev.filter((s) => s.id !== size.id);
+            const next = exists ? prev.filter((s) => s.id !== size.id) : [...prev, size];
+            if (next.length > 0) {
+                setSizeError(false);
             }
-
-            return [...prev, size];
+            return next;
         });
     };
 
     // select colors handler
-    const formattedColors: Color[] = colors.map(mapAttributeToColor);
-    const [selectedColors, setSelectedColors] = useState<Color[] | []>([]);
-    const toggleColor = (color: Color) => {
+    const [selectedColors, setSelectedColors] = useState<Attribute[] | []>([]);
+    const toggleColor = (color: Attribute) => {
         setSelectedColors((prev) => {
             const exists = prev.some((c) => c.hex === color.hex);
-
             if (exists) {
                 return prev.filter((c) => c.hex !== color.hex);
             }
-
             return [...prev, color];
         });
     };
 
     const [showColorPicker, setShowColorPicker] = useState(false);
-    const [customColors, setCustomColors] = useState<Color[]>([]);
-    const handleAddColor = (color: Color) => {
+    const [customColors, setCustomColors] = useState<Attribute[]>([]);
+    const handleAddColor = (color: Attribute) => {
         setCustomColors((prev) => [...prev, color]);
     };
 
@@ -130,27 +136,36 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
 
     // base price and stock
-    const [basePrice, setBasePrice] = useState('');
-    const [baseStock, setBaseStock] = useState('');
+    const [basePrice, setBasePrice] = useState<string>('');
+    const [baseStock, setBaseStock] = useState<string>('');
+
+    // validate size
+    const [sizeError, setSizeError] = useState(false);
+    const validateSize = () => {
+        const isValid = selectedSizes.length > 0;
+        setSizeError(!isValid);
+        return isValid;
+    };
+
+    const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
             <FlashToast />
             <Form {...form}>
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6 p-4"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
                     <section className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <h3 className="text-xl font-medium">
-                                Add New Product
-                            </h3>
+                            <h3 className="text-xl font-medium">Add New Product</h3>
                         </div>
                         <div>
                             <Button
-                                type="submit"
+                                onClick={() => {
+                                    if (!validateSize()) return;
+                                    form.handleSubmit(onSubmit)();
+                                }}
+                                type="button"
                                 size="lg"
                                 className="rounded-full"
                             >
@@ -161,21 +176,17 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                     </section>
 
                     <section className="flex gap-6">
-                        {/* Left Section */}
+                        {/* Left section */}
                         <section className="w-full space-y-6">
                             <div className="space-y-4 rounded-lg border p-4">
-                                <h4 className="font-semibold">
-                                    General Information
-                                </h4>
+                                <h4 className="font-semibold">General Information</h4>
                                 <div className="grid gap-4">
                                     <FormField
                                         control={form.control}
                                         name="name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>
-                                                    Product Name
-                                                </FormLabel>
+                                                <FormLabel>Product Name</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         placeholder="White T-shirt"
@@ -192,9 +203,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                         name="description"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>
-                                                    Product Description
-                                                </FormLabel>
+                                                <FormLabel>Product Description</FormLabel>
                                                 <FormControl>
                                                     <Textarea
                                                         className="min-h-32"
@@ -217,12 +226,9 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                         <FormControl>
                                             <div className="flex gap-2">
                                                 {sizes.map((size, i) => {
-                                                    const selected =
-                                                        selectedSizes.some(
-                                                            (s) =>
-                                                                s.id ===
-                                                                size.id,
-                                                        );
+                                                    const selected = selectedSizes.some(
+                                                        (s) => s.id === size.id,
+                                                    );
 
                                                     return (
                                                         <Button
@@ -243,7 +249,11 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                                 })}
                                             </div>
                                         </FormControl>
-                                        <FormMessage />
+                                        {sizeError && (
+                                            <FormMessage>
+                                                At least one size is required
+                                            </FormMessage>
+                                        )}
                                     </FormItem>
 
                                     <FormItem>
@@ -253,47 +263,43 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                         </FormDescription>
                                         <FormControl>
                                             <div className="flex flex-wrap gap-2">
-                                                {[
-                                                    ...formattedColors,
-                                                    ...customColors,
-                                                ].map((color, i) => {
-                                                    const selected =
-                                                        selectedColors.some(
-                                                            (c) =>
-                                                                c.hex ==
-                                                                color.hex,
-                                                        );
+                                                {[...colors, ...customColors].map(
+                                                    (color, i) => {
+                                                        const selected =
+                                                            selectedColors.some(
+                                                                (c) => c.hex == color.hex,
+                                                            );
 
-                                                    return (
-                                                        <Button
-                                                            key={i}
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className={cn(
-                                                                'group relative inset-0 overflow-hidden rounded-full border hover:border-2 hover:border-neutral-300',
-                                                                selected &&
-                                                                    'border-2 border-primary hover:border-primary',
-                                                            )}
-                                                            onClick={() =>
-                                                                toggleColor(
-                                                                    color,
-                                                                )
-                                                            }
-                                                        >
-                                                            <div
+                                                        return (
+                                                            <Button
+                                                                key={i}
+                                                                variant="ghost"
+                                                                size="icon"
                                                                 className={cn(
-                                                                    'h-full w-full rounded-full transition-transform duration-200 group-hover:scale-[85%]',
+                                                                    'group relative inset-0 overflow-hidden rounded-full border hover:border-2 hover:border-neutral-300',
                                                                     selected &&
-                                                                        'scale-[85%]',
+                                                                        'border-2 border-primary hover:border-primary',
                                                                 )}
-                                                                style={{
-                                                                    backgroundColor:
-                                                                        color.hex,
-                                                                }}
-                                                            ></div>
-                                                        </Button>
-                                                    );
-                                                })}
+                                                                onClick={() =>
+                                                                    toggleColor(color)
+                                                                }
+                                                            >
+                                                                <div
+                                                                    className={cn(
+                                                                        'h-full w-full rounded-full transition-transform duration-200 group-hover:scale-[85%]',
+                                                                        selected &&
+                                                                            'scale-[85%]',
+                                                                    )}
+                                                                    style={{
+                                                                        backgroundColor:
+                                                                            color.hex ??
+                                                                            '#fff',
+                                                                    }}
+                                                                ></div>
+                                                            </Button>
+                                                        );
+                                                    },
+                                                )}
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -312,31 +318,22 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                             </div>
 
                             <div className="space-y-4 rounded-lg border p-4">
-                                <h4 className="font-semibold">
-                                    Pricing and Stock
-                                </h4>
-
+                                <h4 className="font-semibold">Pricing and Stock</h4>
                                 <div className="grid gap-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormItem>
-                                            <FormLabel>Base Pricing</FormLabel>
+                                            <FormLabel>Base Price</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="Rp 0"
                                                     inputMode="numeric"
-                                                    value={
-                                                        basePrice
-                                                            ? formatNumber(
-                                                                  basePrice,
-                                                              )
-                                                            : ''
-                                                    }
+                                                    value={formatNumber(basePrice)}
                                                     onChange={(e) => {
-                                                        const raw = parseNumber(
+                                                        const numericValue = parseNumber(
                                                             e.target.value,
                                                         );
                                                         setBasePrice(
-                                                            raw.toString(),
+                                                            numericValue.toString(),
                                                         );
                                                     }}
                                                 />
@@ -350,19 +347,13 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                                 <Input
                                                     placeholder="0"
                                                     inputMode="numeric"
-                                                    value={
-                                                        baseStock
-                                                            ? formatNumber(
-                                                                  baseStock,
-                                                              )
-                                                            : ''
-                                                    }
+                                                    value={formatNumber(baseStock)}
                                                     onChange={(e) => {
-                                                        const raw = parseNumber(
+                                                        const numericValue = parseNumber(
                                                             e.target.value,
                                                         );
                                                         setBaseStock(
-                                                            raw.toString(),
+                                                            numericValue.toString(),
                                                         );
                                                     }}
                                                 />
@@ -421,7 +412,9 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                     <div className="flex justify-end">
                                         <Button
                                             onClick={() =>
-                                                setShowPricesDialog(true)
+                                                selectedSizes.length == 0
+                                                    ? setSizeError(true)
+                                                    : setShowPricesDialog(true)
                                             }
                                             size="lg"
                                             className="w-fit rounded-full"
@@ -434,51 +427,130 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                         </section>
 
                         {/* Right Section */}
-                        {/* <section className="w-full max-w-sm space-y-6">
+                        <section className="w-full max-w-sm space-y-6">
                             <div className="space-y-4 rounded-lg border p-4">
-                                <h4 className="font-semibold">
-                                    Product Images
-                                </h4>
+                                <h4 className="font-semibold">Product Images</h4>
                                 <div className="flex flex-col gap-4">
                                     <div className="flex justify-center bg-gray-100">
                                         <ImageUploader
-                                            setValue={setData}
-                                            name="thumbnail"
-                                            watch={}
+                                            onChange={(file) => {
+                                                if (file) {
+                                                    // Tambah / ganti thumbnail
+                                                    const preview =
+                                                        URL.createObjectURL(file);
+                                                    setImageFiles((prev) => [
+                                                        ...prev.filter(
+                                                            (i) => i.type !== 'thumbnail',
+                                                        ), // hapus thumbnail lama
+                                                        {
+                                                            type: 'thumbnail',
+                                                            file,
+                                                            preview,
+                                                        },
+                                                    ]);
+
+                                                    form.setValue(
+                                                        'images',
+                                                        [
+                                                            ...(
+                                                                form.getValues(
+                                                                    'images',
+                                                                ) ?? []
+                                                            ).filter(
+                                                                (i) =>
+                                                                    i.type !==
+                                                                    'thumbnail',
+                                                            ),
+                                                            {
+                                                                type: 'thumbnail' as const,
+                                                            },
+                                                        ],
+                                                        { shouldValidate: true },
+                                                    );
+                                                } else {
+                                                    // User hapus thumbnail
+                                                    setImageFiles((prev) =>
+                                                        prev.filter(
+                                                            (i) => i.type !== 'thumbnail',
+                                                        ),
+                                                    );
+
+                                                    form.setValue(
+                                                        'images',
+                                                        (
+                                                            form.getValues('images') ?? []
+                                                        ).filter(
+                                                            (i) => i.type !== 'thumbnail',
+                                                        ),
+                                                        { shouldValidate: true },
+                                                    );
+                                                }
+                                            }}
                                         />
                                     </div>
-                                    <MultiImageUploader />
+                                    <MultiImageUploader
+                                        onChange={(files) => {
+                                            setImageFiles((prev) => [
+                                                ...prev,
+                                                ...files.map((file) => ({
+                                                    type: 'gallery' as const,
+                                                    file,
+                                                    preview: URL.createObjectURL(file),
+                                                })),
+                                            ]);
+
+                                            form.setValue(
+                                                'images',
+                                                [
+                                                    ...(form.getValues('images') || []),
+                                                    ...files.map(() => ({
+                                                        type: 'gallery' as const,
+                                                    })),
+                                                ],
+                                                { shouldValidate: true },
+                                            );
+                                        }}
+                                    />
                                 </div>
                             </div>
 
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h4 className="font-semibold">Category</h4>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="stock">
-                                        Product category
-                                    </Label>
-                                    <Select>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select product category" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {categories.map((category, i) => (
-                                                <SelectItem
-                                                    key={i}
-                                                    value={category.id}
+                                <FormField
+                                    control={form.control}
+                                    name="category_id"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Product Category</FormLabel>
+                                            <FormControl>
+                                                <Select
+                                                    value={field.value}
+                                                    onValueChange={field.onChange}
                                                 >
-                                                    {category.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message="" className="mt-2" />
-                                </div>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select product category" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {categories.map((category, i) => (
+                                                            <SelectItem
+                                                                key={i}
+                                                                value={category.id}
+                                                            >
+                                                                {category.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
                                 <div className="flex justify-end">
                                     <Button
                                         onClick={() =>
-                                            setShowNewCategoryDialog(true)
+                                            !sizeError && setShowNewCategoryDialog(true)
                                         }
                                         type="button"
                                         size="lg"
@@ -488,7 +560,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                     </Button>
                                 </div>
                             </div>
-                        </section> */}
+                        </section>
                     </section>
                 </form>
                 {/* Dialog Components */}
@@ -510,6 +582,8 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                         });
                         setShowPricesDialog(false);
                     }}
+                    basePriceProp={basePrice}
+                    baseStockProp={baseStock}
                 />
 
                 <NewCategoryDialog

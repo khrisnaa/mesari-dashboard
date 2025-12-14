@@ -2,70 +2,46 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Plus, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import {
-    FieldValues,
-    Path,
-    UseFormSetValue,
-    UseFormWatch,
-} from 'react-hook-form';
 
-interface ImageUploaderProps<T extends FieldValues> {
-    name: Path<T>;
-    setValue: UseFormSetValue<T>;
-    watch: UseFormWatch<T>;
+interface ImageUploaderProps {
+    onChange: (file: File | null) => void;
 }
 
-export const ImageUploader = <T extends FieldValues>({
-    name,
-    setValue,
-    watch,
-}: ImageUploaderProps<T>) => {
-    // State untuk menyimpan URL preview (string atau null)
+export const ImageUploader = ({ onChange }: ImageUploaderProps) => {
     const [preview, setPreview] = useState<string | null>(null);
-
-    // Ref untuk elemen input file HTML
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Fungsi untuk memicu klik pada input file yang tersembunyi
     const handleTriggerUpload = () => {
         fileInputRef.current?.click();
     };
 
-    // Fungsi saat user memilih file
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            // Validasi sederhana (opsional: cek tipe file)
-            if (!file.type.startsWith('image/')) {
-                alert('Please upload image only.');
-                return;
-            }
+        if (!file) return;
 
-            // Buat URL sementara untuk preview
-            const objectUrl = URL.createObjectURL(file);
-            setPreview(objectUrl);
-
-            // Set value ke react hook form
-            setValue(name, [file] as any);
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload image only.');
+            return;
         }
+
+        const objectUrl = URL.createObjectURL(file);
+        setPreview(objectUrl);
+        onChange(file);
     };
 
-    // Fungsi untuk menghapus gambar
     const handleRemoveImage = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.stopPropagation(); // Mencegah trigger upload saat klik tombol hapus
+        e.stopPropagation();
         setPreview(null);
-        // Reset value input agar user bisa memilih file yang sama jika diinginkan
+        onChange(null);
+
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
     };
 
-    // Cleanup object URL untuk mencegah memory leak saat komponen unmount
     useEffect(() => {
         return () => {
-            if (preview) {
-                URL.revokeObjectURL(preview);
-            }
+            if (preview) URL.revokeObjectURL(preview);
         };
     }, [preview]);
 
@@ -119,20 +95,14 @@ export const ImageUploader = <T extends FieldValues>({
             ) : (
                 // --- TAMPILAN INPUT (DASHED BOX) ---
                 <div className="flex flex-col items-center justify-center gap-2 text-center text-gray-500">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-full"
-                    >
+                    <Button variant="outline" size="icon" className="rounded-full">
                         <Plus />
                     </Button>
                     <div className="space-y-1">
                         <p className="text-sm font-semibold text-gray-700">
                             Click to upload
                         </p>
-                        <p className="text-xs text-gray-500">
-                            JPEG, PNG, JPG or WEBP
-                        </p>
+                        <p className="text-xs text-gray-500">JPEG, PNG, JPG or WEBP</p>
                     </div>
                 </div>
             )}

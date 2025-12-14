@@ -35,7 +35,7 @@ export interface AttributeType {
 }
 
 export interface Attribute {
-    id: string;
+    id?: string;
     name: string;
     hex?: string | null;
     attribute_type_id: string;

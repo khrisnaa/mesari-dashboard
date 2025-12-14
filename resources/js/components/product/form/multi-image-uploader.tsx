@@ -3,35 +3,36 @@ import { cn } from '@/lib/utils';
 import { GripVertical, Plus, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
-interface ImageFile {
+
+type ImagePreview = {
     id: string;
-    url: string;
-    file: File;
+    preview: string;
+};
+
+interface MultiImageUploaderProps {
+    onChange: (files: File[]) => void;
 }
 
-export const MultiImageUploader = () => {
-    const [images, setImages] = useState<ImageFile[]>([]);
+export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
+    const [images, setImages] = useState<ImagePreview[]>([]);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const dragItem = useRef<number | null>(null); // Menyimpan index item yang sedang di-drag (sorting)
-    const dragOverItem = useRef<number | null>(null); // Menyimpan index target (sorting)
-
-    // --- File Handling Logic ---
+    const dragItem = useRef<number | null>(null);
+    const dragOverItem = useRef<number | null>(null);
 
     const processFiles = (fileList: File[]) => {
-        const validFiles = fileList.filter((file) =>
-            file.type.startsWith('image/'),
-        );
+        const validFiles = fileList.filter((file) => file.type.startsWith('image/'));
 
-        if (validFiles.length > 0) {
-            const newImages: ImageFile[] = validFiles.map((file) => ({
-                id: uuid(),
-                url: URL.createObjectURL(file),
-                file: file,
-            }));
-            setImages((prev) => [...prev, ...newImages]);
-        }
+        if (!validFiles.length) return;
+
+        const previews: ImagePreview[] = validFiles.map((file) => ({
+            id: uuid(),
+            preview: URL.createObjectURL(file),
+        }));
+
+        setImages((prev) => [...prev, ...previews]);
+        onChange(validFiles);
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,26 +72,18 @@ export const MultiImageUploader = () => {
         }
     };
 
-    // --- Drag & Drop Sorting Logic ---
-
     const handleSortStart = (e: React.DragEvent, position: number) => {
         dragItem.current = position;
-        // Set opacity item yang di-drag sedikit transparan (opsional visual effect)
-        // e.dataTransfer.effectAllowed = "move";
     };
 
     const handleSortEnter = (e: React.DragEvent, position: number) => {
-        // Logic: Saat item yang didrag melewati item lain, tukar posisi array
         if (dragItem.current !== null && dragItem.current !== position) {
             const copyListItems = [...images];
             const dragItemContent = copyListItems[dragItem.current];
 
-            // Hapus item dari posisi lama
             copyListItems.splice(dragItem.current, 1);
-            // Masukkan ke posisi baru
             copyListItems.splice(position, 0, dragItemContent);
 
-            // Update ref dan state
             dragItem.current = position;
             setImages(copyListItems);
         }
@@ -101,22 +94,19 @@ export const MultiImageUploader = () => {
         dragOverItem.current = null;
     };
 
-    // --- Utils ---
-
-    const removeImage = (idToRemove: string) => {
+    const removeImage = (id: string) => {
         setImages((prev) => {
-            const filtered = prev.filter((img) => img.id !== idToRemove);
-            const removedItem = prev.find((img) => img.id === idToRemove);
-            if (removedItem) URL.revokeObjectURL(removedItem.url);
-            return filtered;
+            const removed = prev.find((img) => img.id === id);
+            if (removed) URL.revokeObjectURL(removed.preview);
+            return prev.filter((img) => img.id !== id);
         });
     };
 
     useEffect(() => {
         return () => {
-            images.forEach((img) => URL.revokeObjectURL(img.url));
+            images.forEach((img) => URL.revokeObjectURL(img.preview));
         };
-    }, []);
+    }, [images]);
 
     return (
         <div
@@ -156,7 +146,7 @@ export const MultiImageUploader = () => {
                         >
                             <div className="relative aspect-square h-18 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md">
                                 <img
-                                    src={image.url}
+                                    src={image.preview}
                                     alt={`Preview ${index}`}
                                     className="pointer-events-none h-full w-full object-cover" // pointer-events-none agar gambar tidak di-drag sebagai file terpisah
                                 />
@@ -191,14 +181,12 @@ export const MultiImageUploader = () => {
 
                     {images.length <= 3 && (
                         <>
-                            {Array.from({ length: 3 - images.length }).map(
-                                (_, i) => (
-                                    <div
-                                        key={i}
-                                        className="aspect-square h-18 rounded-md bg-gray-100"
-                                    />
-                                ),
-                            )}
+                            {Array.from({ length: 3 - images.length }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="aspect-square h-18 rounded-md bg-gray-100"
+                                />
+                            ))}
                         </>
                     )}
                 </div>
@@ -208,11 +196,7 @@ export const MultiImageUploader = () => {
                         className="flex aspect-square h-18 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-gray-400 hover:bg-gray-100"
                         onClick={() => fileInputRef.current?.click()}
                     >
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="rounded-full"
-                        >
+                        <Button variant="outline" size="icon" className="rounded-full">
                             <Plus />
                         </Button>
                     </div>
