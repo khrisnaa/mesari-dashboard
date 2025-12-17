@@ -21,7 +21,6 @@ const VariantSchema = z.object({
 
 const ImageSchema = z.object({
     type: z.enum(['thumbnail', 'gallery']),
-    path: z.string().optional(),
 });
 
 export const createProductSchema = z.object({

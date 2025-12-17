@@ -1,20 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ImageFile } from '@/pages/products/create';
 import { GripVertical, Plus, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
-type ImagePreview = {
-    id: string;
-    preview: string;
-};
-
-interface MultiImageUploaderProps {
-    onChange: (files: File[]) => void;
+interface GalleryUploaderProps {
+    onChange: (files: ImageFile[]) => void;
+    onRemove: (tempId: string) => void;
 }
 
-export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
-    const [images, setImages] = useState<ImagePreview[]>([]);
+export const GalleryUploader = ({ onChange, onRemove }: GalleryUploaderProps) => {
+    const [images, setImages] = useState<ImageFile[]>([]);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,13 +23,15 @@ export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
 
         if (!validFiles.length) return;
 
-        const previews: ImagePreview[] = validFiles.map((file) => ({
-            id: uuid(),
+        const formattedFiles: ImageFile[] = validFiles.map((file) => ({
+            tempId: uuid(),
+            type: 'gallery',
+            file: file,
             preview: URL.createObjectURL(file),
         }));
 
-        setImages((prev) => [...prev, ...previews]);
-        onChange(validFiles);
+        setImages((prev) => [...prev, ...formattedFiles]);
+        onChange(formattedFiles);
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,11 +41,8 @@ export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    // --- Drag & Drop Upload Logic (Dropzone) ---
-
     const handleContainerDragOver = (e: React.DragEvent) => {
         e.preventDefault();
-        // Hanya aktifkan visual dropzone jika user drag file eksternal, bukan item internal
         if (dragItem.current === null) {
             setIsDraggingOver(true);
         }
@@ -60,13 +56,7 @@ export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
     const handleContainerDrop = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDraggingOver(false);
-
-        // Cek apakah ini drop file dari OS (bukan sorting internal)
-        if (
-            dragItem.current === null &&
-            e.dataTransfer.files &&
-            e.dataTransfer.files.length > 0
-        ) {
+        if (dragItem.current === null && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             processFiles(Array.from(e.dataTransfer.files));
             e.dataTransfer.clearData();
         }
@@ -94,12 +84,14 @@ export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
         dragOverItem.current = null;
     };
 
-    const removeImage = (id: string) => {
+    const handleRemoveImage = (tempId: string) => {
         setImages((prev) => {
-            const removed = prev.find((img) => img.id === id);
+            const removed = prev.find((img) => img.tempId === tempId);
             if (removed) URL.revokeObjectURL(removed.preview);
-            return prev.filter((img) => img.id !== id);
+            return prev.filter((img) => img.tempId !== tempId);
         });
+
+        onRemove(tempId);
     };
 
     useEffect(() => {
@@ -129,12 +121,10 @@ export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
             />
 
             <div className="flex justify-between gap-4">
-                {/* Scrollable Container */}
                 <div className="custom-scrollbar flex gap-4 overflow-x-auto pb-2">
-                    {/* Draggable Image Items */}
                     {images.map((image, index) => (
                         <div
-                            key={image.id}
+                            key={image.preview}
                             draggable
                             onDragStart={(e) => handleSortStart(e, index)}
                             onDragEnter={(e) => handleSortEnter(e, index)}
@@ -148,22 +138,19 @@ export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
                                 <img
                                     src={image.preview}
                                     alt={`Preview ${index}`}
-                                    className="pointer-events-none h-full w-full object-cover" // pointer-events-none agar gambar tidak di-drag sebagai file terpisah
+                                    className="pointer-events-none h-full w-full object-cover"
                                 />
 
-                                {/* Overlay saat Hover */}
                                 <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
 
-                                {/* Indikator Grip (Opsional, untuk visual cue draggable) */}
                                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-70">
                                     <GripVertical className="h-4 w-4 rotate-90 text-white drop-shadow-md" />
                                 </div>
 
-                                {/* Tombol Hapus */}
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        removeImage(image.id);
+                                        handleRemoveImage(image.tempId);
                                     }}
                                     className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 hover:bg-red-600"
                                     type="button"
@@ -171,7 +158,6 @@ export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
                                     <X className="h-3 w-3" />
                                 </button>
 
-                                {/* Badge Urutan */}
                                 <div className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/50 text-[10px] text-white backdrop-blur-sm">
                                     {index + 1}
                                 </div>
@@ -190,7 +176,7 @@ export const MultiImageUploader = ({ onChange }: MultiImageUploaderProps) => {
                         </>
                     )}
                 </div>
-                {/* Add Button (Selalu di akhir list) */}
+
                 <div className="flex-shrink-0">
                     <div
                         className="flex aspect-square h-18 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-gray-400 hover:bg-gray-100"

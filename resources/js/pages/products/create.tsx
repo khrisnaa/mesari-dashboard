@@ -1,9 +1,10 @@
 import { ColorPickerDialog } from '@/components/color-picker';
 import FlashToast from '@/components/flash-toast';
-import { ImageUploader } from '@/components/product/form/image-uploader';
-import { MultiImageUploader } from '@/components/product/form/multi-image-uploader';
+import { GalleryUploader } from '@/components/product/form/gallery-uploader';
+
 import { MultiplePricesDialog } from '@/components/product/form/multiple-prices';
 import { NewCategoryDialog } from '@/components/product/form/new-category';
+import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
 import { Button } from '@/components/ui/button';
 import {
     Form,
@@ -31,7 +32,7 @@ import { Category } from '@/types/category';
 import { Attribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -68,11 +69,12 @@ interface PageProps {
     colors: Attribute[];
 }
 
-type ImageFile = {
+export interface ImageFile {
+    tempId: string;
     file: File;
     type: 'thumbnail' | 'gallery';
     preview: string;
-};
+}
 
 const Create = ({ categories, colors, sizes }: PageProps) => {
     const form = useForm<CreateProductInput>({
@@ -88,16 +90,23 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
     const onSubmit = (data: CreateProductInput) => {
         const formData = new FormData();
+
+        formData.append('name', data.name);
+        formData.append('variants', JSON.stringify(data.variants));
+        formData.append('category_id', data.category_id);
+
+        if (data.description) {
+            formData.append('description', data.description);
+        }
+
         imageFiles.forEach((img, index) => {
             formData.append(`images[${index}][type]`, img.type);
             formData.append(`images[${index}][file]`, img.file);
         });
 
-        console.log('FormData contents:');
-        for (const [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
-        console.log('DATA => ', data);
+        router.post('/products', formData, {
+            forceFormData: true,
+        });
     };
 
     // select sizes handler
@@ -106,9 +115,11 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
         setSelectedSizes((prev) => {
             const exists = prev.some((s) => s.id === size.id);
             const next = exists ? prev.filter((s) => s.id !== size.id) : [...prev, size];
+
             if (next.length > 0) {
                 setSizeError(false);
             }
+
             return next;
         });
     };
@@ -118,9 +129,11 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     const toggleColor = (color: Attribute) => {
         setSelectedColors((prev) => {
             const exists = prev.some((c) => c.hex === color.hex);
+
             if (exists) {
                 return prev.filter((c) => c.hex !== color.hex);
             }
+
             return [...prev, color];
         });
     };
@@ -141,13 +154,56 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
     // validate size
     const [sizeError, setSizeError] = useState(false);
+
     const validateSize = () => {
         const isValid = selectedSizes.length > 0;
+
         setSizeError(!isValid);
         return isValid;
     };
 
+    // images handler
     const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
+
+    const handleThumbnailChange = (file: ImageFile) => {
+        setImageFiles((prev) => [...prev.filter((i) => i.type !== 'thumbnail'), file]);
+
+        form.setValue(
+            'images',
+            [
+                ...(form.getValues('images') ?? []).filter((i) => i.type != 'thumbnail'),
+                {
+                    type: 'thumbnail' as const,
+                },
+            ],
+            { shouldValidate: true, shouldDirty: true, shouldTouch: true },
+        );
+    };
+
+    const handleGalleryChange = (files: ImageFile[]) => {
+        setImageFiles((prev) => [...prev, ...files]);
+
+        form.setValue(
+            'images',
+            [
+                ...(form.getValues('images') || []),
+                ...files.map(() => ({
+                    type: 'gallery' as const,
+                })),
+            ],
+            { shouldValidate: true, shouldDirty: true, shouldTouch: true },
+        );
+    };
+
+    const handleRemoveImage = (tempId: string) => {
+        setImageFiles((prev) => prev.filter((img) => img.tempId !== tempId));
+
+        const currentImages = form.getValues('images') || [];
+
+        form.setValue('images', currentImages.slice(0, currentImages.length - 1), {
+            shouldValidate: true,
+        });
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -188,10 +244,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                             <FormItem>
                                                 <FormLabel>Product Name</FormLabel>
                                                 <FormControl>
-                                                    <Input
-                                                        placeholder="White T-shirt"
-                                                        {...field}
-                                                    />
+                                                    <Input placeholder="White T-shirt" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -220,9 +273,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                 <div className="grid grid-cols-2 gap-6">
                                     <FormItem>
                                         <FormLabel>Size</FormLabel>
-                                        <FormDescription>
-                                            Pick Available Size
-                                        </FormDescription>
+                                        <FormDescription>Pick Available Size</FormDescription>
                                         <FormControl>
                                             <div className="flex gap-2">
                                                 {sizes.map((size, i) => {
@@ -239,9 +290,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                                                 selected &&
                                                                     'bg-primary text-secondary hover:bg-primary/90 hover:text-secondary',
                                                             )}
-                                                            onClick={() =>
-                                                                toggleSize(size)
-                                                            }
+                                                            onClick={() => toggleSize(size)}
                                                         >
                                                             {size.name}
                                                         </Button>
@@ -250,63 +299,50 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                             </div>
                                         </FormControl>
                                         {sizeError && (
-                                            <FormMessage>
-                                                At least one size is required
-                                            </FormMessage>
+                                            <FormMessage>At least one size is required</FormMessage>
                                         )}
                                     </FormItem>
 
                                     <FormItem>
                                         <FormLabel>Color</FormLabel>
-                                        <FormDescription>
-                                            Pick Color Variant
-                                        </FormDescription>
+                                        <FormDescription>Pick Color Variant</FormDescription>
                                         <FormControl>
                                             <div className="flex flex-wrap gap-2">
-                                                {[...colors, ...customColors].map(
-                                                    (color, i) => {
-                                                        const selected =
-                                                            selectedColors.some(
-                                                                (c) => c.hex == color.hex,
-                                                            );
+                                                {[...colors, ...customColors].map((color, i) => {
+                                                    const selected = selectedColors.some(
+                                                        (c) => c.hex == color.hex,
+                                                    );
 
-                                                        return (
-                                                            <Button
-                                                                key={i}
-                                                                variant="ghost"
-                                                                size="icon"
+                                                    return (
+                                                        <Button
+                                                            key={i}
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className={cn(
+                                                                'group relative inset-0 overflow-hidden rounded-full border hover:border-2 hover:border-neutral-300',
+                                                                selected &&
+                                                                    'border-2 border-primary hover:border-primary',
+                                                            )}
+                                                            onClick={() => toggleColor(color)}
+                                                        >
+                                                            <div
                                                                 className={cn(
-                                                                    'group relative inset-0 overflow-hidden rounded-full border hover:border-2 hover:border-neutral-300',
-                                                                    selected &&
-                                                                        'border-2 border-primary hover:border-primary',
+                                                                    'h-full w-full rounded-full transition-transform duration-200 group-hover:scale-[85%]',
+                                                                    selected && 'scale-[85%]',
                                                                 )}
-                                                                onClick={() =>
-                                                                    toggleColor(color)
-                                                                }
-                                                            >
-                                                                <div
-                                                                    className={cn(
-                                                                        'h-full w-full rounded-full transition-transform duration-200 group-hover:scale-[85%]',
-                                                                        selected &&
-                                                                            'scale-[85%]',
-                                                                    )}
-                                                                    style={{
-                                                                        backgroundColor:
-                                                                            color.hex ??
-                                                                            '#fff',
-                                                                    }}
-                                                                ></div>
-                                                            </Button>
-                                                        );
-                                                    },
-                                                )}
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        color.hex ?? '#fff',
+                                                                }}
+                                                            ></div>
+                                                        </Button>
+                                                    );
+                                                })}
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full border-2"
-                                                    onClick={() =>
-                                                        setShowColorPicker(true)
-                                                    }
+                                                    onClick={() => setShowColorPicker(true)}
                                                 >
                                                     <Plus />
                                                 </Button>
@@ -332,9 +368,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                                         const numericValue = parseNumber(
                                                             e.target.value,
                                                         );
-                                                        setBasePrice(
-                                                            numericValue.toString(),
-                                                        );
+                                                        setBasePrice(numericValue.toString());
                                                     }}
                                                 />
                                             </FormControl>
@@ -352,9 +386,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                                         const numericValue = parseNumber(
                                                             e.target.value,
                                                         );
-                                                        setBaseStock(
-                                                            numericValue.toString(),
-                                                        );
+                                                        setBaseStock(numericValue.toString());
                                                     }}
                                                 />
                                             </FormControl>
@@ -432,84 +464,14 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                 <h4 className="font-semibold">Product Images</h4>
                                 <div className="flex flex-col gap-4">
                                     <div className="flex justify-center bg-gray-100">
-                                        <ImageUploader
-                                            onChange={(file) => {
-                                                if (file) {
-                                                    // Tambah / ganti thumbnail
-                                                    const preview =
-                                                        URL.createObjectURL(file);
-                                                    setImageFiles((prev) => [
-                                                        ...prev.filter(
-                                                            (i) => i.type !== 'thumbnail',
-                                                        ), // hapus thumbnail lama
-                                                        {
-                                                            type: 'thumbnail',
-                                                            file,
-                                                            preview,
-                                                        },
-                                                    ]);
-
-                                                    form.setValue(
-                                                        'images',
-                                                        [
-                                                            ...(
-                                                                form.getValues(
-                                                                    'images',
-                                                                ) ?? []
-                                                            ).filter(
-                                                                (i) =>
-                                                                    i.type !==
-                                                                    'thumbnail',
-                                                            ),
-                                                            {
-                                                                type: 'thumbnail' as const,
-                                                            },
-                                                        ],
-                                                        { shouldValidate: true },
-                                                    );
-                                                } else {
-                                                    // User hapus thumbnail
-                                                    setImageFiles((prev) =>
-                                                        prev.filter(
-                                                            (i) => i.type !== 'thumbnail',
-                                                        ),
-                                                    );
-
-                                                    form.setValue(
-                                                        'images',
-                                                        (
-                                                            form.getValues('images') ?? []
-                                                        ).filter(
-                                                            (i) => i.type !== 'thumbnail',
-                                                        ),
-                                                        { shouldValidate: true },
-                                                    );
-                                                }
-                                            }}
+                                        <ThumbnailUploader
+                                            onChange={(file) => handleThumbnailChange(file)}
+                                            onRemove={handleRemoveImage}
                                         />
                                     </div>
-                                    <MultiImageUploader
-                                        onChange={(files) => {
-                                            setImageFiles((prev) => [
-                                                ...prev,
-                                                ...files.map((file) => ({
-                                                    type: 'gallery' as const,
-                                                    file,
-                                                    preview: URL.createObjectURL(file),
-                                                })),
-                                            ]);
-
-                                            form.setValue(
-                                                'images',
-                                                [
-                                                    ...(form.getValues('images') || []),
-                                                    ...files.map(() => ({
-                                                        type: 'gallery' as const,
-                                                    })),
-                                                ],
-                                                { shouldValidate: true },
-                                            );
-                                        }}
+                                    <GalleryUploader
+                                        onChange={(files) => handleGalleryChange(files)}
+                                        onRemove={handleRemoveImage}
                                     />
                                 </div>
                             </div>
@@ -532,10 +494,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {categories.map((category, i) => (
-                                                            <SelectItem
-                                                                key={i}
-                                                                value={category.id}
-                                                            >
+                                                            <SelectItem key={i} value={category.id}>
                                                                 {category.name}
                                                             </SelectItem>
                                                         ))}
@@ -549,9 +508,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
                                 <div className="flex justify-end">
                                     <Button
-                                        onClick={() =>
-                                            !sizeError && setShowNewCategoryDialog(true)
-                                        }
+                                        onClick={() => !sizeError && setShowNewCategoryDialog(true)}
                                         type="button"
                                         size="lg"
                                         className="rounded-full"
