@@ -15,10 +15,6 @@ class Attribute extends Model
 
     protected $guarded = [];
 
-    public function type()
-    {
-        return $this->belongsTo(AttributeType::class, 'attribute_type_id');
-    }
 
     public function variants()
     {

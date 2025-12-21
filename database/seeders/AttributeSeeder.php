@@ -12,43 +12,25 @@ class AttributeSeeder extends Seeder
     public function run(): void
     {
 
-        $sizeType = AttributeType::firstOrCreate(
-            ['name' => 'size'],
-            ['id' => Str::uuid()]
-        );
 
-        $colorType = AttributeType::firstOrCreate(
-            ['name' => 'color'],
-            ['id' => Str::uuid()]
-        );
-
-
-        $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+        $sizes = config('product.sizes');
 
         foreach ($sizes as $size) {
             Attribute::firstOrCreate([
-                'name' => $size,
-                'attribute_type_id' => $sizeType->id,
+                'name' => $size['name'],
+                'type' => 'size',
             ], [
                 'id' => Str::uuid(),
                 'hex' => null,
             ]);
         }
 
-        $colors = [
-            ['name' => 'Black',  'hex' => '#000000'],
-            ['name' => 'White',  'hex' => '#FFFFFF'],
-            ['name' => 'Red',    'hex' => '#FF0000'],
-            ['name' => 'Blue',   'hex' => '#0000FF'],
-            ['name' => 'Green',  'hex' => '#008000'],
-            ['name' => 'Yellow', 'hex' => '#FFFF00'],
-            ['name' => 'Gray',   'hex' => '#808080'],
-        ];
+        $colors = config('product.colors');
 
         foreach ($colors as $color) {
             Attribute::firstOrCreate([
                 'name' => $color['name'],
-                'attribute_type_id' => $colorType->id,
+                'type' => 'color',
             ], [
                 'id' => Str::uuid(),
                 'hex' => $color['hex'],

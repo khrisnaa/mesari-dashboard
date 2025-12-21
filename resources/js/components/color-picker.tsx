@@ -117,16 +117,9 @@ const SaturationArea: React.FC<SaturationAreaProps> = ({ hsv, onChange }) => {
     const [isDragging, setIsDragging] = useState(false);
 
     const handleMove = useCallback(
-        (
-            event:
-                | MouseEvent
-                | TouchEvent
-                | React.MouseEvent
-                | React.TouchEvent,
-        ) => {
+        (event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent) => {
             if (!containerRef.current) return;
-            const { left, top, width, height } =
-                containerRef.current.getBoundingClientRect();
+            const { left, top, width, height } = containerRef.current.getBoundingClientRect();
 
             let clientX: number, clientY: number;
 
@@ -221,16 +214,9 @@ const HueSlider: React.FC<HueSliderProps> = ({ hsv, onChange }) => {
     const [isDragging, setIsDragging] = useState(false);
 
     const handleMove = useCallback(
-        (
-            event:
-                | MouseEvent
-                | TouchEvent
-                | React.MouseEvent
-                | React.TouchEvent,
-        ) => {
+        (event: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent) => {
             if (!containerRef.current) return;
-            const { left, width } =
-                containerRef.current.getBoundingClientRect();
+            const { left, width } = containerRef.current.getBoundingClientRect();
 
             let clientX: number;
             if ('touches' in event) {
@@ -309,7 +295,8 @@ export const ColorPickerDialog = ({
 }: ColorPickerDialogProps) => {
     const [hsv, setHsv] = useState<HSV>({ h: 210, s: 50, v: 90 });
     const [hex, setHex] = useState<string>('#73A0E6');
-    const [colorLabel, setColorLabel] = useState<string>('Custom Color');
+    const [colorLabel, setColorLabel] = useState<string>('');
+    const [error, setError] = useState<string | null>(null);
 
     const handleHsvChange = (newHsv: HSV) => {
         setHsv(newHsv);
@@ -327,6 +314,12 @@ export const ColorPickerDialog = ({
     };
 
     const handleOnSave = () => {
+        if (!colorLabel?.trim()) {
+            setError('Color label is required');
+            return;
+        }
+
+        setError(null);
         onOpenChange(false);
         if (!onColorSelect) return;
         onColorSelect({ name: colorLabel, hex });
@@ -342,12 +335,9 @@ export const ColorPickerDialog = ({
 
                         <HueSlider hsv={hsv} onChange={handleHsvChange} />
                     </section>
-                    <section className="grid grid-cols-2 gap-6">
+                    <section className="grid grid-cols-2 items-start gap-6">
                         <div className="grid gap-2">
-                            <Label
-                                htmlFor="hex"
-                                className="text-xs text-muted-foreground"
-                            >
+                            <Label htmlFor="hex" className="text-muted-foreground">
                                 Color Hex
                             </Label>
                             <div className="relative">
@@ -368,10 +358,7 @@ export const ColorPickerDialog = ({
                             </div>
                         </div>
                         <div className="grid gap-2">
-                            <Label
-                                htmlFor="name"
-                                className="text-xs text-muted-foreground"
-                            >
+                            <Label htmlFor="name" className="text-muted-foreground">
                                 Color label
                             </Label>
                             <Input
@@ -383,14 +370,16 @@ export const ColorPickerDialog = ({
                                 name="name"
                                 placeholder="Black"
                             />
+                            {error && (
+                                <p data-slot="form-message" className="text-destructive">
+                                    {error}
+                                </p>
+                            )}
                         </div>
                     </section>
                 </div>
                 <DialogFooter>
-                    <Button
-                        variant="outline"
-                        onClick={() => onOpenChange(false)}
-                    >
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Close
                     </Button>
                     <Button onClick={handleOnSave}>Save</Button>

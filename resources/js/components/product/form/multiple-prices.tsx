@@ -77,9 +77,10 @@ export const MultiplePricesDialog = ({
         if (basePriceProp !== undefined && basePriceProp !== null) {
             setBasePrice(String(basePriceProp));
         }
-        if (baseStockProp !== undefined && baseStockProp !== null) {
-            setBaseStock(String(baseStockProp));
-        }
+        // if (baseStockProp !== undefined && baseStockProp !== null) {
+        //     setBaseStock(String(baseStockProp));
+        // }
+        setBaseStock(baseStockProp || '');
     }, [basePriceProp, baseStockProp]);
 
     const [basePrice, setBasePrice] = useState<string>(basePriceProp ?? '');
@@ -103,11 +104,11 @@ export const MultiplePricesDialog = ({
 
             const rawPrice = specificValues?.price
                 ? parseNumber(specificValues.price)
-                : parseNumber(basePrice);
+                : (parseNumber(basePriceProp) ?? parseNumber(basePrice));
 
             const rawStock = specificValues?.stock
                 ? parseNumber(specificValues.stock)
-                : parseNumber(baseStock);
+                : (parseNumber(baseStockProp) ?? parseNumber(baseStock));
 
             return {
                 size: variant.size,
@@ -122,14 +123,11 @@ export const MultiplePricesDialog = ({
 
     useEffect(() => {
         handleSave();
-    }, [basePriceProp, baseStockProp]);
+    }, [basePriceProp, baseStockProp, colors, sizes]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent
-                onOpenAutoFocus={(e) => e.preventDefault()}
-                className="sm:max-w-xl"
-            >
+            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="sm:max-w-xl">
                 <DialogHeader>
                     <DialogTitle>Pricing and Stock</DialogTitle>
                 </DialogHeader>
@@ -191,8 +189,7 @@ export const MultiplePricesDialog = ({
                                                         <div
                                                             style={{
                                                                 backgroundColor:
-                                                                    variant.color.hex ??
-                                                                    '#fff',
+                                                                    variant.color.hex ?? '#fff',
                                                             }}
                                                             className="aspect-square h-5 rounded-full border"
                                                         />
@@ -209,9 +206,7 @@ export const MultiplePricesDialog = ({
                                             <Input
                                                 type="text"
                                                 inputMode="numeric"
-                                                placeholder={
-                                                    formatNumber(basePrice) || '0'
-                                                }
+                                                placeholder={formatNumber(basePrice) || '0'}
                                                 value={formatNumber(
                                                     variantValues[variant.id]?.price,
                                                 )}
@@ -265,11 +260,7 @@ export const MultiplePricesDialog = ({
                             >
                                 Cancel
                             </Button>
-                            <Button
-                                onClick={handleSave}
-                                size="lg"
-                                className="rounded-full"
-                            >
+                            <Button onClick={handleSave} size="lg" className="rounded-full">
                                 Save Prices
                             </Button>
                         </div>

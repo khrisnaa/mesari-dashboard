@@ -80,6 +80,7 @@ export const GalleryUploader = ({ onChange, onRemove }: GalleryUploaderProps) =>
     };
 
     const handleSortEnd = () => {
+        onChange(images);
         dragItem.current = null;
         dragOverItem.current = null;
     };

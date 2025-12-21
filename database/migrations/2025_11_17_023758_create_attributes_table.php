@@ -15,8 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name')->unique();
             $table->string('hex')->nullable();
-
-            $table->foreignUuid('attribute_type_id')->constrained()->onDelete('cascade');
+            $table->enum('type', ['color', 'size']);
 
             $table->timestamps();
             $table->softDeletes();

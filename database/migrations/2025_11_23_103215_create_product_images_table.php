@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('product_images', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('path');
-            $table->string('disk')->default('public');
+            $table->string('url')->nullable();
             $table->string('type')->default('gallery');
             $table->unsignedInteger('sort_order')->default(0);
 

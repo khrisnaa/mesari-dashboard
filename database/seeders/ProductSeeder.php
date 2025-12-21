@@ -67,32 +67,13 @@ class ProductSeeder extends Seeder
         // Attribute Types & Attributes
         // --------------------
         $attributeTypesData = [
-            'Size' => [
-                ['name' => 'XS', 'hex' => null],
-                ['name' => 'S', 'hex' => null],
-                ['name' => 'M', 'hex' => null],
-                ['name' => 'L', 'hex' => null],
-                ['name' => 'XL', 'hex' => null],
-                ['name' => 'XXL', 'hex' => null],
-            ],
-            'Color' => [
-                ['name' => 'Red', 'hex' => '#FF0000'],
-                ['name' => 'Blue', 'hex' => '#0000FF'],
-                ['name' => 'Black', 'hex' => '#000000'],
-                ['name' => 'White', 'hex' => '#FFFFFF'],
-                ['name' => 'Green', 'hex' => '#00FF00'],
-                ['name' => 'Navy', 'hex' => '#000080'],
-            ]
+            'size' => config('product.sizes'),
+            'color' => config('product.colors')
         ];
 
         $attributeIds = [];
 
         foreach ($attributeTypesData as $typeName => $attributesArray) {
-            $type = AttributeType::create([
-                'id' => $typeId = Str::uuid(),
-                'name' => $typeName
-            ]);
-
             $attributeIds[$typeName] = [];
 
             foreach ($attributesArray as $attrData) {
@@ -100,7 +81,7 @@ class ProductSeeder extends Seeder
                     'id' => $attrId = Str::uuid(),
                     'name' => $attrData['name'],
                     'hex' => $attrData['hex'],
-                    'attribute_type_id' => $typeId
+                    'type' => $typeName
                 ]);
 
                 $attributeIds[$typeName][$attrData['name']] = $attrId;

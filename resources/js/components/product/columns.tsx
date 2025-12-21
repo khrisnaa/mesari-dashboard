@@ -23,9 +23,7 @@ export const columns: ColumnDef<Product>[] = [
                     table.getIsAllPageRowsSelected() ||
                     (table.getIsSomePageRowsSelected() && 'indeterminate')
                 }
-                onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
-                }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                 aria-label="Select all"
             />
         ),
@@ -45,9 +43,7 @@ export const columns: ColumnDef<Product>[] = [
             <Button
                 variant="ghost"
                 size="sm"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
                 Name
                 <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -58,11 +54,7 @@ export const columns: ColumnDef<Product>[] = [
         accessorKey: 'description',
         header: 'Description',
         cell: ({ row }) => {
-            return (
-                <span className="block max-w-sm truncate">
-                    {row.original.description}
-                </span>
-            );
+            return <span className="block max-w-sm truncate">{row.original.description}</span>;
         },
     },
     {
@@ -73,9 +65,7 @@ export const columns: ColumnDef<Product>[] = [
                 <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === 'asc')
-                    }
+                    onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                 >
                     Price
                     <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -83,9 +73,7 @@ export const columns: ColumnDef<Product>[] = [
             );
         },
         cell: ({ row }) => (
-            <span className="px-2.5">
-                {formatRupiah(row.original.variants[0].price)}
-            </span>
+            <span className="px-2.5">{formatRupiah(row.original.variants[0].price)}</span>
         ),
     },
     {
@@ -94,17 +82,13 @@ export const columns: ColumnDef<Product>[] = [
             <Button
                 variant="ghost"
                 size="sm"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
                 Total Stock
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => (
-            <span className="px-4">{row.original.total_stock}</span>
-        ),
+        cell: ({ row }) => <span className="px-4">{row.original.total_stock}</span>,
     },
     {
         id: 'actions',
@@ -119,22 +103,14 @@ export const columns: ColumnDef<Product>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="w-full"
-                            >
+                            <Button variant="ghost" size="sm" className="w-full">
                                 <Pencil />
                                 Edit
                             </Button>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="w-full"
-                            >
+                            <Button variant="ghost" size="sm" className="w-full">
                                 <Eye />
                                 Show
                             </Button>

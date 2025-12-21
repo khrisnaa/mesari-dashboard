@@ -26,7 +26,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { CreateProductInput, createProductSchema } from '@/schemas/createProductSchema';
+import { CreateProductInput, createProductSchema } from '@/schemas/product';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
 import { Attribute } from '@/types/product';
@@ -90,7 +90,8 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
     const onSubmit = (data: CreateProductInput) => {
         const formData = new FormData();
-
+        console.log(baseStock);
+        console.log(data.variants);
         formData.append('name', data.name);
         formData.append('variants', JSON.stringify(data.variants));
         formData.append('category_id', data.category_id);
@@ -128,10 +129,10 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     const [selectedColors, setSelectedColors] = useState<Attribute[] | []>([]);
     const toggleColor = (color: Attribute) => {
         setSelectedColors((prev) => {
-            const exists = prev.some((c) => c.hex === color.hex);
+            const exists = prev.some((c) => c.hex === color.hex && c.name === color.name);
 
             if (exists) {
-                return prev.filter((c) => c.hex !== color.hex);
+                return prev.filter((c) => c.hex !== color.hex || c.name !== color.name);
             }
 
             return [...prev, color];
@@ -141,6 +142,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     const [showColorPicker, setShowColorPicker] = useState(false);
     const [customColors, setCustomColors] = useState<Attribute[]>([]);
     const handleAddColor = (color: Attribute) => {
+        setSelectedColors((prev) => [...prev, color]);
         setCustomColors((prev) => [...prev, color]);
     };
 
@@ -181,7 +183,10 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     };
 
     const handleGalleryChange = (files: ImageFile[]) => {
-        setImageFiles((prev) => [...prev, ...files]);
+        setImageFiles((prev) => {
+            const remaining = prev.filter((p) => !files.includes(p));
+            return [...remaining, ...files];
+        });
 
         form.setValue(
             'images',
@@ -270,7 +275,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-6">
+                                <div className="grid grid-cols-2 items-start gap-6">
                                     <FormItem>
                                         <FormLabel>Size</FormLabel>
                                         <FormDescription>Pick Available Size</FormDescription>
@@ -310,7 +315,9 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                             <div className="flex flex-wrap gap-2">
                                                 {[...colors, ...customColors].map((color, i) => {
                                                     const selected = selectedColors.some(
-                                                        (c) => c.hex == color.hex,
+                                                        (c) =>
+                                                            c.hex == color.hex &&
+                                                            c.name == color.name,
                                                     );
 
                                                     return (

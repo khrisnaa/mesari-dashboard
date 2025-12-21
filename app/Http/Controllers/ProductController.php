@@ -2,15 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FlashHelper;
 use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ProductController extends Controller
 {
+
+    private function generateUniqueSlug(string $name): string
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+
+        $count = 1;
+
+        while (Product::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $count;
+            $count++;
+        }
+
+        return $slug;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -50,6 +72,7 @@ class ProductController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
+
         return Inertia::render('products/index', [
             'products' => $products,
             'filters' => $request->only(['search', 'sort', 'direction', 'per_page']),
@@ -62,20 +85,26 @@ class ProductController extends Controller
      */
     public function create()
     {
+
+
+
         $categories = Category::all();
 
-        $colors = Attribute::whereHas(
-            'type',
-            fn($q) =>
-            $q->where('name', 'color')
-        )->get();
+        $sizes = Attribute::where('type', 'size')
+            ->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL')")
+            ->get();
 
-
-        $sizes = Attribute::whereHas(
-            'type',
-            fn($q) => $q->where('name', 'size')
-        )
-            ->orderByRaw("FIELD(name, 'xs', 's', 'm', 'l', 'xl', 'xxl')")
+        $colors = Attribute::where('type', 'color')
+            ->where(function ($q) {
+                foreach (config('product.colors') as $color) {
+                    $q->orWhere(function ($q2) use ($color) {
+                        $q2->where('name', $color['name'])
+                            ->where('hex', $color['hex']);
+                    });
+                }
+            })
+            ->orderByRaw("FIELD(name, 'White', 'Black') DESC")
+            ->orderBy('name')
             ->get();
 
         return Inertia::render('products/create', [
@@ -90,8 +119,113 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        DB::beginTransaction();
+
+        try {
+            $data = $request->all();
+            $data['slug'] = $this->generateUniqueSlug($data['name']);
+
+            $product = Product::create([
+                'name'        => $data['name'],
+                'slug'        => $data['slug'],
+                'description' => $data['description'],
+                'category_id' => $data['category_id'],
+            ]);
+
+            $variants = json_decode($data['variants'], true);
+
+
+            foreach ($variants as $key => $variant) {
+                if (isset($variant['color']) && !empty($variant['color']['name'])) {
+                    $color = Attribute::firstOrCreate([
+                        'name' => $variant['color']['name'],
+                        'hex'  => $variant['color']['hex'],
+                        'type' => 'color',
+                    ]);
+
+                    $variants[$key]['color']['id'] = $color->id;
+                }
+            }
+
+            foreach ($variants as $variant) {
+                $skuParts = [
+                    $product->name,
+                    data_get($variant, 'size.name'),
+                    data_get($variant, 'color.name'),
+                ];
+
+                $sku = strtoupper(Str::slug(
+                    collect($skuParts)->filter()->join('-'),
+                    '-'
+                ));
+
+                $productVariant =  ProductVariant::create([
+                    'price' => $variant['price'],
+                    'stock' => $variant['stock'],
+                    'sku' => $sku,
+                    'product_id' => $product->id
+                ]);
+
+                $attributeIds = collect([
+                    $variant['size']['id'] ?? null,
+                    $variant['color']['id'] ?? null,
+                ])->filter();
+
+                $productVariant->attributes()->sync($attributeIds);
+            }
+
+
+            if ($request->hasFile('images')) {
+                $images = $data['images'];
+                $gallery = [];
+                $thumbnail = null;
+
+                foreach ($images as $image) {
+                    if ($image['type'] === 'thumbnail') {
+                        $thumbnail = $image;
+                    } else {
+                        $gallery[] = $image;
+                    }
+                }
+
+                $basePath = 'product-images/' . $product->slug . '/' . now()->format('Y/m/d');
+
+                if ($thumbnail) {
+                    $path = $thumbnail['file']->store($basePath, 'public');
+
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'path'       => $path,
+                        'type'       => 'thumbnail',
+                    ]);
+                }
+
+                foreach ($gallery as $index => $image) {
+                    $path = $image['file']->store($basePath, 'public');
+
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'path'       => $path,
+                        'type'       => 'gallery',
+                        'sort_order' => $index,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('products.index')->with('success',  FlashHelper::stamp('Product created successfully'));
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            if (isset($basePath)) {
+                Storage::disk('public')->deleteDirectory($basePath);
+            }
+
+            throw $e;
+        }
     }
+
 
     /**
      * Display the specified resource.
