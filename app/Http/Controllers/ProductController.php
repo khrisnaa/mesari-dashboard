@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FlashHelper;
+use App\Http\Requests\Product\CreateProductRequest;
 use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -117,12 +119,13 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateProductRequest $request)
     {
         DB::beginTransaction();
 
         try {
-            $data = $request->all();
+            $data = $request->validated();
+
             $data['slug'] = $this->generateUniqueSlug($data['name']);
 
             $product = Product::create([
@@ -217,12 +220,18 @@ class ProductController extends Controller
             return redirect()->route('products.index')->with('success',  FlashHelper::stamp('Product created successfully'));
         } catch (\Throwable $e) {
             DB::rollBack();
+            if ($basePath) Storage::disk('public')->deleteDirectory($basePath);
 
-            if (isset($basePath)) {
-                Storage::disk('public')->deleteDirectory($basePath);
+            if ($e instanceof ValidationException) {
+                return response()->json([
+                    'message' => 'The given data was invalid.',
+                    'errors' => $e->errors(),
+                ], 422);
             }
 
-            throw $e;
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 

@@ -1,5 +1,4 @@
 import { ColorPickerDialog } from '@/components/color-picker';
-import FlashToast from '@/components/flash-toast';
 import { GalleryUploader } from '@/components/product/form/gallery-uploader';
 
 import { MultiplePricesDialog } from '@/components/product/form/multiple-prices';
@@ -33,9 +32,10 @@ import { Attribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { ChevronLeftIcon, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -90,8 +90,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
     const onSubmit = (data: CreateProductInput) => {
         const formData = new FormData();
-        console.log(baseStock);
-        console.log(data.variants);
+
         formData.append('name', data.name);
         formData.append('variants', JSON.stringify(data.variants));
         formData.append('category_id', data.category_id);
@@ -107,6 +106,10 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
         router.post('/products', formData, {
             forceFormData: true,
+            onError: (errors) => {
+                const errorMessage = Object.values(errors)[0];
+                toast.error(errorMessage);
+            },
         });
     };
 
@@ -213,12 +216,18 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
-            <FlashToast />
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
                     <section className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <h3 className="text-xl font-medium">Add New Product</h3>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => router.visit('/products', { replace: true })}
+                            >
+                                <ChevronLeftIcon />
+                            </Button>
+                            <h3 className="text-xl font-semibold">Add New Product</h3>
                         </div>
                         <div>
                             <Button
@@ -546,6 +555,8 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                         });
                         setShowPricesDialog(false);
                     }}
+                    setBasePriceProp={setBasePrice}
+                    setBaseStockProp={setBaseStock}
                     basePriceProp={basePrice}
                     baseStockProp={baseStock}
                 />

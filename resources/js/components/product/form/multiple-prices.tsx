@@ -37,6 +37,8 @@ interface PricesDialogProps {
     colors: Attribute[];
     basePriceProp?: string;
     baseStockProp?: string;
+    setBasePriceProp: (data: string) => void;
+    setBaseStockProp: (data: string) => void;
 }
 
 interface VariantValueState {
@@ -54,6 +56,8 @@ export const MultiplePricesDialog = ({
     sizes,
     basePriceProp,
     baseStockProp,
+    setBasePriceProp,
+    setBaseStockProp,
 }: PricesDialogProps) => {
     // Generate combinations
     const variants = useMemo<Variant[]>(() => {
@@ -72,16 +76,6 @@ export const MultiplePricesDialog = ({
             })),
         );
     }, [colors, sizes]);
-
-    useEffect(() => {
-        if (basePriceProp !== undefined && basePriceProp !== null) {
-            setBasePrice(String(basePriceProp));
-        }
-        // if (baseStockProp !== undefined && baseStockProp !== null) {
-        //     setBaseStock(String(baseStockProp));
-        // }
-        setBaseStock(baseStockProp || '');
-    }, [basePriceProp, baseStockProp]);
 
     const [basePrice, setBasePrice] = useState<string>(basePriceProp ?? '');
     const [baseStock, setBaseStock] = useState<string>(baseStockProp || '');
@@ -104,11 +98,20 @@ export const MultiplePricesDialog = ({
 
             const rawPrice = specificValues?.price
                 ? parseNumber(specificValues.price)
-                : (parseNumber(basePriceProp) ?? parseNumber(basePrice));
+                : parseNumber(basePriceProp);
 
             const rawStock = specificValues?.stock
                 ? parseNumber(specificValues.stock)
-                : (parseNumber(baseStockProp) ?? parseNumber(baseStock));
+                : parseNumber(baseStockProp);
+
+            if (basePrice != '') {
+                setBasePriceProp(basePrice);
+                setBasePrice('');
+            }
+            if (baseStock != '') {
+                setBaseStockProp(baseStock);
+                setBaseStock('');
+            }
 
             return {
                 size: variant.size,
@@ -125,8 +128,14 @@ export const MultiplePricesDialog = ({
         handleSave();
     }, [basePriceProp, baseStockProp, colors, sizes]);
 
+    const handleClose = () => {
+        onOpenChange(false);
+        setBasePrice(basePriceProp ?? '');
+        setBaseStock(baseStockProp ?? '');
+    };
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="sm:max-w-xl">
                 <DialogHeader>
                     <DialogTitle>Pricing and Stock</DialogTitle>
@@ -142,7 +151,9 @@ export const MultiplePricesDialog = ({
                                 <Input
                                     placeholder="Rp 0"
                                     inputMode="numeric"
-                                    value={formatNumber(basePrice)}
+                                    value={formatNumber(
+                                        basePrice != '' ? basePrice : basePriceProp,
+                                    )}
                                     onChange={(e) => {
                                         const numericValue = parseNumber(e.target.value);
                                         setBasePrice(numericValue.toString());
@@ -158,7 +169,9 @@ export const MultiplePricesDialog = ({
                                 <Input
                                     placeholder="0"
                                     inputMode="numeric"
-                                    value={formatNumber(baseStock)}
+                                    value={formatNumber(
+                                        baseStock != '' ? baseStock : baseStockProp,
+                                    )}
                                     onChange={(e) => {
                                         const numericValue = parseNumber(e.target.value);
                                         setBaseStock(numericValue.toString());
@@ -206,7 +219,9 @@ export const MultiplePricesDialog = ({
                                             <Input
                                                 type="text"
                                                 inputMode="numeric"
-                                                placeholder={formatNumber(basePrice) || '0'}
+                                                placeholder={formatNumber(
+                                                    basePrice != '' ? basePrice : basePriceProp,
+                                                )}
                                                 value={formatNumber(
                                                     variantValues[variant.id]?.price,
                                                 )}
@@ -228,7 +243,9 @@ export const MultiplePricesDialog = ({
                                             <Input
                                                 type="text"
                                                 inputMode="numeric"
-                                                placeholder={baseStock || '0'}
+                                                placeholder={formatNumber(
+                                                    baseStock != '' ? baseStock : baseStockProp,
+                                                )}
                                                 value={formatNumber(
                                                     variantValues[variant.id]?.stock,
                                                 )}
@@ -254,7 +271,7 @@ export const MultiplePricesDialog = ({
                         <div className="flex justify-end gap-4">
                             <Button
                                 size="lg"
-                                onClick={() => onOpenChange(false)}
+                                onClick={handleClose}
                                 variant="outline"
                                 className="rounded-full"
                             >

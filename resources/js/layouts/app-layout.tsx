@@ -10,7 +10,7 @@ interface AppLayoutProps {
 
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
     <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-        <Toaster position="top-right" />
+        <Toaster position="bottom-right" />
         {children}
     </AppLayoutTemplate>
 );

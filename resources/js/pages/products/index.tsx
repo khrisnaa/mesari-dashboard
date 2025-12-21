@@ -1,4 +1,5 @@
 import { DataTable } from '@/components/data-table/data-table';
+import FlashToast from '@/components/flash-toast';
 import { PageHeader } from '@/components/page-header';
 import { columns } from '@/components/product/columns';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ const Index = ({ products }: PageProps) => {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Products" />
+            <FlashToast />
             <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Products"

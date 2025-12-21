@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateProductRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class CreateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,41 @@ class CreateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['sometimes', 'string', 'max:255'],
+            'category_id' => ['required', 'uuid', 'exists:categories,id'],
+            'variants' => ['required', 'string'],
+            'images' => ['sometimes', 'array'],
+            'images.*.type' => ['required', 'in:thumbnail,gallery'],
+            'images.*.file' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Product name is required.',
+            'name.string' => 'Product name must be a valid string.',
+            'name.max' => 'Product name cannot exceed 255 characters.',
+
+            'description.string' => 'Description must be a valid string.',
+            'description.max' => 'Description cannot exceed 255 characters.',
+
+            'category_id.required' => 'Category is required.',
+            'category_id.uuid' => 'Category ID must be a valid UUID.',
+            'category_id.exists' => 'Selected category does not exist.',
+
+            'variants.required' => 'At least one variant is required.',
+            'variants.string' => 'Variants must be a valid JSON string.',
+
+            'images.array' => 'Images must be an array.',
+            'images.*.type.required' => 'Each image must have a type.',
+            'images.*.type.in' => 'Image type must be either thumbnail or gallery.',
+            'images.*.file.required' => 'Each image must have a file.',
+            'images.*.file.file' => 'Each image must be a valid file.',
+            'images.*.file.image' => 'Each file must be an image.',
+            'images.*.file.mimes' => 'Each image must be in JPG, JPEG, PNG, or WEBP format.',
+            'images.*.file.max' => 'Each image may not exceed 10MB.',
         ];
     }
 }
