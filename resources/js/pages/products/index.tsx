@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/page-header';
 import { columns } from '@/components/product/columns';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+import products, { create } from '@/routes/products';
 import { BreadcrumbItem } from '@/types';
 import { PaginatedResponse } from '@/types/pagination';
 import { Product } from '@/types/product';
@@ -13,7 +14,7 @@ import { Plus } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Products',
-        href: '/products',
+        href: products.index(),
     },
 ];
 
@@ -32,7 +33,7 @@ const Index = ({ products }: PageProps) => {
                     description="Track your products seamlessly, ensuring smooth organization and effortless control."
                     actions={
                         <Button asChild>
-                            <Link href="/products/create">
+                            <Link href={create()}>
                                 <Plus /> Create product
                             </Link>
                         </Button>

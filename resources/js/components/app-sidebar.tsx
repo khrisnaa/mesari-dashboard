@@ -11,6 +11,8 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import categories from '@/routes/categories';
+import products from '@/routes/products';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
@@ -24,12 +26,12 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Products',
-        href: '/products',
+        href: products.index(),
         icon: LayoutGrid,
     },
     {
         title: 'Categories',
-        href: '/categories',
+        href: categories.index(),
         icon: LayoutGrid,
     },
 ];

@@ -23,11 +23,11 @@ import { Form, Head } from '@inertiajs/react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Categories',
-        href: '/categories',
+        href: categories.index(),
     },
     {
         title: 'Edit',
-        href: '/categories/edit',
+        href: '',
     },
 ];
 
@@ -68,15 +68,10 @@ const Edit = ({ category, categories: categoriesData }: PageProps) => {
                                             placeholder="Category name"
                                             defaultValue={category.name}
                                         />
-                                        <InputError
-                                            message={errors.name}
-                                            className="mt-2"
-                                        />
+                                        <InputError message={errors.name} className="mt-2" />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="description">
-                                            Description
-                                        </Label>
+                                        <Label htmlFor="description">Description</Label>
                                         <Textarea
                                             id="description"
                                             autoFocus
@@ -85,16 +80,11 @@ const Edit = ({ category, categories: categoriesData }: PageProps) => {
                                             placeholder="Category description"
                                             defaultValue={category.description?.toString()}
                                         />
-                                        <InputError
-                                            message={errors.description}
-                                            className="mt-2"
-                                        />
+                                        <InputError message={errors.description} className="mt-2" />
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="parent_id">
-                                            Parent
-                                        </Label>
+                                        <Label htmlFor="parent_id">Parent</Label>
                                         <Select
                                             name="parent_id"
                                             defaultValue={category.parent_id?.toString()}
@@ -103,33 +93,20 @@ const Edit = ({ category, categories: categoriesData }: PageProps) => {
                                                 <SelectValue placeholder="Select Parent" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {categoriesData.map(
-                                                    (category, i) => (
-                                                        <SelectItem
-                                                            key={i}
-                                                            value={category.id}
-                                                        >
-                                                            {category.name}
-                                                        </SelectItem>
-                                                    ),
-                                                )}
+                                                {categoriesData.map((category, i) => (
+                                                    <SelectItem key={i} value={category.id}>
+                                                        {category.name}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
                                         <InputDescription>
-                                            Set parent if your category is
-                                            sub-category
+                                            Set parent if your category is sub-category
                                         </InputDescription>
-                                        <InputError
-                                            message={errors.parent_id}
-                                            className="mt-2"
-                                        />
+                                        <InputError message={errors.parent_id} className="mt-2" />
                                     </div>
 
-                                    <Button
-                                        type="submit"
-                                        className="mt-2 w-full"
-                                        tabIndex={5}
-                                    >
+                                    <Button type="submit" className="mt-2 w-full" tabIndex={5}>
                                         {processing && <Spinner />}
                                         Save changes
                                     </Button>

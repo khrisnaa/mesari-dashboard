@@ -25,6 +25,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
+import products from '@/routes/products';
 import { CreateProductInput, createProductSchema } from '@/schemas/product';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
@@ -40,11 +41,11 @@ import { toast } from 'sonner';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Products',
-        href: '/products',
+        href: products.index(),
     },
     {
         title: 'Create',
-        href: '/products/create',
+        href: '',
     },
 ];
 
@@ -104,7 +105,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
             formData.append(`images[${index}][file]`, img.file);
         });
 
-        router.post('/products', formData, {
+        router.post(products.store(), formData, {
             forceFormData: true,
             onError: (errors) => {
                 const errorMessage = Object.values(errors)[0];
@@ -223,7 +224,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => router.visit('/products', { replace: true })}
+                                onClick={() => router.get(products.index(), { replace: true })}
                             >
                                 <ChevronLeftIcon />
                             </Button>

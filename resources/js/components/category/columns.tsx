@@ -6,6 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import categories from '@/routes/categories';
 import { Category } from '@/types/category';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
@@ -36,9 +37,7 @@ export const columns: ColumnDef<Category>[] = [
             <Button
                 variant="ghost"
                 size="sm"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
                 Name
                 <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -53,9 +52,7 @@ export const columns: ColumnDef<Category>[] = [
         accessorKey: 'description',
         header: 'Description',
         cell: ({ row }) => (
-            <span className="block max-w-sm truncate">
-                {row.original.description}
-            </span>
+            <span className="block max-w-sm truncate">{row.original.description}</span>
         ),
     },
     {
@@ -86,7 +83,7 @@ export const columns: ColumnDef<Category>[] = [
                         cancelLabel="Cancel"
                         variant="danger"
                         onConfirm={() => {
-                            router.delete(`/categories/${category.id}`);
+                            router.delete(categories.destroy(category));
                         }}
                     />
                     <DropdownMenu>
@@ -99,11 +96,7 @@ export const columns: ColumnDef<Category>[] = [
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem>
                                 <Button
-                                    onClick={() =>
-                                        router.get(
-                                            `/categories/${category.id}/edit`,
-                                        )
-                                    }
+                                    onClick={() => router.get(categories.edit(category))}
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-between"

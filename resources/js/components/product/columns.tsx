@@ -13,6 +13,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import products from '@/routes/products';
+import { router } from '@inertiajs/react';
 
 export const columns: ColumnDef<Product>[] = [
     {
@@ -93,6 +95,7 @@ export const columns: ColumnDef<Product>[] = [
     {
         id: 'actions',
         cell: ({ row }) => {
+            const product = row.original;
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -103,7 +106,12 @@ export const columns: ColumnDef<Product>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                            <Button variant="ghost" size="sm" className="w-full">
+                            <Button
+                                onClick={() => router.get(products.edit(product))}
+                                variant="ghost"
+                                size="sm"
+                                className="w-full"
+                            >
                                 <Pencil />
                                 Edit
                             </Button>

@@ -249,7 +249,13 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        //
+        $product = Product::with(['category', 'variants', 'images'])
+            ->where('id', $product->id)
+            ->first();
+
+        return Inertia::render('products/edit', [
+            'product' => $product
+        ]);
     }
 
     /**
