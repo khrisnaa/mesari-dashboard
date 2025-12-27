@@ -24,7 +24,7 @@ class CreateProductRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['sometimes', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'uuid', 'exists:categories,id'],
             'variants' => ['required', 'string'],
             'images' => ['sometimes', 'array'],
@@ -40,6 +40,7 @@ class CreateProductRequest extends FormRequest
             'name.string' => 'Product name must be a valid string.',
             'name.max' => 'Product name cannot exceed 255 characters.',
 
+            'description.required' => 'Product name is required.',
             'description.string' => 'Description must be a valid string.',
             'description.max' => 'Description cannot exceed 255 characters.',
 

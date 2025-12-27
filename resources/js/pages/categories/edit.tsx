@@ -1,19 +1,10 @@
 import FlashToast from '@/components/flash-toast';
-import { InputDescription } from '@/components/input-description';
 import InputError from '@/components/input-error';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import categories from '@/routes/categories';
 import { BreadcrumbItem } from '@/types';
@@ -70,7 +61,7 @@ const Edit = ({ category, categories: categoriesData }: PageProps) => {
                                         />
                                         <InputError message={errors.name} className="mt-2" />
                                     </div>
-                                    <div className="grid gap-2">
+                                    {/* <div className="grid gap-2">
                                         <Label htmlFor="description">Description</Label>
                                         <Textarea
                                             id="description"
@@ -104,7 +95,7 @@ const Edit = ({ category, categories: categoriesData }: PageProps) => {
                                             Set parent if your category is sub-category
                                         </InputDescription>
                                         <InputError message={errors.parent_id} className="mt-2" />
-                                    </div>
+                                    </div> */}
 
                                     <Button type="submit" className="mt-2 w-full" tabIndex={5}>
                                         {processing && <Spinner />}

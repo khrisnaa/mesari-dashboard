@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/page-header';
 import { columns } from '@/components/product/columns';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import products, { create } from '@/routes/products';
+import { create } from '@/routes/products';
 import { BreadcrumbItem } from '@/types';
 import { PaginatedResponse } from '@/types/pagination';
 import { Product } from '@/types/product';
@@ -14,7 +14,7 @@ import { Plus } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Products',
-        href: products.index(),
+        href: '',
     },
 ];
 

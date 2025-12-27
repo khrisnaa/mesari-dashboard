@@ -1,10 +1,15 @@
+import { Category } from './category';
+
 export interface Product {
     id: string;
     name: string;
     slug: string;
     description?: string;
+    status: 'draft' | 'published' | 'archived';
     variants: ProductVariant[];
-    total_stock: number;
+    category: Category;
+    images: ProductImage[];
+    total_stock?: number;
     created_at: string;
     updated_at: string;
     deleted_at?: string | null;
@@ -26,20 +31,21 @@ export interface ProductVariantAttributePivot {
     attribute_id: string;
 }
 
-export interface AttributeType {
-    id: string;
+export interface Attribute {
+    id?: string;
     name: string;
+    hex?: string | null;
+    type?: 'color' | 'size';
     created_at?: string;
     updated_at?: string;
     deleted_at?: string | null;
 }
 
-export interface Attribute {
-    id?: string;
-    name: string;
-    hex?: string | null;
-    attribute_type_id: string;
-    type?: AttributeType;
+export interface ProductImage {
+    id: string;
+    path: string;
+    type: 'gallery' | 'thumbnail';
+    sort_order: number;
     created_at?: string;
     updated_at?: string;
     deleted_at?: string | null;

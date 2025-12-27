@@ -14,11 +14,7 @@ interface DetailDialogProps {
     onOpenChange: (open: boolean) => void;
     category: Category;
 }
-export const DetailDialog = ({
-    open,
-    onOpenChange,
-    category,
-}: DetailDialogProps) => {
+export const DetailDialog = ({ open, onOpenChange, category }: DetailDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
@@ -34,7 +30,7 @@ export const DetailDialog = ({
                                     {category.name}
                                 </p>
                             </div>
-                            <div className="grid gap-2">
+                            {/* <div className="grid gap-2">
                                 <Label htmlFor="description">Description</Label>
                                 <p className="min-h-16 rounded-md border px-3 py-2 text-sm">
                                     {category.description}
@@ -46,7 +42,7 @@ export const DetailDialog = ({
                                 <p className="rounded-md border px-3 py-2 text-sm">
                                     {category.parent?.name}
                                 </p>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

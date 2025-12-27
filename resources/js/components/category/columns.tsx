@@ -49,19 +49,6 @@ export const columns: ColumnDef<Category>[] = [
         header: 'Slug',
     },
     {
-        accessorKey: 'description',
-        header: 'Description',
-        cell: ({ row }) => (
-            <span className="block max-w-sm truncate">{row.original.description}</span>
-        ),
-    },
-    {
-        id: 'parent',
-        accessorFn: (row) => row.parent?.name ?? '-',
-        header: 'Parent',
-        cell: ({ row }) => <span>{row.original.parent?.name ?? '-'}</span>,
-    },
-    {
         id: 'actions',
         cell: ({ row }) => {
             const category = row.original;

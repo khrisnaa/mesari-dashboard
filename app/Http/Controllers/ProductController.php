@@ -87,9 +87,6 @@ class ProductController extends Controller
      */
     public function create()
     {
-
-
-
         $categories = Category::all();
 
         $sizes = Attribute::where('type', 'size')
@@ -122,6 +119,8 @@ class ProductController extends Controller
     public function store(CreateProductRequest $request)
     {
         DB::beginTransaction();
+
+        $basePath = null;
 
         try {
             $data = $request->validated();
@@ -177,8 +176,7 @@ class ProductController extends Controller
                 $productVariant->attributes()->sync($attributeIds);
             }
 
-
-            if ($request->hasFile('images')) {
+            if (isset($data['images'])) {
                 $images = $data['images'];
                 $gallery = [];
                 $thumbnail = null;
@@ -220,18 +218,13 @@ class ProductController extends Controller
             return redirect()->route('products.index')->with('success',  FlashHelper::stamp('Product created successfully'));
         } catch (\Throwable $e) {
             DB::rollBack();
-            if ($basePath) Storage::disk('public')->deleteDirectory($basePath);
 
-            if ($e instanceof ValidationException) {
-                return response()->json([
-                    'message' => 'The given data was invalid.',
-                    'errors' => $e->errors(),
-                ], 422);
+            if ($basePath && Storage::disk('public')->exists($basePath)) {
+                Storage::disk('public')->deleteDirectory($basePath);
             }
 
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 500);
+            Log::error($e->getMessage());
+            return back()->withErrors(['error' => FlashHelper::stamp('Failed to create product.') . $e->getMessage()]);
         }
     }
 
@@ -249,12 +242,34 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        $product = Product::with(['category', 'variants', 'images'])
+        $categories = Category::all();
+
+        $sizes = Attribute::where('type', 'size')
+            ->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL')")
+            ->get();
+
+        $colors = Attribute::where('type', 'color')
+            ->where(function ($q) {
+                foreach (config('product.colors') as $color) {
+                    $q->orWhere(function ($q2) use ($color) {
+                        $q2->where('name', $color['name'])
+                            ->where('hex', $color['hex']);
+                    });
+                }
+            })
+            ->orderByRaw("FIELD(name, 'White', 'Black') DESC")
+            ->orderBy('name')
+            ->get();
+
+        $product = Product::with(['category', 'variants.attributes', 'images'])
             ->where('id', $product->id)
             ->first();
 
         return Inertia::render('products/edit', [
-            'product' => $product
+            'product' => $product,
+            'categories' => $categories,
+            'colors' => $colors,
+            'sizes' => $sizes,
         ]);
     }
 

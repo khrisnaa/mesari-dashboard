@@ -1,8 +1,7 @@
 import { ColorPickerDialog } from '@/components/color-picker';
 import { GalleryUploader } from '@/components/product/form/gallery-uploader';
-
-import { MultiplePricesDialog } from '@/components/product/form/multiple-prices';
 import { NewCategoryDialog } from '@/components/product/form/new-category';
+import PricingForm from '@/components/product/form/pricing-form';
 import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,7 +25,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import products from '@/routes/products';
-import { CreateProductInput, createProductSchema } from '@/schemas/product';
+import { CreateProductInput, createProductSchema } from '@/schemas/product/createProductSchema';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
 import { Attribute } from '@/types/product';
@@ -86,10 +85,13 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
             variants: [],
             images: [],
             category_id: '',
+            base_price: 0,
+            base_stock: 0,
         },
     });
 
     const onSubmit = (data: CreateProductInput) => {
+        console.log(data);
         const formData = new FormData();
 
         formData.append('name', data.name);
@@ -153,10 +155,6 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     // dialog handler
     const [showPricesDialog, setShowPricesDialog] = useState(false);
     const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
-
-    // base price and stock
-    const [basePrice, setBasePrice] = useState<string>('');
-    const [baseStock, setBaseStock] = useState<string>('');
 
     // validate size
     const [sizeError, setSizeError] = useState(false);
@@ -374,41 +372,55 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                 <h4 className="font-semibold">Pricing and Stock</h4>
                                 <div className="grid gap-4">
                                     <div className="grid grid-cols-2 gap-4">
-                                        <FormItem>
-                                            <FormLabel>Base Price</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="Rp 0"
-                                                    inputMode="numeric"
-                                                    value={formatNumber(basePrice)}
-                                                    onChange={(e) => {
-                                                        const numericValue = parseNumber(
-                                                            e.target.value,
-                                                        );
-                                                        setBasePrice(numericValue.toString());
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
+                                        <FormField
+                                            control={form.control}
+                                            name="base_price"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Base Price</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="0"
+                                                            inputMode="numeric"
+                                                            {...field}
+                                                            value={formatNumber(field.value)}
+                                                            onChange={(e) => {
+                                                                const numericValue = parseNumber(
+                                                                    e.target.value,
+                                                                );
+                                                                field.onChange(numericValue);
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                        <FormItem>
-                                            <FormLabel>Base Stock</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="0"
-                                                    inputMode="numeric"
-                                                    value={formatNumber(baseStock)}
-                                                    onChange={(e) => {
-                                                        const numericValue = parseNumber(
-                                                            e.target.value,
-                                                        );
-                                                        setBaseStock(numericValue.toString());
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
+                                        <FormField
+                                            control={form.control}
+                                            name="base_stock"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Base Stock</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="0"
+                                                            inputMode="numeric"
+                                                            {...field}
+                                                            value={formatNumber(field.value)}
+                                                            onChange={(e) => {
+                                                                const numericValue = parseNumber(
+                                                                    e.target.value,
+                                                                );
+                                                                field.onChange(numericValue);
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     </div>
 
                                     {/* <div className="grid grid-cols-2 gap-4">
@@ -544,7 +556,14 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                     onColorSelect={handleAddColor}
                 />
 
-                <MultiplePricesDialog
+                <PricingForm
+                    open={showPricesDialog}
+                    onOpenChange={setShowPricesDialog}
+                    colors={selectedColors}
+                    sizes={selectedSizes}
+                />
+
+                {/* <MultiplePricesDialog
                     open={showPricesDialog}
                     onOpenChange={setShowPricesDialog}
                     colors={selectedColors}
@@ -560,7 +579,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                     setBaseStockProp={setBaseStock}
                     basePriceProp={basePrice}
                     baseStockProp={baseStock}
-                />
+                /> */}
 
                 <NewCategoryDialog
                     open={showNewCategoryDialog}

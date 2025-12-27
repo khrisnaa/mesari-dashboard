@@ -4,7 +4,7 @@ import FlashToast from '@/components/flash-toast';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import categories, { create } from '@/routes/categories';
+import { create } from '@/routes/categories';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
 import { PaginatedResponse } from '@/types/pagination';
@@ -14,7 +14,7 @@ import { Plus } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Categories',
-        href: categories.index(),
+        href: '',
     },
 ];
 
