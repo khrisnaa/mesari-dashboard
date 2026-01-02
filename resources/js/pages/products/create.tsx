@@ -69,7 +69,7 @@ interface PageProps {
     colors: Attribute[];
 }
 
-export interface ImageFile {
+export interface ImageState {
     id?: string;
     tempId: string;
     file?: File;
@@ -93,16 +93,12 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     });
 
     const onSubmit = (data: CreateProductInput) => {
-        console.log(data);
         const formData = new FormData();
 
         formData.append('name', data.name);
         formData.append('variants', JSON.stringify(data.variants));
         formData.append('category_id', data.category_id);
-
-        if (data.description) {
-            formData.append('description', data.description);
-        }
+        formData.append('description', data.description || '');
 
         images.forEach((img, index) => {
             formData.append(`images[${index}][type]`, img.type);
@@ -172,9 +168,9 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
     // images handler
 
-    const [images, setImages] = useState<ImageFile[]>([]);
+    const [images, setImages] = useState<ImageState[]>([]);
 
-    const handleThumbnailChange = (file: ImageFile) => {
+    const handleThumbnailChange = (file: ImageState) => {
         setImages((prev) => [...prev.filter((i) => i.type !== 'thumbnail'), file]);
 
         form.setValue(
@@ -189,7 +185,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
         );
     };
 
-    const handleGalleryChange = (files: ImageFile[]) => {
+    const handleGalleryChange = (files: ImageState[]) => {
         setImages((prev) => {
             const remaining = prev.filter((p) => !files.includes(p));
             return [...remaining, ...files];
@@ -217,7 +213,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
         });
     };
 
-    const handleSortOrder = (items: ImageFile[]) => {
+    const handleSortOrder = (items: ImageState[]) => {
         setImages((prev) => {
             const thumbnail = prev.filter((img) => img.type === 'thumbnail');
 

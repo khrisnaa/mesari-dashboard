@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ImageFile } from '@/pages/products/create';
+import { ImageState } from '@/pages/products/create';
 import { Plus, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface ThumbnailUploaderProps {
-    existingImage?: ImageFile | null;
-    onChange: (file: ImageFile) => void;
+    existingImage?: ImageState | null;
+    onChange: (file: ImageState) => void;
     onRemove: (tempId: string) => void;
 }
 
@@ -16,7 +16,7 @@ export const ThumbnailUploader = ({
     onRemove,
     existingImage,
 }: ThumbnailUploaderProps) => {
-    const [image, setImage] = useState<ImageFile | null>(null);
+    const [image, setImage] = useState<ImageState | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleTriggerUpload = () => {
@@ -34,7 +34,7 @@ export const ThumbnailUploader = ({
 
         const objectUrl = URL.createObjectURL(file);
 
-        const formattedFile: ImageFile = {
+        const formattedFile: ImageState = {
             tempId: uuid(),
             type: 'thumbnail',
             file: file,
@@ -63,7 +63,6 @@ export const ThumbnailUploader = ({
     const hasExistingImage = !!existingImage && !image;
     const hasNewImage = !!image;
 
-    console.log(existingImage);
     return (
         <div
             className={cn(

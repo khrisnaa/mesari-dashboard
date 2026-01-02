@@ -3,9 +3,8 @@
 namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class CreateProductRequest extends FormRequest
+class UpdateProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +26,11 @@ class CreateProductRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'uuid', 'exists:categories,id'],
             'variants' => ['required', 'string'],
-            'images' => ['sometimes', 'array'],
-            'images.*.type' => ['required', 'in:thumbnail,gallery'],
-            'images.*.file' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+
+            'image_state' => ['sometimes', 'string'],
+            'images_upload' => ['sometimes', 'array'],
+            'images_upload.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+
         ];
     }
 
@@ -50,14 +51,13 @@ class CreateProductRequest extends FormRequest
             'variants.required' => 'At least one variant is required.',
             'variants.string' => 'Variants must be a valid JSON string.',
 
-            'images.array' => 'Images must be an array.',
-            'images.*.type.required' => 'Each image must have a type.',
-            'images.*.type.in' => 'Image type must be either thumbnail or gallery.',
-            'images.*.file.required' => 'Each image must have a file.',
-            'images.*.file.file' => 'Each image must be a valid file.',
-            'images.*.file.image' => 'Each file must be an image.',
-            'images.*.file.mimes' => 'Each image must be in JPG, JPEG, PNG, or WEBP format.',
-            'images.*.file.max' => 'Each image may not exceed 10MB.',
+            'image_state.string' => 'Image state must be a valid JSON string.',
+            'images_upload.array' => 'Uploaded images must be an array.',
+            'images_upload.*.required' => 'Each uploaded image is required.',
+            'images_upload.*.file' => 'Each uploaded image must be a file.',
+            'images_upload.*.image' => 'Each uploaded file must be an image.',
+            'images_upload.*.mimes' => 'Each uploaded image must be in JPG, JPEG, PNG, or WEBP format.',
+            'images_upload.*.max' => 'Each uploaded image may not exceed 10MB.',
         ];
     }
 }

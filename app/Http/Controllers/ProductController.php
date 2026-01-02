@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\FlashHelper;
 use App\Http\Requests\Product\CreateProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;
@@ -276,9 +277,175 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        dd($request->all());
+
+        DB::beginTransaction();
+
+        $basePath = null;
+
+        try {
+
+            $data = $request->validated();
+
+            $product->update([
+                'name' => $data['name'],
+                'description' => $data['description'],
+                'category_id' => $data['category_id']
+            ]);
+
+            $variants = json_decode($data['variants'], true);
+            foreach ($variants as $key => $variant) {
+                if (isset($variant['color']) && !empty($variant['color']['name'])) {
+                    $color = Attribute::firstOrCreate([
+                        'name' => $variant['color']['name'],
+                        'hex'  => $variant['color']['hex'],
+                        'type' => 'color',
+                    ]);
+
+                    $variants[$key]['color']['id'] = $color->id;
+                }
+            }
+
+            $oldVariants = ProductVariant::withTrashed()->with('attributes')->where('product_id', $product->id)->get();
+
+            $newVariantIds = [];
+
+            $newVariantIds = [];
+
+            foreach ($variants as $variant) {
+                $skuParts = [
+                    $product->name,
+                    data_get($variant, 'size.name'),
+                    data_get($variant, 'color.name'),
+                ];
+
+                $sku = strtoupper(Str::slug(
+                    collect($skuParts)->filter()->join('-'),
+                    '-'
+                ));
+
+                $existingVariant = $oldVariants->first(function ($v) use ($variant) {
+                    $relationAttrs = $v->attributes()->get();
+                    $sizeIdMatch = $relationAttrs->contains('id', $variant['size']['id'] ?? null);
+                    $colorIdMatch = isset($variant['color']['id'])
+                        ? $relationAttrs->contains('id', $variant['color']['id'])
+                        : true;
+
+                    return $sizeIdMatch && $colorIdMatch;
+                });
+
+
+                if ($existingVariant) {
+                    if ($existingVariant->trashed()) {
+                        $existingVariant->restore();
+                    }
+
+                    $existingVariant->update([
+                        'price' => $variant['price'],
+                        'stock' => $variant['stock'],
+                        'sku'   => $sku,
+                    ]);
+
+                    $productVariant = $existingVariant;
+                } else {
+
+                    $productVariant = ProductVariant::create([
+                        'price'      => $variant['price'],
+                        'stock'      => $variant['stock'],
+                        'sku'        => $sku,
+                        'product_id' => $product->id,
+                    ]);
+                }
+
+                $attributeIds = collect([
+                    $variant['size']['id'] ?? null,
+                    $variant['color']['id'] ?? null,
+                ])->filter();
+
+                $productVariant->attributes()->sync($attributeIds);
+
+                $newVariantIds[] = $productVariant->id;
+            }
+
+
+            $oldVariants->whereNotIn('id', $newVariantIds)->each(function ($v) {
+                $v->delete();
+            });
+
+
+
+            $imageState = json_decode($data['image_state'], true) ?? [];
+            $imagesUpload = $data['images_upload'] ?? [];
+
+            $basePath = 'product-images/' . $product->slug . '/' . now()->format('Y/m/d');
+
+
+            $oldImages = ProductImage::where('product_id', $product->id)->get();
+            $idsInState = collect($imageState)->pluck('id')->filter()->all();
+
+            $oldImages->each(function ($image) use ($idsInState) {
+                if (!in_array($image->id, $idsInState)) {
+                    if (Storage::disk('public')->exists($image->path)) {
+                        Storage::disk('public')->delete($image->path);
+                    }
+                    $image->delete();
+                }
+            });
+
+            foreach ($imageState as $state) {
+                if (!isset($state['id'])) continue;
+
+                $img = ProductImage::find($state['id']);
+                if ($img) {
+                    $img->update([
+                        'type' => $state['type'] ?? $img->type,
+                        'sort_order' => $state['sort_order'] ?? $img->sort_order,
+                    ]);
+                }
+            }
+
+
+            foreach ($imageState as $state) {
+                if (isset($state['id'])) continue;
+
+                $uploadedFile = array_shift($imagesUpload);
+                if (!$uploadedFile) continue;
+
+                $path = $uploadedFile->store($basePath, 'public');
+
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'path' => $path,
+                    'type' => $state['type'] ?? 'gallery',
+                    'sort_order' => $state['sort_order'] ?? 0,
+                ]);
+            }
+
+            foreach ($imagesUpload as $uploadedFile) {
+                $path = $uploadedFile->store($basePath, 'public');
+
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'path' => $path,
+                    'type' => 'gallery',
+                    'sort_order' => ProductImage::where('product_id', $product->id)
+                        ->where('type', 'gallery')->max('sort_order') + 1,
+                ]);
+            }
+            DB::commit();
+
+            return redirect()->route('products.index')->with('success',  FlashHelper::stamp('Product updated successfully'));
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            if ($basePath && Storage::disk('public')->exists($basePath)) {
+                Storage::disk('public')->deleteDirectory($basePath);
+            }
+
+            Log::error($e->getMessage());
+            return back()->withErrors(['error' => FlashHelper::stamp('Failed to update product.') . $e->getMessage()]);
+        }
     }
 
     /**

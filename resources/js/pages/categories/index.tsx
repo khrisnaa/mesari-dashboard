@@ -23,7 +23,6 @@ interface PageProps {
 }
 
 const Index = ({ categories }: PageProps) => {
-    console.log(categories);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Categories" />

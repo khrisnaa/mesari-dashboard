@@ -1,15 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ImageFile } from '@/pages/products/create';
+import { ImageState } from '@/pages/products/create';
 import { GripVertical, Plus, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface GalleryUploaderProps {
-    existingImages?: ImageFile[] | [];
-    onChange: (files: ImageFile[]) => void;
+    existingImages?: ImageState[] | [];
+    onChange: (files: ImageState[]) => void;
     onRemove: (tempId: string) => void;
-    onSortOrder: (images: ImageFile[]) => void;
+    onSortOrder: (images: ImageState[]) => void;
 }
 
 export const GalleryUploader = ({
@@ -18,7 +18,7 @@ export const GalleryUploader = ({
     onRemove,
     onSortOrder,
 }: GalleryUploaderProps) => {
-    const [images, setImages] = useState<ImageFile[]>(existingImages || []);
+    const [images, setImages] = useState<ImageState[]>(existingImages || []);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,7 +31,7 @@ export const GalleryUploader = ({
 
         if (!validFiles.length) return;
 
-        const formattedFiles: ImageFile[] = validFiles.map((file) => ({
+        const formattedFiles: ImageState[] = validFiles.map((file) => ({
             tempId: uuid(),
             type: 'gallery',
             file: file,

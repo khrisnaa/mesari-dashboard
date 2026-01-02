@@ -34,10 +34,10 @@ import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { ImageFile } from './create';
+import { ImageState } from './create';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -92,6 +92,7 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
                 : undefined,
         };
     });
+
     const form = useForm<UpdateProductInput>({
         resolver: zodResolver(updateProductSchema),
         defaultValues: {
@@ -111,10 +112,7 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
         formData.append('name', data.name);
         formData.append('variants', JSON.stringify(data.variants));
         formData.append('category_id', data.category_id);
-
-        if (data.description) {
-            formData.append('description', data.description);
-        }
+        formData.append('description', data.description || '');
 
         formData.append(
             'image_state',
@@ -201,7 +199,7 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
     };
 
     // images handler
-    const [images, setImages] = useState<ImageFile[]>(() =>
+    const [images, setImages] = useState<ImageState[]>(() =>
         product.images.map((img) => ({
             id: img.id,
             tempId: img.id,
@@ -211,7 +209,7 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
         })),
     );
 
-    const handleThumbnailChange = (file: ImageFile) => {
+    const handleThumbnailChange = (file: ImageState) => {
         setImages((prev) => {
             const gallery = prev.filter((i) => i.type !== 'thumbnail');
             return [
@@ -221,7 +219,7 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
         });
     };
 
-    const handleGalleryChange = (files: ImageFile[]) => {
+    const handleGalleryChange = (files: ImageState[]) => {
         setImages((prev) => {
             const existingGallery = prev.filter((img) => img.type === 'gallery' && img.id);
 
@@ -249,7 +247,7 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
         );
     };
 
-    const handleSortOrder = (items: ImageFile[]) => {
+    const handleSortOrder = (items: ImageState[]) => {
         setImages((prev) => {
             const thumbnail = prev.filter((img) => img.type === 'thumbnail');
 
@@ -263,11 +261,10 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
     };
 
     const thumbnailImage = images.find((img) => img.type === 'thumbnail');
-    const galleryImages = images.filter((img) => img.type === 'gallery');
+    const galleryImages = images
+        .filter((img) => img.type === 'gallery')
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
-    useEffect(() => {
-        console.log('PARENT IMAGES', images);
-    }, [images]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />

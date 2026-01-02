@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { Attribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export interface Variant {
@@ -52,7 +52,7 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
     }, [watch('base_price'), watch('base_stock'), open]);
 
     const baseVariants: Variant[] = watch('variants');
-    const [variants, setVariants] = useState<Variant[] | []>(() => baseVariants || []);
+    const [variants, setVariants] = useState<Variant[] | []>(baseVariants || []);
 
     const generateCombinations = () => {
         if (colors.length === 0) {
@@ -79,21 +79,16 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
 
     useEffect(() => {
         const combinations: Variant[] = generateCombinations();
-
         setVariants((prev) => {
-            // Keep variants that still match current size/color combinations
             const stillValid = prev.filter((v) => {
-                // Check if this variant's size still exists
                 const sizeExists = sizes.some(
                     (s) => s.name.trim().toLowerCase() === v.size?.name.trim().toLowerCase(),
                 );
 
-                // If no colors, just check size
                 if (colors.length === 0) {
                     return sizeExists && !v.color;
                 }
 
-                // Check if this variant's color still exists
                 const colorExists = colors.some(
                     (c) => c.name.trim().toLowerCase() === v.color?.name?.trim().toLowerCase(),
                 );
@@ -101,7 +96,6 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
                 return sizeExists && colorExists;
             });
 
-            // Find new combinations that don't exist in stillValid
             const newVariants = combinations
                 .filter((comb) => {
                     return !stillValid.some((v) => {
@@ -111,14 +105,12 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
                     });
                 })
                 .map((comb) => {
-                    // Check if this combination exists in baseVariants to preserve its data
                     const existingInBase = baseVariants?.find((base) => {
                         const sizeMatch = namesMatch(base.size?.name, comb.size?.name);
                         const colorMatch = namesMatch(base.color?.name, comb.color?.name);
                         return sizeMatch && colorMatch;
                     });
 
-                    // If found in baseVariants, use its price and stock, otherwise use defaults
                     return existingInBase
                         ? {
                               ...comb,
@@ -139,6 +131,8 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
             return [...stillValid, ...newVariants];
         });
     }, [colors, sizes, baseVariants]);
+
+    const variantsRef = useRef<Variant[]>([]);
 
     useEffect(() => {
         if (basePrice === null && baseStock === null) return;
@@ -185,6 +179,13 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
 
         form.setValue('variants', finalData);
     };
+
+    useEffect(() => {
+        if (JSON.stringify(variantsRef.current) !== JSON.stringify(variants)) {
+            variantsRef.current = variants;
+            handleSave();
+        }
+    }, [variants]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
