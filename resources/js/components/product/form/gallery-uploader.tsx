@@ -1,44 +1,31 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ImageFile } from '@/pages/products/create';
-import { ProductImage } from '@/types/product';
 import { GripVertical, Plus, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface GalleryUploaderProps {
-    existingImages?: ProductImage[] | [];
+    existingImages?: ImageFile[] | [];
     onChange: (files: ImageFile[]) => void;
     onRemove: (tempId: string) => void;
-    onRemoveExisting?: (image: ProductImage) => void;
-    onSortOrder?: (gallery: GalleryItem[]) => void;
+    onSortOrder: (images: ImageFile[]) => void;
 }
 
-export type GalleryItem =
-    | {
-          kind: 'existing';
-          image: ProductImage;
-      }
-    | {
-          kind: 'new';
-          image: ImageFile;
-      };
-
 export const GalleryUploader = ({
+    existingImages,
     onChange,
     onRemove,
-    existingImages,
-    onRemoveExisting,
     onSortOrder,
 }: GalleryUploaderProps) => {
-    const [images, setImages] = useState<ImageFile[]>([]);
-    const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+    const [images, setImages] = useState<ImageFile[]>(existingImages || []);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const dragItem = useRef<number | null>(null);
     const dragOverItem = useRef<number | null>(null);
 
+    // processing new images
     const processFiles = (fileList: File[]) => {
         const validFiles = fileList.filter((file) => file.type.startsWith('image/'));
 
@@ -53,16 +40,9 @@ export const GalleryUploader = ({
 
         setImages((prev) => [...prev, ...formattedFiles]);
         onChange(formattedFiles);
-
-        setGalleryItems((prev) => [
-            ...prev,
-            ...formattedFiles.map((img) => ({
-                kind: 'new' as const,
-                image: img,
-            })),
-        ]);
     };
 
+    // handle upload new image
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             processFiles(Array.from(e.target.files));
@@ -70,6 +50,7 @@ export const GalleryUploader = ({
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
+    // handle drag for sorting
     const handleContainerDragOver = (e: React.DragEvent) => {
         e.preventDefault();
         if (dragItem.current === null) {
@@ -96,32 +77,21 @@ export const GalleryUploader = ({
     };
 
     const handleSortEnter = (e: React.DragEvent, position: number) => {
-        // if (dragItem.current !== null && dragItem.current !== position) {
-        //     const copyListItems = [...images];
-        //     const dragItemContent = copyListItems[dragItem.current];
+        if (dragItem.current !== null && dragItem.current !== position) {
+            const copyListItems = [...images];
+            const dragItemContent = copyListItems[dragItem.current];
 
-        //     copyListItems.splice(dragItem.current, 1);
-        //     copyListItems.splice(position, 0, dragItemContent);
-
-        //     dragItem.current = position;
-        //     setImages(copyListItems);
-        // }
-        if (dragItem.current === null) return;
-
-        setGalleryItems((prev) => {
-            const copy = [...prev];
-            const dragged = copy[dragItem.current!];
-
-            copy.splice(dragItem.current!, 1);
-            copy.splice(position, 0, dragged);
+            copyListItems.splice(dragItem.current, 1);
+            copyListItems.splice(position, 0, dragItemContent);
 
             dragItem.current = position;
-            return copy;
-        });
+            setImages(copyListItems);
+        }
+        if (dragItem.current === null) return;
     };
 
     const handleSortEnd = () => {
-        onChange(images);
+        onSortOrder(images);
         dragItem.current = null;
         dragOverItem.current = null;
     };
@@ -133,61 +103,8 @@ export const GalleryUploader = ({
             return prev.filter((img) => img.tempId !== tempId);
         });
 
-        setGalleryItems((prev) => {
-            const removed = prev.find(
-                (item) => item.kind === 'new' && item.image.tempId === tempId,
-            );
-
-            if (removed && removed.kind === 'new') {
-                URL.revokeObjectURL(removed.image.preview);
-            }
-
-            return prev.filter((item) => !(item.kind === 'new' && item.image.tempId === tempId));
-        });
-
         onRemove(tempId);
     };
-
-    const handleRemoveExisitingImage = (existingImage: ProductImage) => {
-        if (!existingImage?.id) return;
-
-        setGalleryItems((prev) =>
-            prev.filter(
-                (item) => !(item.kind === 'existing' && item.image.id === existingImage.id),
-            ),
-        );
-
-        onRemoveExisting?.(existingImage);
-    };
-
-    useEffect(() => {
-        if (onSortOrder) {
-            onSortOrder(galleryItems);
-        }
-        return () => {
-            galleryItems.forEach((item) => {
-                if (item.kind === 'new') {
-                    URL.revokeObjectURL(item.image.preview);
-                }
-            });
-        };
-    }, [galleryItems]);
-
-    useEffect(() => {
-        if (!existingImages) return;
-        setGalleryItems(
-            existingImages.map((img) => ({
-                kind: 'existing',
-                image: img,
-            })),
-        );
-    }, []);
-
-    // useEffect(() => {
-    //     console.log('IMAGES', images);
-    //     console.log('EXISTING', existingImages);
-    //     console.log('GALLERY', galleryItems);
-    // }, [existingImages, images, galleryItems]);
 
     return (
         <div
@@ -211,25 +128,21 @@ export const GalleryUploader = ({
 
             <div className="flex justify-between gap-4">
                 <div className="custom-scrollbar flex gap-4 overflow-x-auto pb-2">
-                    {galleryItems.map(({ kind, image }, index) => (
+                    {images.map((image, index) => (
                         <div
-                            key={kind == 'existing' ? image.id : image.tempId}
+                            key={image.id ? image.id : image.tempId}
                             draggable
                             onDragStart={(e) => handleSortStart(e, index)}
                             onDragEnter={(e) => handleSortEnter(e, index)}
                             onDragEnd={handleSortEnd}
-                            onDragOver={(e) => e.preventDefault()} // Penting untuk memperbolehkan drop
+                            onDragOver={(e) => e.preventDefault()}
                             className={cn(
                                 'group relative flex-shrink-0 cursor-move transition-all active:scale-95',
                             )}
                         >
                             <div className="relative aspect-square h-18 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md">
                                 <img
-                                    src={
-                                        kind == 'existing'
-                                            ? '/storage/' + image.path
-                                            : image.preview
-                                    }
+                                    src={image.preview}
                                     alt={`Preview ${index}`}
                                     className="pointer-events-none h-full w-full object-cover"
                                 />
@@ -243,9 +156,8 @@ export const GalleryUploader = ({
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        kind == 'existing'
-                                            ? handleRemoveExisitingImage(image)
-                                            : handleRemoveImage(image.tempId);
+
+                                        handleRemoveImage(image.tempId);
                                     }}
                                     className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 hover:bg-red-600"
                                     type="button"

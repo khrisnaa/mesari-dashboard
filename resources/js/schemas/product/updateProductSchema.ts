@@ -19,11 +19,6 @@ const VariantSchema = z.object({
     stock: z.number().int('Stock must be an integer').min(0, 'Stock cannot be negative').optional(),
 });
 
-const ImageSchema = z.object({
-    id: z.string().optional(),
-    type: z.enum(['thumbnail', 'gallery']).optional(),
-});
-
 export const updateProductSchema = z.object({
     name: z
         .string()
@@ -58,7 +53,6 @@ export const updateProductSchema = z.object({
             },
         )
         .optional(),
-    images: z.array(ImageSchema).max(20, 'Too many images').optional(),
     category_id: z.string().min(1, 'Product category is required'),
 });
 

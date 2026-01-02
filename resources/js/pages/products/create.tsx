@@ -70,10 +70,12 @@ interface PageProps {
 }
 
 export interface ImageFile {
+    id?: string;
     tempId: string;
-    file: File;
+    file?: File;
     type: 'thumbnail' | 'gallery';
     preview: string;
+    sort_order?: number;
 }
 
 const Create = ({ categories, colors, sizes }: PageProps) => {
@@ -102,9 +104,11 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
             formData.append('description', data.description);
         }
 
-        imageFiles.forEach((img, index) => {
+        images.forEach((img, index) => {
             formData.append(`images[${index}][type]`, img.type);
-            formData.append(`images[${index}][file]`, img.file);
+            if (img.file) {
+                formData.append(`images[${index}][file]`, img.file);
+            }
         });
 
         router.post(products.store(), formData, {
@@ -167,10 +171,11 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     };
 
     // images handler
-    const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
+
+    const [images, setImages] = useState<ImageFile[]>([]);
 
     const handleThumbnailChange = (file: ImageFile) => {
-        setImageFiles((prev) => [...prev.filter((i) => i.type !== 'thumbnail'), file]);
+        setImages((prev) => [...prev.filter((i) => i.type !== 'thumbnail'), file]);
 
         form.setValue(
             'images',
@@ -185,7 +190,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     };
 
     const handleGalleryChange = (files: ImageFile[]) => {
-        setImageFiles((prev) => {
+        setImages((prev) => {
             const remaining = prev.filter((p) => !files.includes(p));
             return [...remaining, ...files];
         });
@@ -203,12 +208,25 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     };
 
     const handleRemoveImage = (tempId: string) => {
-        setImageFiles((prev) => prev.filter((img) => img.tempId !== tempId));
+        setImages((prev) => prev.filter((img) => img.tempId !== tempId));
 
         const currentImages = form.getValues('images') || [];
 
         form.setValue('images', currentImages.slice(0, currentImages.length - 1), {
             shouldValidate: true,
+        });
+    };
+
+    const handleSortOrder = (items: ImageFile[]) => {
+        setImages((prev) => {
+            const thumbnail = prev.filter((img) => img.type === 'thumbnail');
+
+            const gallery = items.map((img, i) => ({
+                ...img,
+                sort_order: i,
+            }));
+
+            return [...thumbnail, ...gallery];
         });
     };
 
@@ -501,6 +519,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                     <GalleryUploader
                                         onChange={(files) => handleGalleryChange(files)}
                                         onRemove={handleRemoveImage}
+                                        onSortOrder={handleSortOrder}
                                     />
                                 </div>
                             </div>
@@ -562,24 +581,6 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                     colors={selectedColors}
                     sizes={selectedSizes}
                 />
-
-                {/* <MultiplePricesDialog
-                    open={showPricesDialog}
-                    onOpenChange={setShowPricesDialog}
-                    colors={selectedColors}
-                    sizes={selectedSizes}
-                    onSubmit={(data) => {
-                        form.setValue('variants', data, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                        });
-                        setShowPricesDialog(false);
-                    }}
-                    setBasePriceProp={setBasePrice}
-                    setBaseStockProp={setBaseStock}
-                    basePriceProp={basePrice}
-                    baseStockProp={baseStock}
-                /> */}
 
                 <NewCategoryDialog
                     open={showNewCategoryDialog}

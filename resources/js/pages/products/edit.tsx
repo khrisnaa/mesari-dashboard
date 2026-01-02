@@ -1,8 +1,7 @@
 import { ColorPickerDialog } from '@/components/color-picker';
-import { GalleryItem, GalleryUploader } from '@/components/product/form/gallery-uploader';
+import { GalleryUploader } from '@/components/product/form/gallery-uploader';
 import { NewCategoryDialog } from '@/components/product/form/new-category';
 import PricingForm, { Variant } from '@/components/product/form/pricing-form';
-import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
 import { Button } from '@/components/ui/button';
 import {
     Form,
@@ -26,17 +25,19 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import products from '@/routes/products';
 
+import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
 import { UpdateProductInput, updateProductSchema } from '@/schemas/product/updateProductSchema';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
-import { Attribute, Product, ProductImage } from '@/types/product';
+import { Attribute, Product } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { ImageFile } from './create';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -71,13 +72,6 @@ interface PageProps {
     product: Product;
 }
 
-export interface ImageFile {
-    tempId: string;
-    file: File;
-    type: 'thumbnail' | 'gallery';
-    preview: string;
-}
-
 export interface SortOrder {
     id: string;
     sort_order: number;
@@ -104,7 +98,6 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
             name: product.name,
             description: product.description,
             variants: formattedvariants,
-            images: [],
             category_id: product.category.id,
             base_price: 0,
             base_stock: 0,
@@ -123,14 +116,22 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
             formData.append('description', data.description);
         }
 
-        imageFiles.forEach((img, index) => {
-            formData.append(`images[${index}][tempId]`, img.tempId);
-            formData.append(`images[${index}][type]`, img.type);
-            formData.append(`images[${index}][file]`, img.file);
-        });
+        formData.append(
+            'image_state',
+            JSON.stringify(
+                images.map((img) => ({
+                    id: img.id ?? null,
+                    type: img.type,
+                    sort_order: img.sort_order,
+                })),
+            ),
+        );
 
-        formData.append('deleted_images', JSON.stringify(deletedImageIds));
-        formData.append('sort_orders', JSON.stringify(sortOrder));
+        images
+            .filter((img) => img.file)
+            .forEach((img, i) => {
+                formData.append(`images_upload[${i}]`, img.file!);
+            });
 
         router.post(products.update(product), formData, {
             forceFormData: true,
@@ -200,83 +201,73 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
     };
 
     // images handler
-    const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
+    const [images, setImages] = useState<ImageFile[]>(() =>
+        product.images.map((img) => ({
+            id: img.id,
+            tempId: img.id,
+            type: img.type,
+            preview: `/storage/${img.path}`,
+            sort_order: img.sort_order,
+        })),
+    );
 
     const handleThumbnailChange = (file: ImageFile) => {
-        setImageFiles((prev) => [...prev.filter((i) => i.type !== 'thumbnail'), file]);
-
-        form.setValue(
-            'images',
-            [
-                ...(form.getValues('images') ?? []).filter((i) => i.type != 'thumbnail'),
-                {
-                    type: 'thumbnail' as const,
-                },
-            ],
-            { shouldValidate: true, shouldDirty: true, shouldTouch: true },
-        );
+        setImages((prev) => {
+            const gallery = prev.filter((i) => i.type !== 'thumbnail');
+            return [
+                { ...file, sort_order: 0 },
+                ...gallery.map((img, i) => ({ ...img, sort_order: i + 1 })),
+            ];
+        });
     };
 
     const handleGalleryChange = (files: ImageFile[]) => {
-        setImageFiles((prev) => {
-            const remaining = prev.filter((p) => !files.includes(p));
-            return [...remaining, ...files];
-        });
+        setImages((prev) => {
+            const existingGallery = prev.filter((img) => img.type === 'gallery' && img.id);
 
-        form.setValue(
-            'images',
-            [
-                ...(form.getValues('images') || []),
-                ...files.map(() => ({
-                    type: 'gallery' as const,
-                })),
-            ],
-            { shouldValidate: true, shouldDirty: true, shouldTouch: true },
-        );
+            const thumbnail = prev.filter((img) => img.type === 'thumbnail');
+
+            const start = existingGallery.length;
+
+            const newGallery = files.map((f, i) => ({
+                ...f,
+                sort_order: start + i,
+            }));
+
+            return [...thumbnail, ...existingGallery, ...newGallery];
+        });
     };
 
     const handleRemoveImage = (tempId: string) => {
-        setImageFiles((prev) => prev.filter((img) => img.tempId !== tempId));
+        setImages((prev) =>
+            prev
+                .filter((img) => img.tempId !== tempId)
+                .map((img, i) => ({
+                    ...img,
+                    sort_order: i,
+                })),
+        );
+    };
 
-        const currentImages = form.getValues('images') || [];
+    const handleSortOrder = (items: ImageFile[]) => {
+        setImages((prev) => {
+            const thumbnail = prev.filter((img) => img.type === 'thumbnail');
 
-        form.setValue('images', currentImages.slice(0, currentImages.length - 1), {
-            shouldValidate: true,
+            const gallery = items.map((img, i) => ({
+                ...img,
+                sort_order: i,
+            }));
+
+            return [...thumbnail, ...gallery];
         });
     };
 
-    // default value
-    const [thumbnail, setThumbnail] = useState<ProductImage | null>(
-        () => product.images.find((i) => i.type === 'thumbnail') ?? null,
-    );
+    const thumbnailImage = images.find((img) => img.type === 'thumbnail');
+    const galleryImages = images.filter((img) => img.type === 'gallery');
 
-    const [gallery, setGallery] = useState<ProductImage[] | []>(() =>
-        product.images.filter((i) => i.type === 'gallery'),
-    );
-
-    const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
-    const [sortOrder, setSortOrder] = useState<SortOrder[]>([]);
-
-    const handleSortOrder = (galleryItem: GalleryItem[]) => {
-        const sorted = galleryItem.map(({ kind, image }, i) => ({
-            id: kind == 'existing' ? image.id : image.tempId,
-            sort_order: i,
-        }));
-        setSortOrder(sorted);
-    };
-
-    const handleRemoveExistingImage = (image: ProductImage) => {
-        setDeletedImageIds((prev) => [...prev, image.id]);
-
-        if (image.type === 'thumbnail') {
-            setThumbnail(null);
-        }
-
-        if (image.type === 'gallery') {
-            setGallery((prev) => prev.filter((g) => g.id !== image.id));
-        }
-    };
-
+    useEffect(() => {
+        console.log('PARENT IMAGES', images);
+    }, [images]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
@@ -514,15 +505,13 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
                                         <ThumbnailUploader
                                             onChange={(file) => handleThumbnailChange(file)}
                                             onRemove={handleRemoveImage}
-                                            existingImage={thumbnail}
-                                            onRemoveExisting={handleRemoveExistingImage}
+                                            existingImage={thumbnailImage}
                                         />
                                     </div>
                                     <GalleryUploader
                                         onChange={(files) => handleGalleryChange(files)}
                                         onRemove={handleRemoveImage}
-                                        existingImages={gallery}
-                                        onRemoveExisting={handleRemoveExistingImage}
+                                        existingImages={galleryImages}
                                         onSortOrder={handleSortOrder}
                                     />
                                 </div>

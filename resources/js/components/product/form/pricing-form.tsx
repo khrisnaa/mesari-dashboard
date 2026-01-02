@@ -188,7 +188,7 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent inert={open} className="sm:max-w-xl">
+            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="sm:max-w-xl">
                 <DialogHeader>
                     <DialogTitle>Pricing and Stock</DialogTitle>
                 </DialogHeader>

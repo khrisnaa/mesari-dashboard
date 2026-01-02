@@ -1,22 +1,19 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ImageFile } from '@/pages/products/create';
-import { ProductImage } from '@/types/product';
 import { Plus, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface ThumbnailUploaderProps {
-    existingImage?: ProductImage | null;
+    existingImage?: ImageFile | null;
     onChange: (file: ImageFile) => void;
     onRemove: (tempId: string) => void;
-    onRemoveExisting?: (image: ProductImage) => void;
 }
 
 export const ThumbnailUploader = ({
     onChange,
     onRemove,
-    onRemoveExisting,
     existingImage,
 }: ThumbnailUploaderProps) => {
     const [image, setImage] = useState<ImageFile | null>(null);
@@ -46,7 +43,6 @@ export const ThumbnailUploader = ({
 
         onChange(formattedFile);
         setImage(formattedFile);
-        handleRemoveExisitingImage();
     };
 
     const handleRemoveImage = (tempId: string) => {
@@ -58,12 +54,6 @@ export const ThumbnailUploader = ({
         onRemove(tempId);
     };
 
-    const handleRemoveExisitingImage = () => {
-        if (existingImage?.id && onRemoveExisting) {
-            onRemoveExisting(existingImage);
-        }
-    };
-
     useEffect(() => {
         return () => {
             if (image) URL.revokeObjectURL(image.preview);
@@ -73,6 +63,7 @@ export const ThumbnailUploader = ({
     const hasExistingImage = !!existingImage && !image;
     const hasNewImage = !!image;
 
+    console.log(existingImage);
     return (
         <div
             className={cn(
@@ -92,7 +83,7 @@ export const ThumbnailUploader = ({
             {hasExistingImage && (
                 <>
                     <img
-                        src={`/storage/${existingImage.path}`}
+                        src={`${existingImage.preview}`}
                         alt="Thumbnail"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
@@ -106,7 +97,7 @@ export const ThumbnailUploader = ({
                             className="h-8 w-8 rounded-full opacity-100 shadow-md transition-opacity sm:opacity-0 sm:group-hover:opacity-100"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleRemoveExisitingImage();
+                                handleRemoveImage(existingImage.tempId);
                             }}
                             type="button"
                         >
