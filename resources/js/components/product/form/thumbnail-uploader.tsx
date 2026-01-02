@@ -1,16 +1,24 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ImageFile } from '@/pages/products/create';
+import { ProductImage } from '@/types/product';
 import { Plus, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface ThumbnailUploaderProps {
+    existingImage?: ProductImage | null;
     onChange: (file: ImageFile) => void;
     onRemove: (tempId: string) => void;
+    onRemoveExisting?: (image: ProductImage) => void;
 }
 
-export const ThumbnailUploader = ({ onChange, onRemove }: ThumbnailUploaderProps) => {
+export const ThumbnailUploader = ({
+    onChange,
+    onRemove,
+    onRemoveExisting,
+    existingImage,
+}: ThumbnailUploaderProps) => {
     const [image, setImage] = useState<ImageFile | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -38,6 +46,7 @@ export const ThumbnailUploader = ({ onChange, onRemove }: ThumbnailUploaderProps
 
         onChange(formattedFile);
         setImage(formattedFile);
+        handleRemoveExisitingImage();
     };
 
     const handleRemoveImage = (tempId: string) => {
@@ -49,11 +58,20 @@ export const ThumbnailUploader = ({ onChange, onRemove }: ThumbnailUploaderProps
         onRemove(tempId);
     };
 
+    const handleRemoveExisitingImage = () => {
+        if (existingImage?.id && onRemoveExisting) {
+            onRemoveExisting(existingImage);
+        }
+    };
+
     useEffect(() => {
         return () => {
             if (image) URL.revokeObjectURL(image.preview);
         };
     }, [image]);
+
+    const hasExistingImage = !!existingImage && !image;
+    const hasNewImage = !!image;
 
     return (
         <div
@@ -71,7 +89,38 @@ export const ThumbnailUploader = ({ onChange, onRemove }: ThumbnailUploaderProps
                 onChange={handleFileChange}
             />
 
-            {image ? (
+            {hasExistingImage && (
+                <>
+                    <img
+                        src={`/storage/${existingImage.path}`}
+                        alt="Thumbnail"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+
+                    <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
+
+                    <div className="absolute top-2 right-2">
+                        <Button
+                            variant="destructive"
+                            size="icon"
+                            className="h-8 w-8 rounded-full opacity-100 shadow-md transition-opacity sm:opacity-0 sm:group-hover:opacity-100"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveExisitingImage();
+                            }}
+                            type="button"
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                        Click to change
+                    </div>
+                </>
+            )}
+
+            {hasNewImage && (
                 <>
                     <img
                         src={image.preview}
@@ -100,7 +149,9 @@ export const ThumbnailUploader = ({ onChange, onRemove }: ThumbnailUploaderProps
                         Click to change
                     </div>
                 </>
-            ) : (
+            )}
+
+            {!hasExistingImage && !hasNewImage && (
                 <div className="flex flex-col items-center justify-center gap-2 text-center text-gray-500">
                     <Button variant="outline" size="icon" className="rounded-full">
                         <Plus />

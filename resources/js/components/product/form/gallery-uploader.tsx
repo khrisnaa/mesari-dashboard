@@ -1,17 +1,38 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ImageFile } from '@/pages/products/create';
+import { ProductImage } from '@/types/product';
 import { GripVertical, Plus, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 interface GalleryUploaderProps {
+    existingImages?: ProductImage[] | [];
     onChange: (files: ImageFile[]) => void;
     onRemove: (tempId: string) => void;
+    onRemoveExisting?: (image: ProductImage) => void;
+    onSortOrder?: (gallery: GalleryItem[]) => void;
 }
 
-export const GalleryUploader = ({ onChange, onRemove }: GalleryUploaderProps) => {
+export type GalleryItem =
+    | {
+          kind: 'existing';
+          image: ProductImage;
+      }
+    | {
+          kind: 'new';
+          image: ImageFile;
+      };
+
+export const GalleryUploader = ({
+    onChange,
+    onRemove,
+    existingImages,
+    onRemoveExisting,
+    onSortOrder,
+}: GalleryUploaderProps) => {
     const [images, setImages] = useState<ImageFile[]>([]);
+    const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -32,6 +53,14 @@ export const GalleryUploader = ({ onChange, onRemove }: GalleryUploaderProps) =>
 
         setImages((prev) => [...prev, ...formattedFiles]);
         onChange(formattedFiles);
+
+        setGalleryItems((prev) => [
+            ...prev,
+            ...formattedFiles.map((img) => ({
+                kind: 'new' as const,
+                image: img,
+            })),
+        ]);
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,16 +96,28 @@ export const GalleryUploader = ({ onChange, onRemove }: GalleryUploaderProps) =>
     };
 
     const handleSortEnter = (e: React.DragEvent, position: number) => {
-        if (dragItem.current !== null && dragItem.current !== position) {
-            const copyListItems = [...images];
-            const dragItemContent = copyListItems[dragItem.current];
+        // if (dragItem.current !== null && dragItem.current !== position) {
+        //     const copyListItems = [...images];
+        //     const dragItemContent = copyListItems[dragItem.current];
 
-            copyListItems.splice(dragItem.current, 1);
-            copyListItems.splice(position, 0, dragItemContent);
+        //     copyListItems.splice(dragItem.current, 1);
+        //     copyListItems.splice(position, 0, dragItemContent);
+
+        //     dragItem.current = position;
+        //     setImages(copyListItems);
+        // }
+        if (dragItem.current === null) return;
+
+        setGalleryItems((prev) => {
+            const copy = [...prev];
+            const dragged = copy[dragItem.current!];
+
+            copy.splice(dragItem.current!, 1);
+            copy.splice(position, 0, dragged);
 
             dragItem.current = position;
-            setImages(copyListItems);
-        }
+            return copy;
+        });
     };
 
     const handleSortEnd = () => {
@@ -92,14 +133,61 @@ export const GalleryUploader = ({ onChange, onRemove }: GalleryUploaderProps) =>
             return prev.filter((img) => img.tempId !== tempId);
         });
 
+        setGalleryItems((prev) => {
+            const removed = prev.find(
+                (item) => item.kind === 'new' && item.image.tempId === tempId,
+            );
+
+            if (removed && removed.kind === 'new') {
+                URL.revokeObjectURL(removed.image.preview);
+            }
+
+            return prev.filter((item) => !(item.kind === 'new' && item.image.tempId === tempId));
+        });
+
         onRemove(tempId);
     };
 
+    const handleRemoveExisitingImage = (existingImage: ProductImage) => {
+        if (!existingImage?.id) return;
+
+        setGalleryItems((prev) =>
+            prev.filter(
+                (item) => !(item.kind === 'existing' && item.image.id === existingImage.id),
+            ),
+        );
+
+        onRemoveExisting?.(existingImage);
+    };
+
     useEffect(() => {
+        if (onSortOrder) {
+            onSortOrder(galleryItems);
+        }
         return () => {
-            images.forEach((img) => URL.revokeObjectURL(img.preview));
+            galleryItems.forEach((item) => {
+                if (item.kind === 'new') {
+                    URL.revokeObjectURL(item.image.preview);
+                }
+            });
         };
-    }, [images]);
+    }, [galleryItems]);
+
+    useEffect(() => {
+        if (!existingImages) return;
+        setGalleryItems(
+            existingImages.map((img) => ({
+                kind: 'existing',
+                image: img,
+            })),
+        );
+    }, []);
+
+    // useEffect(() => {
+    //     console.log('IMAGES', images);
+    //     console.log('EXISTING', existingImages);
+    //     console.log('GALLERY', galleryItems);
+    // }, [existingImages, images, galleryItems]);
 
     return (
         <div
@@ -123,9 +211,9 @@ export const GalleryUploader = ({ onChange, onRemove }: GalleryUploaderProps) =>
 
             <div className="flex justify-between gap-4">
                 <div className="custom-scrollbar flex gap-4 overflow-x-auto pb-2">
-                    {images.map((image, index) => (
+                    {galleryItems.map(({ kind, image }, index) => (
                         <div
-                            key={image.preview}
+                            key={kind == 'existing' ? image.id : image.tempId}
                             draggable
                             onDragStart={(e) => handleSortStart(e, index)}
                             onDragEnter={(e) => handleSortEnter(e, index)}
@@ -137,7 +225,11 @@ export const GalleryUploader = ({ onChange, onRemove }: GalleryUploaderProps) =>
                         >
                             <div className="relative aspect-square h-18 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md">
                                 <img
-                                    src={image.preview}
+                                    src={
+                                        kind == 'existing'
+                                            ? '/storage/' + image.path
+                                            : image.preview
+                                    }
                                     alt={`Preview ${index}`}
                                     className="pointer-events-none h-full w-full object-cover"
                                 />
@@ -151,7 +243,9 @@ export const GalleryUploader = ({ onChange, onRemove }: GalleryUploaderProps) =>
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleRemoveImage(image.tempId);
+                                        kind == 'existing'
+                                            ? handleRemoveExisitingImage(image)
+                                            : handleRemoveImage(image.tempId);
                                     }}
                                     className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 hover:bg-red-600"
                                     type="button"
