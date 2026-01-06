@@ -13,13 +13,11 @@ return new class extends Migration
     {
         Schema::create('product_images', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('product_id')->constrained();
             $table->string('path');
             $table->string('url')->nullable();
             $table->enum('type', ['thumbnail', 'gallery'])->default('gallery');
             $table->unsignedInteger('sort_order')->default(0);
-
-            $table->foreignUuid('product_id')->constrained();
-
             $table->timestamps();
         });
     }

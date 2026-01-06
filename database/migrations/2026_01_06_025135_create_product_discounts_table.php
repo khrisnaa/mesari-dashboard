@@ -13,14 +13,12 @@ return new class extends Migration
     {
         Schema::create('product_discounts', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('product_id')->constrained();
             $table->enum('type', ['percentage', 'fixed']);
             $table->decimal('value', 10, 2);
             $table->timestamp('start_at')->nullable();
             $table->timestamp('end_at')->nullable();
             $table->boolean('is_active')->default(false);
-
-            $table->foreignUuid('product_id')->constrained();
-
             $table->timestamps();
             $table->softDeletes();
         });

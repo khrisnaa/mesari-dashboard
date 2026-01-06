@@ -13,13 +13,11 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('category_id')->constrained();
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
-
-            $table->foreignUuid('category_id')->constrained();
-
             $table->timestamps();
             $table->softDeletes();
         });

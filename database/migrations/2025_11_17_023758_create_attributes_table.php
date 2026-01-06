@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('hex')->nullable();
             $table->enum('type', ['color', 'size']);
-
             $table->timestamps();
             $table->softDeletes();
         });
