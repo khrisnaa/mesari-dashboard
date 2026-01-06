@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_images', function (Blueprint $table) {
+        Schema::create('product_discounts', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('path');
-            $table->string('url')->nullable();
-            $table->enum('type', ['thumbnail', 'gallery'])->default('gallery');
-            $table->unsignedInteger('sort_order')->default(0);
+            $table->enum('type', ['percentage', 'fixed']);
+            $table->decimal('value', 10, 2);
+            $table->timestamp('start_at')->nullable();
+            $table->timestamp('end_at')->nullable();
+            $table->boolean('is_active')->default(false);
 
             $table->foreignUuid('product_id')->constrained();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_images');
+        Schema::dropIfExists('product_discounts');
     }
 };

@@ -15,11 +15,10 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('slug')->unique();
-
             $table->text('description')->nullable();
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
 
-            $table->foreignUuid('category_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('category_id')->constrained();
 
             $table->timestamps();
             $table->softDeletes();

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->integer('stock')->default(0);
 
-            $table->foreignUuid('product_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('product_id')->constrained();
 
             $table->timestamps();
             $table->softDeletes();
