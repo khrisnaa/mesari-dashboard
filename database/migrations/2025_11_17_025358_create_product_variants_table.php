@@ -15,7 +15,6 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->decimal('price', 10, 2);
             $table->integer('stock')->default(0);
-            $table->string('sku')->unique();
 
             $table->foreignUuid('product_id')->constrained()->onDelete('cascade');
 
