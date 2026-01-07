@@ -4,33 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class OrderItem extends Model
+class ProductReview extends Model
 {
-    use HasUuids;
+    use HasUuids, SoftDeletes;
 
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $guarded = [];
 
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
-
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function variant()
+    public function item()
     {
-        return $this->belongsTo(ProductVariant::class);
+        return $this->belongsTo(OrderItem::class);
     }
 
-    public function reviews()
+    public function user()
     {
-        return $this->hasMany(ProductReview::class);
+        return $this->belongsTo(User::class);
     }
 }
