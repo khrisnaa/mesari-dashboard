@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ImageType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +17,7 @@ return new class extends Migration
             $table->foreignUuid('product_id')->constrained();
             $table->string('path');
             $table->string('url')->nullable();
-            $table->enum('type', ['thumbnail', 'gallery'])->default('gallery');
+            $table->enum('type', array_column(ImageType::cases(), 'value'))->default(ImageType::GALLERY->value);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
         });

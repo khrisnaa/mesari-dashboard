@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AttributeType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name')->unique();
             $table->string('hex')->nullable();
-            $table->enum('type', ['color', 'size']);
+            $table->enum('type', array_column(AttributeType::cases(), 'value'));
             $table->timestamps();
             $table->softDeletes();
         });
