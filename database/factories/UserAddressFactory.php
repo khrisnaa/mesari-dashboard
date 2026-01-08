@@ -18,7 +18,7 @@ class UserAddressFactory extends Factory
     {
         return [
             'user_id' => null,
-            'recepient_name' => $this->faker->name(),
+            'recipient_name' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),
             'label' => $this->faker->word(),
             'address_line' => $this->faker->address(),

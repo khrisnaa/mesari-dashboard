@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('faqs', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('question');
-            $table->string('asnwer');
+            $table->string('answer');
+            $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_published');
             $table->timestamps();
             $table->softDeletes();

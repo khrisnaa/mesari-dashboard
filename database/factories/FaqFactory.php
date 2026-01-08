@@ -18,7 +18,7 @@ class FaqFactory extends Factory
     {
         return [
             'question' => $this->faker->sentence(),
-            'answer' => $this->faker->sentences(2),
+            'answer' => $this->faker->sentences(2, true),
             'is_published' => $this->faker->boolean(100),
             'sort_order' => 0
         ];

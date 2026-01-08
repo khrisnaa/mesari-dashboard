@@ -18,7 +18,7 @@ class OrderAddressFactory extends Factory
     {
         return [
             'order_id' => null,
-            'recepient_name' => null,
+            'recipient_name' => null,
             'phone' => null,
             'address_line' => null,
             'province_name' => null,

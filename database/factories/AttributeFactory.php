@@ -17,17 +17,10 @@ class AttributeFactory extends Factory
      */
     public function definition(): array
     {
-        $type = $this->faker->randomElement(
-            array_column(AttributeType::cases(), 'value')
-        );
-
         return [
             'name' => $this->faker->word(),
-            'type' => $type,
-            'hex' => $type === AttributeType::COLOR->value
-                ? $this->faker->hexColor()
-                : null,
-
+            'type' => AttributeType::COLOR->value,
+            'hex' => $this->faker->hexColor()
         ];
     }
 }
