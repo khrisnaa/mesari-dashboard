@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Enums\AttributeType;
-use App\Enums\VariantSize;
 use App\Models\Attribute;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,16 +14,24 @@ class AttributeSeeder extends Seeder
      */
     public function run(): void
     {
-        $sizes = array_column(VariantSize::cases(), 'value');
+        $sizes = config('product.sizes');
 
         foreach ($sizes as $size) {
             Attribute::create([
-                'name' => $size,
+                'name' => $size['name'],
                 'type' => AttributeType::SIZE->value,
                 'hex' => null
             ]);
         }
 
-        Attribute::factory()->count(5)->create();
+        $colors = config('product.colors');
+
+        foreach ($colors as $color) {
+            Attribute::create([
+                'name' => $color['name'],
+                'type' => AttributeType::COLOR->value,
+                'hex' => $color['hex']
+            ]);
+        }
     }
 }

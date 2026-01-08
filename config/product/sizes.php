@@ -1,6 +1,7 @@
 <?php
 
 return [
+    ['name' => 'ALL', 'hex' => null],
     ['name' => 'XS', 'hex' => null],
     ['name' => 'S', 'hex' => null],
     ['name' => 'M', 'hex' => null],
