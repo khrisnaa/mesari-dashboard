@@ -24,9 +24,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface PageProps {
     category: Category;
-    categories: Category[];
 }
-const Edit = ({ category, categories: categoriesData }: PageProps) => {
+
+const Edit = ({ category }: PageProps) => {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Category" />
@@ -61,42 +61,6 @@ const Edit = ({ category, categories: categoriesData }: PageProps) => {
                                         />
                                         <InputError message={errors.name} className="mt-2" />
                                     </div>
-                                    {/* <div className="grid gap-2">
-                                        <Label htmlFor="description">Description</Label>
-                                        <Textarea
-                                            id="description"
-                                            autoFocus
-                                            autoComplete="description"
-                                            name="description"
-                                            placeholder="Category description"
-                                            defaultValue={category.description?.toString()}
-                                        />
-                                        <InputError message={errors.description} className="mt-2" />
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="parent_id">Parent</Label>
-                                        <Select
-                                            name="parent_id"
-                                            defaultValue={category.parent_id?.toString()}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select Parent" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {categoriesData.map((category, i) => (
-                                                    <SelectItem key={i} value={category.id}>
-                                                        {category.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputDescription>
-                                            Set parent if your category is sub-category
-                                        </InputDescription>
-                                        <InputError message={errors.parent_id} className="mt-2" />
-                                    </div> */}
-
                                     <Button type="submit" className="mt-2 w-full" tabIndex={5}>
                                         {processing && <Spinner />}
                                         Save changes

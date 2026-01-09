@@ -12,15 +12,23 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-// Dashboard routes
-Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-});
 
-// Product routes
 Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function () {
+    // Dashboard
+    Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
+
+    // Categories
+    Route::prefix('categories')->name('categories.')->group(function () {
+        Route::get('/', [CategoryController::class, 'index'])->name('index');
+        Route::get('/create', [CategoryController::class, 'create'])->name('create');
+        Route::post('/', [CategoryController::class, 'store'])->name('store');
+        Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
+        Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
+        Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
+        Route::post('/modal', [CategoryController::class, 'storeForModal'])->name('store.modal');
+    });
+
+    // Products
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
         Route::get('/create', [ProductController::class, 'create'])->name('create');
@@ -31,16 +39,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
         Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
         Route::post('/variant', [ProductController::class, 'storeVariant'])->name('store.variant');
     });
-
-    Route::prefix('categories')->name('categories.')->group(function () {
-        Route::get('/', [CategoryController::class, 'index'])->name('index');
-        Route::get('/create', [CategoryController::class, 'create'])->name('create');
-        Route::post('/', [CategoryController::class, 'store'])->name('store');
-        Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
-        Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
-        Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
-        Route::post('/modal', [CategoryController::class, 'storeForModal'])->name('store.modal');
-    });
 });
+
 
 require __DIR__ . '/settings.php';

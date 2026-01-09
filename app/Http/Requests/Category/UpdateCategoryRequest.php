@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateCategoryRequest extends FormRequest
 {
@@ -24,9 +25,9 @@ class UpdateCategoryRequest extends FormRequest
         $categoryId = $this->route('category')->id ?? null;
 
         return [
-            'name' => 'required|string|max:255|unique:categories,name,' . $categoryId,
-            'description' => 'nullable|string|max:1000',
-            'parent_id' => 'nullable|uuid|exists:categories,id',
+            'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')
+                ->ignore($categoryId)
+                ->whereNull('deleted_at')],
         ];
     }
 
@@ -37,12 +38,6 @@ class UpdateCategoryRequest extends FormRequest
             'name.string' => 'Category name must be a valid string.',
             'name.max' => 'Category name cannot exceed 255 characters.',
             'name.unique' => 'This category name is already taken.',
-
-            'description.string' => 'Description must be a valid text.',
-            'description.max' => 'Description cannot exceed 1000 characters.',
-
-            'parent_id.uuid' => 'Parent category ID must be a valid UUID.',
-            'parent_id.exists' => 'Selected parent category does not exist.',
         ];
     }
 }
