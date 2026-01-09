@@ -8,6 +8,7 @@ use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
+// set-up and seeding database
 beforeEach(function () {
     $this->seed(RolePermissionSeeder::class);
 
@@ -18,6 +19,7 @@ beforeEach(function () {
     $this->actingAs($user);
 });
 
+// display a paginated category test
 it('can access category index page', function () {
     Category::factory()->count(3)->create();
 
@@ -29,6 +31,7 @@ it('can access category index page', function () {
         );
 });
 
+// show form create a new category test
 it('can access create category page', function () {
     $this->get(route('categories.create'))
         ->assertStatus(200)
@@ -38,6 +41,7 @@ it('can access create category page', function () {
         );
 });
 
+// store a new category test
 it('can store new category', function () {
     $payload = ['name' => 'T-Shirt'];
 
@@ -50,6 +54,7 @@ it('can store new category', function () {
     ]);
 });
 
+// show form edit a category test
 it('can access edit category page', function () {
     $category = Category::factory()->create();
 
@@ -62,6 +67,7 @@ it('can access edit category page', function () {
         );
 });
 
+// update a category test
 it('can update category', function () {
     $category = Category::factory()->create(['name' => 'Old Name']);
 
@@ -75,6 +81,7 @@ it('can update category', function () {
     ]);
 });
 
+// soft-delete a category test
 it('can soft delete category', function () {
     $category = Category::factory()->create();
 

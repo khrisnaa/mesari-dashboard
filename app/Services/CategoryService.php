@@ -8,6 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class CategoryService
 {
+    // get paginated data of category
     public function getPaginatedCategories(array $params): LengthAwarePaginator
     {
         $perPage = $params['per_page'] ?? 10;
@@ -21,11 +22,12 @@ class CategoryService
             ->withQueryString();
     }
 
+    // create or update a category
     public function upsertCategory(array $data): Category
     {
         $data['slug'] = Str::slug($data['name']);
 
-        // Cari di sampah dulu
+        // find a category by name, including soft-deleted ones
         $existing = Category::onlyTrashed()
             ->where('name', $data['name'])
             ->first();
@@ -39,6 +41,7 @@ class CategoryService
         return Category::create($data);
     }
 
+    // delete a category
     public function deleteCategory(Category $category): bool
     {
         if ($category->products()->exists()) {

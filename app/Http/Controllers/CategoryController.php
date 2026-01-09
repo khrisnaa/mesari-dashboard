@@ -16,7 +16,7 @@ class CategoryController extends Controller
         protected CategoryService $categoryService
     ) {}
 
-
+    // display a paginated list of category
     public function index(Request $request)
     {
         $categories = $this->categoryService->getPaginatedCategories($request->all());
@@ -27,7 +27,7 @@ class CategoryController extends Controller
         ]);
     }
 
-
+    // show form to create a new category
     public function create()
     {
         return Inertia::render('categories/create', [
@@ -35,7 +35,7 @@ class CategoryController extends Controller
         ]);
     }
 
-
+    // store a new category in the database
     public function store(CreateCategoryRequest $request)
     {
         $category = $this->categoryService->upsertCategory($request->validated());
@@ -46,13 +46,13 @@ class CategoryController extends Controller
             ->with('success', FlashHelper::stamp($message));
     }
 
-
+    // show form to edit an existing category
     public function edit(Category $category)
     {
         return Inertia::render('categories/edit', ['category' => $category]);
     }
 
-
+    // update an existing category
     public function update(UpdateCategoryRequest $request, Category $category)
     {
         $category->update($request->validated());
@@ -61,7 +61,7 @@ class CategoryController extends Controller
             ->with('success', FlashHelper::stamp('Category updated successfully.'));
     }
 
-
+    // soft delete a category
     public function destroy(Category $category)
     {
         $deleted = $this->categoryService->deleteCategory($category);
@@ -75,7 +75,7 @@ class CategoryController extends Controller
             ->with('success', FlashHelper::stamp('Category deleted successfully.'));
     }
 
-
+    // store a new category without redirect to categories.index
     public function storeForModal(CreateCategoryRequest $request)
     {
         $this->categoryService->upsertCategory($request->validated());
