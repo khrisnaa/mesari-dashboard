@@ -16,7 +16,7 @@ interface ConfirmationDialogProps {
     onConfirm: () => void;
     confirmLabel?: string;
     cancelLabel?: string;
-    variant?: 'danger' | 'default'; // <── TAMBAHAN
+    variant?: 'danger' | 'default';
 }
 
 export const ConfirmationDialog = ({
@@ -27,7 +27,7 @@ export const ConfirmationDialog = ({
     onConfirm,
     confirmLabel = 'Confirm',
     cancelLabel = 'Cancel',
-    variant = 'default', // <── DEFAULT
+    variant = 'default',
 }: ConfirmationDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -38,18 +38,12 @@ export const ConfirmationDialog = ({
                 </DialogHeader>
 
                 <DialogFooter className="flex justify-end gap-2">
-                    <Button
-                        variant="outline"
-                        onClick={() => onOpenChange(false)}
-                    >
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
                         {cancelLabel}
                     </Button>
 
                     <Button
-                        // VARIANT LOGIC (danger or normal)
-                        variant={
-                            variant === 'danger' ? 'destructive' : 'default'
-                        }
+                        variant={variant === 'danger' ? 'destructive' : 'default'}
                         onClick={() => {
                             onConfirm();
                             onOpenChange(false);
