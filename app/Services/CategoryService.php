@@ -9,7 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class CategoryService
 {
     // get paginated data of category
-    public function getPaginatedCategories(array $params): LengthAwarePaginator
+    public function paginate(array $params): LengthAwarePaginator
     {
         $perPage = $params['per_page'] ?? 10;
         $sort = in_array($params['sort'] ?? '', ['name', 'created_at']) ? $params['sort'] : 'created_at';
@@ -23,7 +23,7 @@ class CategoryService
     }
 
     // create or update a category
-    public function upsertCategory(array $data): Category
+    public function store(array $data): Category
     {
         $data['slug'] = Str::slug($data['name']);
 
@@ -42,7 +42,7 @@ class CategoryService
     }
 
     // delete a category
-    public function deleteCategory(Category $category): bool
+    public function delete(Category $category): bool
     {
         if ($category->products()->exists()) {
             return false;

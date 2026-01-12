@@ -19,11 +19,11 @@ class CategoryController extends Controller
     // display a paginated list of category
     public function index(Request $request)
     {
-        $categories = $this->categoryService->getPaginatedCategories($request->all());
+        $categories = $this->categoryService->paginate($request->all());
 
         return Inertia::render('categories/index', [
             'categories' => $categories,
-            'filters' => $request->only(['search', 'sort', 'direction', 'per_page']),
+            'params' => $request->only(['search', 'sort', 'direction', 'per_page']),
         ]);
     }
 
@@ -38,7 +38,7 @@ class CategoryController extends Controller
     // store a new category in the database
     public function store(CreateCategoryRequest $request)
     {
-        $category = $this->categoryService->upsertCategory($request->validated());
+        $category = $this->categoryService->store($request->validated());
 
         $message = $category->wasRecentlyCreated ? 'Category created successfully.' : 'Category restored successfully.';
 
@@ -64,7 +64,7 @@ class CategoryController extends Controller
     // soft delete a category
     public function destroy(Category $category)
     {
-        $deleted = $this->categoryService->deleteCategory($category);
+        $deleted = $this->categoryService->delete($category);
 
         if (!$deleted) {
             return redirect()->back()
@@ -78,7 +78,7 @@ class CategoryController extends Controller
     // store a new category without redirect to categories.index
     public function storeForModal(CreateCategoryRequest $request)
     {
-        $this->categoryService->upsertCategory($request->validated());
+        $this->categoryService->store($request->validated());
 
         return redirect()->back()
             ->with('success', FlashHelper::stamp('Category created successfully.'));

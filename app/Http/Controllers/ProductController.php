@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -36,62 +37,36 @@ class ProductController extends Controller
         return $slug;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
+
+    public function __construct(
+        protected ProductService $productService
+    ) {}
+
+
+    // display a paginated list of product
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
-        $sort = $request->input('sort');
-        $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
-
-        $products = Product::query()
-            ->withSum('variants as total_stock', 'stock')
-            ->with(['category', 'variants' => function ($query) {
-                $query->with('attributes')->orderBy('price', 'asc');
-            }])
-            ->when($request->search, function ($q, $search) {
-                $q->where('name', 'like', "%{$search}%");
-            })
-            ->when($sort === 'stock', function ($q) use ($direction) {
-                $q->orderBy('total_stock', $direction);
-            })
-            ->when($sort === 'price', function ($q) use ($direction) {
-                $q->orderBy(
-                    ProductVariant::select('price')
-                        ->whereColumn('product_id', 'products.id')
-                        ->orderBy('price', 'asc')
-                        ->limit(1),
-                    $direction
-                );
-            })
-            ->when(!in_array($sort, ['price', 'stock']), function ($q) use ($sort, $direction) {
-                if ($sort) {
-                    $q->orderBy($sort, $direction)->orderBy('id');
-                } else {
-                    $q->orderBy('created_at', 'desc')->orderBy('id', 'desc');
-                }
-            })
-            ->paginate($perPage)
-            ->withQueryString();
-
+        $products = $this->productService->paginate($request->all());
 
         return Inertia::render('products/index', [
             'products' => $products,
-            'filters' => $request->only(['search', 'sort', 'direction', 'per_page']),
+            'params'  => $request->only(['search', 'sort', 'direction', 'per_page']),
         ]);
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
+    // show form to create a new product
     public function create()
     {
         $categories = Category::all();
 
         $sizes = Attribute::where('type', 'size')
-            ->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL')")
+            ->when(
+                DB::getDriverName() === 'mysql',
+                fn($q) =>
+                $q->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'ALL')"),
+                fn($q) =>
+                $q->orderBy('name')
+            )
             ->get();
 
         $colors = Attribute::where('type', 'color')
@@ -103,9 +78,15 @@ class ProductController extends Controller
                     });
                 }
             })
-            ->orderByRaw("FIELD(name, 'White', 'Black') DESC")
-            ->orderBy('name')
+            ->when(
+                DB::getDriverName() === 'mysql',
+                fn($q) =>
+                $q->orderByRaw("FIELD(name, 'White', 'Black') DESC"),
+                fn($q) =>
+                $q->orderBy('name')
+            )
             ->get();
+
 
         return Inertia::render('products/create', [
             'categories' => $categories,
@@ -119,115 +100,21 @@ class ProductController extends Controller
      */
     public function store(CreateProductRequest $request)
     {
-        DB::beginTransaction();
-
-        $basePath = null;
-
         try {
-            $data = $request->validated();
+            $this->productService->store($request->validated());
 
-            $data['slug'] = $this->generateUniqueSlug($data['name']);
-
-            $product = Product::create([
-                'name'        => $data['name'],
-                'slug'        => $data['slug'],
-                'description' => $data['description'],
-                'category_id' => $data['category_id'],
-            ]);
-
-            $variants = json_decode($data['variants'], true);
-
-
-            foreach ($variants as $key => $variant) {
-                if (isset($variant['color']) && !empty($variant['color']['name'])) {
-                    $color = Attribute::firstOrCreate([
-                        'name' => $variant['color']['name'],
-                        'hex'  => $variant['color']['hex'],
-                        'type' => 'color',
-                    ]);
-
-                    $variants[$key]['color']['id'] = $color->id;
-                }
-            }
-
-            foreach ($variants as $variant) {
-                $skuParts = [
-                    $product->name,
-                    data_get($variant, 'size.name'),
-                    data_get($variant, 'color.name'),
-                ];
-
-                $sku = strtoupper(Str::slug(
-                    collect($skuParts)->filter()->join('-'),
-                    '-'
-                ));
-
-                $productVariant =  ProductVariant::create([
-                    'price' => $variant['price'],
-                    'stock' => $variant['stock'],
-                    'sku' => $sku,
-                    'product_id' => $product->id
-                ]);
-
-                $attributeIds = collect([
-                    $variant['size']['id'] ?? null,
-                    $variant['color']['id'] ?? null,
-                ])->filter();
-
-                $productVariant->attributes()->sync($attributeIds);
-            }
-
-            if (isset($data['images'])) {
-                $images = $data['images'];
-                $gallery = [];
-                $thumbnail = null;
-
-                foreach ($images as $image) {
-                    if ($image['type'] === 'thumbnail') {
-                        $thumbnail = $image;
-                    } else {
-                        $gallery[] = $image;
-                    }
-                }
-
-                $basePath = 'product-images/' . $product->slug . '/' . now()->format('Y/m/d');
-
-                if ($thumbnail) {
-                    $path = $thumbnail['file']->store($basePath, 'public');
-
-                    ProductImage::create([
-                        'product_id' => $product->id,
-                        'path'       => $path,
-                        'type'       => 'thumbnail',
-                    ]);
-                }
-
-                foreach ($gallery as $index => $image) {
-                    $path = $image['file']->store($basePath, 'public');
-
-                    ProductImage::create([
-                        'product_id' => $product->id,
-                        'path'       => $path,
-                        'type'       => 'gallery',
-                        'sort_order' => $index,
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route('products.index')->with('success',  FlashHelper::stamp('Product created successfully'));
+            return redirect()
+                ->route('products.index')
+                ->with('success', FlashHelper::stamp('Product created successfully'));
         } catch (\Throwable $e) {
-            DB::rollBack();
+            Log::error($e);
 
-            if ($basePath && Storage::disk('public')->exists($basePath)) {
-                Storage::disk('public')->deleteDirectory($basePath);
-            }
-
-            Log::error($e->getMessage());
-            return back()->withErrors(['error' => FlashHelper::stamp('Failed to create product.') . $e->getMessage()]);
+            return back()->withErrors([
+                'error' => FlashHelper::stamp('Failed to create product.')
+            ]);
         }
     }
+
 
 
     /**
@@ -246,7 +133,13 @@ class ProductController extends Controller
         $categories = Category::all();
 
         $sizes = Attribute::where('type', 'size')
-            ->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL')")
+            ->when(
+                DB::getDriverName() === 'mysql',
+                fn($q) =>
+                $q->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'ALL')"),
+                fn($q) =>
+                $q->orderBy('name')
+            )
             ->get();
 
         $colors = Attribute::where('type', 'color')
@@ -258,8 +151,13 @@ class ProductController extends Controller
                     });
                 }
             })
-            ->orderByRaw("FIELD(name, 'White', 'Black') DESC")
-            ->orderBy('name')
+            ->when(
+                DB::getDriverName() === 'mysql',
+                fn($q) =>
+                $q->orderByRaw("FIELD(name, 'White', 'Black') DESC"),
+                fn($q) =>
+                $q->orderBy('name')
+            )
             ->get();
 
         $product = Product::with(['category', 'variants.attributes', 'images'])
@@ -279,172 +177,18 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-
-        DB::beginTransaction();
-
-        $basePath = null;
-
         try {
+            $this->productService->update($product, $request->validated());
 
-            $data = $request->validated();
-
-            $product->update([
-                'name' => $data['name'],
-                'description' => $data['description'],
-                'category_id' => $data['category_id']
-            ]);
-
-            $variants = json_decode($data['variants'], true);
-            foreach ($variants as $key => $variant) {
-                if (isset($variant['color']) && !empty($variant['color']['name'])) {
-                    $color = Attribute::firstOrCreate([
-                        'name' => $variant['color']['name'],
-                        'hex'  => $variant['color']['hex'],
-                        'type' => 'color',
-                    ]);
-
-                    $variants[$key]['color']['id'] = $color->id;
-                }
-            }
-
-            $oldVariants = ProductVariant::withTrashed()->with('attributes')->where('product_id', $product->id)->get();
-
-            $newVariantIds = [];
-
-            $newVariantIds = [];
-
-            foreach ($variants as $variant) {
-                $skuParts = [
-                    $product->name,
-                    data_get($variant, 'size.name'),
-                    data_get($variant, 'color.name'),
-                ];
-
-                $sku = strtoupper(Str::slug(
-                    collect($skuParts)->filter()->join('-'),
-                    '-'
-                ));
-
-                $existingVariant = $oldVariants->first(function ($v) use ($variant) {
-                    $relationAttrs = $v->attributes()->get();
-                    $sizeIdMatch = $relationAttrs->contains('id', $variant['size']['id'] ?? null);
-                    $colorIdMatch = isset($variant['color']['id'])
-                        ? $relationAttrs->contains('id', $variant['color']['id'])
-                        : true;
-
-                    return $sizeIdMatch && $colorIdMatch;
-                });
-
-
-                if ($existingVariant) {
-                    if ($existingVariant->trashed()) {
-                        $existingVariant->restore();
-                    }
-
-                    $existingVariant->update([
-                        'price' => $variant['price'],
-                        'stock' => $variant['stock'],
-                        'sku'   => $sku,
-                    ]);
-
-                    $productVariant = $existingVariant;
-                } else {
-
-                    $productVariant = ProductVariant::create([
-                        'price'      => $variant['price'],
-                        'stock'      => $variant['stock'],
-                        'sku'        => $sku,
-                        'product_id' => $product->id,
-                    ]);
-                }
-
-                $attributeIds = collect([
-                    $variant['size']['id'] ?? null,
-                    $variant['color']['id'] ?? null,
-                ])->filter();
-
-                $productVariant->attributes()->sync($attributeIds);
-
-                $newVariantIds[] = $productVariant->id;
-            }
-
-
-            $oldVariants->whereNotIn('id', $newVariantIds)->each(function ($v) {
-                $v->delete();
-            });
-
-
-
-            $imageState = json_decode($data['image_state'], true) ?? [];
-            $imagesUpload = $data['images_upload'] ?? [];
-
-            $basePath = 'product-images/' . $product->slug . '/' . now()->format('Y/m/d');
-
-
-            $oldImages = ProductImage::where('product_id', $product->id)->get();
-            $idsInState = collect($imageState)->pluck('id')->filter()->all();
-
-            $oldImages->each(function ($image) use ($idsInState) {
-                if (!in_array($image->id, $idsInState)) {
-                    if (Storage::disk('public')->exists($image->path)) {
-                        Storage::disk('public')->delete($image->path);
-                    }
-                    $image->delete();
-                }
-            });
-
-            foreach ($imageState as $state) {
-                if (!isset($state['id'])) continue;
-
-                $img = ProductImage::find($state['id']);
-                if ($img) {
-                    $img->update([
-                        'type' => $state['type'] ?? $img->type,
-                        'sort_order' => $state['sort_order'] ?? $img->sort_order,
-                    ]);
-                }
-            }
-
-
-            foreach ($imageState as $state) {
-                if (isset($state['id'])) continue;
-
-                $uploadedFile = array_shift($imagesUpload);
-                if (!$uploadedFile) continue;
-
-                $path = $uploadedFile->store($basePath, 'public');
-
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'path' => $path,
-                    'type' => $state['type'] ?? 'gallery',
-                    'sort_order' => $state['sort_order'] ?? 0,
-                ]);
-            }
-
-            foreach ($imagesUpload as $uploadedFile) {
-                $path = $uploadedFile->store($basePath, 'public');
-
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'path' => $path,
-                    'type' => 'gallery',
-                    'sort_order' => ProductImage::where('product_id', $product->id)
-                        ->where('type', 'gallery')->max('sort_order') + 1,
-                ]);
-            }
-            DB::commit();
-
-            return redirect()->route('products.index')->with('success',  FlashHelper::stamp('Product updated successfully'));
+            return redirect()
+                ->route('products.index')
+                ->with('success', FlashHelper::stamp('Product updated successfully'));
         } catch (\Throwable $e) {
-            DB::rollBack();
+            Log::error($e);
 
-            if ($basePath && Storage::disk('public')->exists($basePath)) {
-                Storage::disk('public')->deleteDirectory($basePath);
-            }
-
-            Log::error($e->getMessage());
-            return back()->withErrors(['error' => FlashHelper::stamp('Failed to update product.') . $e->getMessage()]);
+            return back()->withErrors([
+                'error' => FlashHelper::stamp('Failed to update product.')
+            ]);
         }
     }
 
@@ -453,11 +197,10 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
-    }
+        $this->productService->delete($product);
 
-    public function storeVariant(Request $request)
-    {
-        dd($request->all());
+        return redirect()
+            ->route('products.index')
+            ->with('success', FlashHelper::stamp('Product deleted successfully.'));
     }
 }
