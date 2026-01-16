@@ -40,7 +40,7 @@ class CategoryController extends Controller
     {
         $category = $this->categoryService->store($request->validated());
 
-        $message = $category->wasRecentlyCreated ? 'Category created successfully.' : 'Category restored successfully.';
+        $message = $category->wasRecentlyCreated ? 'Category  successfully created.' : 'Category successfully restored.';
 
         return redirect()->route('categories.index')
             ->with('success', FlashHelper::stamp($message));
@@ -58,7 +58,7 @@ class CategoryController extends Controller
         $category->update($request->validated());
 
         return redirect()->route('categories.index')
-            ->with('success', FlashHelper::stamp('Category updated successfully.'));
+            ->with('success', FlashHelper::stamp('Category successfully updated.'));
     }
 
     // soft delete a category
@@ -72,7 +72,7 @@ class CategoryController extends Controller
         }
 
         return redirect()->route('categories.index')
-            ->with('success', FlashHelper::stamp('Category deleted successfully.'));
+            ->with('success', FlashHelper::stamp('Category successfully deleted.'));
     }
 
     // store a new category without redirect to categories.index
@@ -81,6 +81,6 @@ class CategoryController extends Controller
         $this->categoryService->store($request->validated());
 
         return redirect()->back()
-            ->with('success', FlashHelper::stamp('Category created successfully.'));
+            ->with('success', FlashHelper::stamp('Category successfully created.'));
     }
 }

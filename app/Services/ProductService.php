@@ -160,7 +160,6 @@ class ProductService
         try {
             return DB::transaction(function () use ($product, $data, &$basePath) {
 
-
                 $product->update([
                     'name'        => $data['name'],
                     'description' => $data['description'],

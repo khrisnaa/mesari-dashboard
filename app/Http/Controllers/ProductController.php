@@ -21,27 +21,9 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-
-    private function generateUniqueSlug(string $name): string
-    {
-        $slug = Str::slug($name);
-        $originalSlug = $slug;
-
-        $count = 1;
-
-        while (Product::where('slug', $slug)->exists()) {
-            $slug = $originalSlug . '-' . $count;
-            $count++;
-        }
-
-        return $slug;
-    }
-
-
     public function __construct(
         protected ProductService $productService
     ) {}
-
 
     // display a paginated list of product
     public function index(Request $request)
@@ -95,9 +77,7 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(CreateProductRequest $request)
     {
         try {
@@ -105,7 +85,7 @@ class ProductController extends Controller
 
             return redirect()
                 ->route('products.index')
-                ->with('success', FlashHelper::stamp('Product created successfully'));
+                ->with('success', FlashHelper::stamp('Product successfully created.'));
         } catch (\Throwable $e) {
             Log::error($e);
 
@@ -116,18 +96,6 @@ class ProductController extends Controller
     }
 
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Product $product)
     {
         $categories = Category::all();
@@ -172,9 +140,7 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(UpdateProductRequest $request, Product $product)
     {
         try {
@@ -182,7 +148,7 @@ class ProductController extends Controller
 
             return redirect()
                 ->route('products.index')
-                ->with('success', FlashHelper::stamp('Product updated successfully'));
+                ->with('success', FlashHelper::stamp('Product successfully updated.'));
         } catch (\Throwable $e) {
             Log::error($e);
 
@@ -192,15 +158,13 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Product $product)
     {
         $this->productService->delete($product);
 
         return redirect()
             ->route('products.index')
-            ->with('success', FlashHelper::stamp('Product deleted successfully.'));
+            ->with('success', FlashHelper::stamp('Product successfully deleted.'));
     }
 }
