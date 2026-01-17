@@ -6,6 +6,7 @@ use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -143,6 +144,18 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('edit');
 
         Route::put('/', [CompanyProfileController::class, 'update'])
+            ->name('update');
+    });
+
+    Route::prefix('users')->name('users.')->group(function () {
+
+        Route::get('/', [UserController::class, 'index'])
+            ->name('index');
+
+        Route::get('/{user}/edit', [UserController::class, 'edit'])
+            ->name('edit');
+
+        Route::put('/{user}', [UserController::class, 'update'])
             ->name('update');
     });
 });
