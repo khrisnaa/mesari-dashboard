@@ -55,6 +55,7 @@ const Index = ({ categories }: PageProps) => {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Categories" />
             <FlashToast />
+
             <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Categories"

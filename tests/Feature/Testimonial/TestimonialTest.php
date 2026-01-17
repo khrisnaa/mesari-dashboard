@@ -32,14 +32,14 @@ it('can access testimonial index page', function () {
         );
 });
 
-it('can access testimonial create page', function () {
-    $this->get(route('testimonials.create'))
-        ->assertStatus(200)
-        ->assertInertia(
-            fn($page) => $page
-                ->component('testimonials/create')
-        );
-});
+// it('can access testimonial create page', function () {
+//     $this->get(route('testimonials.create'))
+//         ->assertStatus(200)
+//         ->assertInertia(
+//             fn($page) => $page
+//                 ->component('testimonials/create')
+//         );
+// });
 
 it('can store a testimonial', function () {
     $data = [
@@ -59,17 +59,17 @@ it('can store a testimonial', function () {
     ]);
 });
 
-it('can access edit page', function () {
-    $testimonial = Testimonial::factory()->create();
+// it('can access edit page', function () {
+//     $testimonial = Testimonial::factory()->create();
 
-    $this->get(route('testimonials.edit', $testimonial))
-        ->assertStatus(200)
-        ->assertInertia(
-            fn($page) => $page
-                ->component('testimonials/edit')
-                ->has('testimonial')
-        );
-});
+//     $this->get(route('testimonials.edit', $testimonial))
+//         ->assertStatus(200)
+//         ->assertInertia(
+//             fn($page) => $page
+//                 ->component('testimonials/edit')
+//                 ->has('testimonial')
+//         );
+// });
 
 it('can update a testimonial', function () {
     $testimonial = Testimonial::factory()->create([

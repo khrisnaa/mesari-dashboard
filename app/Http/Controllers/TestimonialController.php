@@ -17,6 +17,7 @@ class TestimonialController extends Controller
         protected TestimonialService $testimonialService
     ) {}
 
+    // fetch testimonials
     public function index(Request $request)
     {
         $testimonials = $this->testimonialService->paginate($request->all());
@@ -27,11 +28,7 @@ class TestimonialController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return Inertia::render('testimonials/create');
-    }
-
+    // store testimonial
     public function store(StoreTestimonialRequest $request)
     {
         $this->testimonialService->store($request->validated());
@@ -40,16 +37,7 @@ class TestimonialController extends Controller
             ->with('success', FlashHelper::stamp('Testimonial successfully created.'));
     }
 
-
-    public function edit(string $id)
-    {
-        $testimonial = Testimonial::findOrFail($id);
-
-        return Inertia::render('testimonials/edit', [
-            'testimonial' => $testimonial
-        ]);
-    }
-
+    // update testimonial
     public function update(UpdateTestimonialRequest $request, Testimonial $testimonial)
     {
         $this->testimonialService->update($testimonial, $request->validated());
@@ -58,6 +46,7 @@ class TestimonialController extends Controller
             ->with('success', FlashHelper::stamp('Testimonial successfully updated.'));
     }
 
+    // delete testimonial
     public function destroy(Testimonial $testimonial)
     {
         $this->testimonialService->delete($testimonial);

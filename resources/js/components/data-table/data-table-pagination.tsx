@@ -96,7 +96,7 @@ export const DataTablePagination = <TData,>({
                 <div className="mr-4 flex items-center justify-center space-x-2">
                     <p className="text-sm font-medium">Rows per page</p>
                     <Select
-                        value={`${params?.per_page}`}
+                        value={`${params?.per_page ?? 10}`}
                         onValueChange={(value) => {
                             const size = Number(value);
                             table.setPageSize(size);

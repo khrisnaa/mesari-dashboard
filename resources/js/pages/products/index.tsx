@@ -27,6 +27,7 @@ const Index = ({ products }: PageProps) => {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Products" />
             <FlashToast />
+
             <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Products"

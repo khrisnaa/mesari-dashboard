@@ -1,6 +1,6 @@
-import faqs from '@/routes/faqs';
+import testimonials from '@/routes/testimonials';
 import { DialogComponentProps } from '@/types/dialog';
-import { Faq } from '@/types/faq';
+import { Testimonial } from '@/types/testimonial';
 import { Form } from '@inertiajs/react';
 import { SubmitButton } from '../buttons/submit-button';
 import { Button } from '../ui/button';
@@ -17,21 +17,26 @@ export const DeleteDialog = ({
     isOpen,
     close,
     onOpenChange,
-    payload: faq,
-}: DialogComponentProps<Faq>) => {
-    if (!faq) return null;
+    payload: testimonial,
+}: DialogComponentProps<Testimonial>) => {
+    if (!testimonial) return null;
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="w-sm">
                 <DialogHeader>
-                    <DialogTitle>Delete FAQ</DialogTitle>
+                    <DialogTitle>Delete Testimonial</DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. Are you sure you want to delete this FAQ?
+                        This action cannot be undone. Are you sure you want to delete this
+                        testimonial?
                     </DialogDescription>
                 </DialogHeader>
 
-                <Form {...faqs.destroy.form(faq)} disableWhileProcessing onSuccess={close}>
+                <Form
+                    {...testimonials.destroy.form(testimonial)}
+                    disableWhileProcessing
+                    onSuccess={close}
+                >
                     {({ processing }) => (
                         <DialogFooter>
                             <Button

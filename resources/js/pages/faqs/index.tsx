@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { getColumns } from '@/components/faq/columns';
 import { CreateDialog } from '@/components/faq/create-dialog';
-import { DeleteFaqDialog } from '@/components/faq/delete-dialog';
+import { DeleteDialog } from '@/components/faq/delete-dialog';
 import { EditDialog } from '@/components/faq/edit-dialog';
 import FlashToast from '@/components/flash-toast';
 import { PageHeader } from '@/components/page-header';
@@ -16,7 +16,7 @@ import { Plus } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Categories',
+        title: 'FAQs',
         href: '',
     },
 ];
@@ -55,6 +55,7 @@ const Index = ({ faqs }: PageProps) => {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Faqs" />
             <FlashToast />
+
             <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Faqs"
@@ -89,7 +90,7 @@ const Index = ({ faqs }: PageProps) => {
                 payload={editData}
             />
 
-            <DeleteFaqDialog
+            <DeleteDialog
                 isOpen={isDeleteOpen}
                 close={closeDelete}
                 onOpenChange={onDeleteOpenChange}
