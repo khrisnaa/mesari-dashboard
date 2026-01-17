@@ -16,7 +16,7 @@ class CategoryController extends Controller
         protected CategoryService $categoryService
     ) {}
 
-    // display a paginated list of category
+    // fetch categories
     public function index(Request $request)
     {
         $categories = $this->categoryService->paginate($request->all());
@@ -27,32 +27,19 @@ class CategoryController extends Controller
         ]);
     }
 
-    // show form to create a new category
-    public function create()
-    {
-        return Inertia::render('categories/create', [
-            'categories' => Category::all()
-        ]);
-    }
-
-    // store a new category in the database
+    // store category
     public function store(StoreCategoryRequest $request)
     {
         $category = $this->categoryService->store($request->validated());
 
         $message = $category->wasRecentlyCreated ? 'Category  successfully created.' : 'Category successfully restored.';
 
-        return redirect()->route('categories.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp($message));
     }
 
-    // show form to edit an existing category
-    public function edit(Category $category)
-    {
-        return Inertia::render('categories/edit', ['category' => $category]);
-    }
 
-    // update an existing category
+    // update category
     public function update(UpdateCategoryRequest $request, Category $category)
     {
         $category->update($request->validated());
@@ -61,7 +48,7 @@ class CategoryController extends Controller
             ->with('success', FlashHelper::stamp('Category successfully updated.'));
     }
 
-    // soft delete a category
+    // delete category
     public function destroy(Category $category)
     {
         $deleted = $this->categoryService->delete($category);
@@ -73,14 +60,5 @@ class CategoryController extends Controller
 
         return redirect()->route('categories.index')
             ->with('success', FlashHelper::stamp('Category successfully deleted.'));
-    }
-
-    // store a new category without redirect to categories.index
-    public function storeForModal(StoreCategoryRequest $request)
-    {
-        $this->categoryService->store($request->validated());
-
-        return redirect()->back()
-            ->with('success', FlashHelper::stamp('Category successfully created.'));
     }
 }

@@ -7,18 +7,16 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import categories from '@/routes/categories';
 import { Category } from '@/types/category';
-import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { ChevronDownIcon, Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';
-import { useState } from 'react';
-import { ConfirmationDialog } from '../confirmation-dialog';
-import { DetailDialog } from './detail-dialog';
+import { ChevronDownIcon, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
-export const columns: ColumnDef<Category>[] = [
+export const getColumns = (
+    onEdit: (category: Category) => void,
+    onDelete: (category: Category) => void,
+): ColumnDef<Category>[] => [
     {
-        id: 'no',
+        id: 'rowNumber',
         header: '#',
         cell: ({ row, table }) => {
             const pageIndex = table.getState().pagination.pageIndex;
@@ -69,27 +67,8 @@ export const columns: ColumnDef<Category>[] = [
         id: 'actions',
         cell: ({ row }) => {
             const category = row.original;
-            const [isDetailOpen, setIsDetailOpen] = useState(false);
-            const [isDeleteOpen, setIsDeleteOpen] = useState(false);
             return (
                 <>
-                    <DetailDialog
-                        category={category}
-                        open={isDetailOpen}
-                        onOpenChange={setIsDetailOpen}
-                    />
-                    <ConfirmationDialog
-                        open={isDeleteOpen}
-                        onOpenChange={setIsDeleteOpen}
-                        title="Delete Category?"
-                        description="This action cannot be undone. This category will be permanently removed."
-                        confirmLabel="Delete"
-                        cancelLabel="Cancel"
-                        variant="danger"
-                        onConfirm={() => {
-                            router.delete(categories.destroy(category));
-                        }}
-                    />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -100,22 +79,12 @@ export const columns: ColumnDef<Category>[] = [
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem>
                                 <Button
-                                    onClick={() => router.get(categories.edit(category))}
+                                    onClick={() => onEdit(category)}
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-between"
                                 >
                                     Edit <Pencil />
-                                </Button>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-between"
-                                    onClick={() => setIsDetailOpen(true)}
-                                >
-                                    Show <Eye />
                                 </Button>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -124,7 +93,7 @@ export const columns: ColumnDef<Category>[] = [
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-between text-red-500 hover:text-red-600"
-                                    onClick={() => setIsDeleteOpen(true)}
+                                    onClick={() => onDelete(category)}
                                 >
                                     Delete <Trash className="text-red-500" />
                                 </Button>

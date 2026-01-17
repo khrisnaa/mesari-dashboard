@@ -7,7 +7,6 @@ import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
 import categories from '@/routes/categories';
 import { BreadcrumbItem } from '@/types';
-import { Category } from '@/types/category';
 import { Form, Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,10 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface PageProps {
-    categories: Category[];
-}
-const Create = ({ categories: categoriesData }: PageProps) => {
+const Create = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Category" />
@@ -57,37 +53,6 @@ const Create = ({ categories: categoriesData }: PageProps) => {
                                         />
                                         <InputError message={errors.name} className="mt-2" />
                                     </div>
-                                    {/* <div className="grid gap-2">
-                                        <Label htmlFor="description">Description</Label>
-                                        <Textarea
-                                            id="description"
-                                            autoFocus
-                                            autoComplete="description"
-                                            name="description"
-                                            placeholder="Category description"
-                                        />
-                                        <InputError message={errors.description} className="mt-2" />
-                                    </div>
-
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="parent_id">Parent</Label>
-                                        <Select name="parent_id">
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select Parent" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {categoriesData.map((category, i) => (
-                                                    <SelectItem key={i} value={category.id}>
-                                                        {category.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputDescription>
-                                            Set parent if your category is sub-category
-                                        </InputDescription>
-                                        <InputError message={errors.parent_id} className="mt-2" />
-                                    </div> */}
 
                                     <Button type="submit" className="mt-2 w-full" tabIndex={5}>
                                         {processing && <Spinner />}

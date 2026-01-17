@@ -32,14 +32,14 @@ it('can access category index page', function () {
 });
 
 // show form create a new category test
-it('can access create category page', function () {
-    $this->get(route('categories.create'))
-        ->assertStatus(200)
-        ->assertInertia(
-            fn($page) => $page
-                ->component('categories/create')
-        );
-});
+// it('can access create category page', function () {
+//     $this->get(route('categories.create'))
+//         ->assertStatus(200)
+//         ->assertInertia(
+//             fn($page) => $page
+//                 ->component('categories/create')
+//         );
+// });
 
 // store a new category test
 it('can store new category', function () {
@@ -55,17 +55,17 @@ it('can store new category', function () {
 });
 
 // show form edit a category test
-it('can access edit category page', function () {
-    $category = Category::factory()->create();
+// it('can access edit category page', function () {
+//     $category = Category::factory()->create();
 
-    $this->get(route('categories.edit', $category))
-        ->assertStatus(200)
-        ->assertInertia(
-            fn($page) => $page
-                ->component('categories/edit')
-                ->has('category')
-        );
-});
+//     $this->get(route('categories.edit', $category))
+//         ->assertStatus(200)
+//         ->assertInertia(
+//             fn($page) => $page
+//                 ->component('categories/edit')
+//                 ->has('category')
+//         );
+// });
 
 // update a category test
 it('can update category', function () {

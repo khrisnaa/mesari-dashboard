@@ -1,11 +1,6 @@
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -17,10 +12,7 @@ interface NewCategoryDialogProps {
     onOpenChange: (value: boolean) => void;
 }
 
-export const NewCategoryDialog = ({
-    open,
-    onOpenChange,
-}: NewCategoryDialogProps) => {
+export const NewCategoryDialog = ({ open, onOpenChange }: NewCategoryDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
@@ -28,7 +20,7 @@ export const NewCategoryDialog = ({
                     <DialogTitle>Add new category</DialogTitle>
                 </DialogHeader>
                 <Form
-                    {...categories.store.modal.form()}
+                    {...categories.store.form()}
                     resetOnSuccess={['name']}
                     disableWhileProcessing
                     className="flex flex-col gap-6"
@@ -52,17 +44,10 @@ export const NewCategoryDialog = ({
                                         name="name"
                                         placeholder="Category name"
                                     />
-                                    <InputError
-                                        message={errors.name}
-                                        className="mt-2"
-                                    />
+                                    <InputError message={errors.name} className="mt-2" />
                                 </div>
 
-                                <Button
-                                    type="submit"
-                                    className="mt-2 w-full"
-                                    tabIndex={5}
-                                >
+                                <Button type="submit" className="mt-2 w-full" tabIndex={5}>
                                     {processing && <Spinner />}
                                     Create category
                                 </Button>
