@@ -19,13 +19,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { generateGridTemplate } from '@/lib/table-grid';
 import { PaginationDetails } from '@/types/pagination';
 import { router, usePage } from '@inertiajs/react';
 import { DataTableFilter } from './data-table-filter';
@@ -44,25 +38,28 @@ export function DataTable<TData extends { id: string }, TValue>({
     pagination,
     name,
 }: DataTableProps<TData, TValue>) {
-    const { filters } = usePage().props as any as {
-        filters?: {
+    const { params } = usePage().props as {
+        params?: {
             search?: string;
             sort?: string;
             direction?: string;
             per_page?: number;
         };
     };
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-        {},
-    );
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+
     const [rowSelection, setRowSelection] = useState({});
+
     const [paginationRow, setPaginationRow] = useState({
         pageIndex: 0,
-        pageSize: filters?.per_page ?? 10,
+        pageSize: params?.per_page ?? 10,
     });
+
     const [sorting, setSorting] = useState<SortingState>(() => {
-        const sort = filters?.sort;
-        const direction = filters?.direction;
+        const sort = params?.sort;
+
+        const direction = params?.direction;
+
         if (sort) {
             return [
                 {
@@ -85,11 +82,11 @@ export function DataTable<TData extends { id: string }, TValue>({
             router.get(
                 '?',
                 {
-                    ...filters,
+                    ...params,
                     sort,
                     direction,
                     page: 1,
-                    per_page: pagination.per_page,
+                    per_page: paginationRow.pageSize,
                 },
                 {
                     preserveScroll: true,
@@ -119,51 +116,31 @@ export function DataTable<TData extends { id: string }, TValue>({
         },
     });
 
+    // column sizing handler
+    const gridTemplate = generateGridTemplate(columns);
+
     return (
         <div>
             <div className="flex items-center py-4">
                 <DataTableFilter placeholder={name} />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            Columns
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) =>
-                                            column.toggleVisibility(!!value)
-                                        }
-                                    >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                );
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
             </div>
 
             <div className="overflow-hidden rounded-md border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
+                            <TableRow
+                                key={headerGroup.id}
+                                className="grid"
+                                style={{ gridTemplateColumns: gridTemplate }}
+                            >
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead key={header.id} className="flex items-center">
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
+                                                      header.column.columnDef.header,
                                                       header.getContext(),
                                                   )}
                                         </TableHead>
@@ -177,12 +154,12 @@ export function DataTable<TData extends { id: string }, TValue>({
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && 'selected'
-                                    }
+                                    data-state={row.getIsSelected() && 'selected'}
+                                    className="grid"
+                                    style={{ gridTemplateColumns: gridTemplate }}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="flex items-center">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext(),
@@ -193,10 +170,7 @@ export function DataTable<TData extends { id: string }, TValue>({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
                                     No results.
                                 </TableCell>
                             </TableRow>

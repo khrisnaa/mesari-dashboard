@@ -41,6 +41,7 @@ const Index = ({ categories }: PageProps) => {
                 />
                 <div className="container mx-auto">
                     <DataTable
+                        name="category"
                         columns={columns}
                         data={categories.data}
                         pagination={(({ data, ...rest }) => rest)(categories)}

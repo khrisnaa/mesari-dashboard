@@ -3,13 +3,7 @@ import { PaginationDetails } from '@/types/pagination';
 import { router, usePage } from '@inertiajs/react';
 import { Table } from '@tanstack/react-table';
 import { Button } from '../ui/button';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface DataTablePaginationProps<TData> {
     selected: {
@@ -25,8 +19,8 @@ export const DataTablePagination = <TData,>({
     selected,
     table,
 }: DataTablePaginationProps<TData>) => {
-    const { filters } = usePage().props as any as {
-        filters?: {
+    const { params } = usePage().props as any as {
+        params?: {
             search?: string;
             sort?: string;
             direction?: string;
@@ -42,7 +36,7 @@ export const DataTablePagination = <TData,>({
         router.get(
             `?`,
             {
-                ...filters,
+                ...params,
                 page,
             },
             {
@@ -62,26 +56,10 @@ export const DataTablePagination = <TData,>({
 
         // Case 3: Near end
         if (current >= last - 3)
-            return [
-                1,
-                'ellipsis',
-                last - 4,
-                last - 3,
-                last - 2,
-                last - 1,
-                last,
-            ];
+            return [1, 'ellipsis', last - 4, last - 3, last - 2, last - 1, last];
 
         // Case 4: Middle
-        return [
-            1,
-            'ellipsis',
-            current - 1,
-            current,
-            current + 1,
-            'ellipsis',
-            last,
-        ];
+        return [1, 'ellipsis', current - 1, current, current + 1, 'ellipsis', last];
     };
 
     const pages = generatePages();
@@ -89,10 +67,7 @@ export const DataTablePagination = <TData,>({
     const renderPage = (p: number | 'ellipsis', i: number) => {
         if (p === 'ellipsis') {
             return (
-                <span
-                    key={i}
-                    className="flex w-10 items-center justify-center px-2"
-                >
+                <span key={i} className="flex w-10 items-center justify-center px-2">
                     ...
                 </span>
             );
@@ -112,23 +87,23 @@ export const DataTablePagination = <TData,>({
     };
 
     return (
-        <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
+        <div className="flex items-center justify-end">
+            {/* <div className="text-sm text-muted-foreground">
                 {selected.count} of {selected.total} row(s) selected.
-            </div>
+            </div> */}
 
             <div className="flex items-center justify-end space-x-2 py-4">
                 <div className="mr-4 flex items-center justify-center space-x-2">
                     <p className="text-sm font-medium">Rows per page</p>
                     <Select
-                        value={`${filters?.per_page}`}
+                        value={`${params?.per_page}`}
                         onValueChange={(value) => {
                             const size = Number(value);
                             table.setPageSize(size);
                             router.get(
                                 `?`,
                                 {
-                                    ...filters,
+                                    ...params,
                                     per_page: size,
                                 },
                                 {
@@ -140,18 +115,11 @@ export const DataTablePagination = <TData,>({
                         }}
                     >
                         <SelectTrigger className="h-8 w-[70px]">
-                            <SelectValue
-                                placeholder={
-                                    table.getState().pagination.pageSize
-                                }
-                            />
+                            <SelectValue placeholder={table.getState().pagination.pageSize} />
                         </SelectTrigger>
                         <SelectContent side="top">
-                            {[2, 10, 20, 25, 30, 40, 50].map((pageSize) => (
-                                <SelectItem
-                                    key={pageSize}
-                                    value={`${pageSize}`}
-                                >
+                            {[10, 20, 25, 30, 40, 50].map((pageSize) => (
+                                <SelectItem key={pageSize} value={`${pageSize}`}>
                                     {pageSize}
                                 </SelectItem>
                             ))}

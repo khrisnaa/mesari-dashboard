@@ -6,18 +6,19 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import categories from '@/routes/categories';
 import { Category } from '@/types/category';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { ChevronDownIcon, Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmationDialog } from '../confirmation-dialog';
 import { DetailDialog } from './detail-dialog';
 
 export const columns: ColumnDef<Category>[] = [
     {
-        id: 'rowNumber',
+        id: 'no',
         header: '#',
         cell: ({ row, table }) => {
             const pageIndex = table.getState().pagination.pageIndex;
@@ -30,6 +31,7 @@ export const columns: ColumnDef<Category>[] = [
         },
         enableSorting: false,
         enableHiding: false,
+        meta: { width: { type: 'fixed', px: 56 } },
     },
     {
         accessorKey: 'name',
@@ -37,16 +39,31 @@ export const columns: ColumnDef<Category>[] = [
             <Button
                 variant="ghost"
                 size="sm"
+                className="flex cursor-pointer items-center justify-center"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
                 Name
-                <ArrowUpDown className="ml-2 h-4 w-4" />
+                <span>
+                    <ChevronDownIcon
+                        size={12}
+                        className={cn(
+                            'ml-2 transition-all duration-300',
+                            column.getIsSorted() === 'asc' ? 'rotate-0' : '-rotate-180',
+                        )}
+                    />
+                </span>
             </Button>
         ),
+        cell: ({ row }) => {
+            const name = row.original.name;
+            return <div className="px-3">{name}</div>;
+        },
+        meta: { width: { type: 'flex', fr: 2 } },
     },
     {
         accessorKey: 'slug',
         header: 'Slug',
+        meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         id: 'actions',
@@ -117,5 +134,6 @@ export const columns: ColumnDef<Category>[] = [
                 </>
             );
         },
+        meta: { width: { type: 'fixed', px: 64 } },
     },
 ];

@@ -12,7 +12,12 @@ class CategoryService
     public function paginate(array $params): LengthAwarePaginator
     {
         $perPage = $params['per_page'] ?? 10;
-        $sort = in_array($params['sort'] ?? '', ['name', 'created_at']) ? $params['sort'] : 'created_at';
+
+        $sort = in_array($params['sort'] ?? '', [
+            'name',
+            'created_at'
+        ]) ? $params['sort'] : 'created_at';
+
         $direction = ($params['direction'] ?? '') === 'asc' ? 'asc' : 'desc';
 
         return Category::query()

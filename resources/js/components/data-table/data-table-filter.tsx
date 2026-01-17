@@ -1,30 +1,45 @@
 import { router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '../ui/input';
 
 interface DataTableFilterProps {
     placeholder?: string;
 }
 export const DataTableFilter = ({ placeholder }: DataTableFilterProps) => {
-    const { filters } = usePage().props as any;
-    const [search, setSearch] = useState(filters.search || '');
-    const handleSearch = (value: string) => {
-        setSearch(value);
-        router.get(
-            `?search=${value}&page=1`,
-            {},
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
-    };
+    const { params } = usePage<{
+        params?: {
+            search?: string;
+        };
+    }>().props;
+
+    const initialSearch = params?.search ?? '';
+    const [search, setSearch] = useState(initialSearch);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            router.get(
+                '?',
+                {
+                    ...params,
+                    search,
+                    page: 1,
+                },
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                    replace: true,
+                },
+            );
+        }, 500);
+
+        return () => clearTimeout(timeout);
+    }, [search]);
+
     return (
         <Input
-            placeholder={`Filter ${placeholder ?? 'items'}...`}
+            placeholder={`Search ${placeholder ?? 'items'} ...`}
             value={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             className="max-w-sm"
         />
     );

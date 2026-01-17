@@ -1,5 +1,4 @@
 import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
@@ -12,40 +11,76 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import categories from '@/routes/categories';
+import companyProfile from '@/routes/company-profile';
+import faqs from '@/routes/faqs';
+import orders from '@/routes/orders';
 import products from '@/routes/products';
-import { type NavItem } from '@/types';
+import testimonials from '@/routes/testimonials';
+import users from '@/routes/users';
+import { type NavItemGroup } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import {
+    BookOpenIcon,
+    Building2Icon,
+    FolderIcon,
+    HelpCircleIcon,
+    LayoutGridIcon,
+    MessageSquareIcon,
+    PackageIcon,
+    ReceiptIcon,
+    TagIcon,
+    UserCogIcon,
+} from 'lucide-react';
 import AppLogo from './app-logo';
+import { NavMain } from './nav-main';
 
-const mainNavItems: NavItem[] = [
+const mainNavItems: NavItemGroup[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
+        heading: 'Dashboard',
+        items: [{ title: 'Overview', href: dashboard(), icon: LayoutGridIcon }],
     },
+
     {
-        title: 'Products',
-        href: products.index(),
-        icon: LayoutGrid,
+        heading: 'Catalog',
+        items: [
+            { title: 'Products', href: products.index(), icon: PackageIcon },
+            { title: 'Categories', href: categories.index(), icon: TagIcon },
+        ],
     },
+
     {
-        title: 'Categories',
-        href: categories.index(),
-        icon: LayoutGrid,
+        heading: 'Content Management',
+        items: [
+            { title: 'Testimonials', href: testimonials.index(), icon: MessageSquareIcon },
+            { title: 'FAQs', href: faqs.index(), icon: HelpCircleIcon },
+            { title: 'Company Profile', href: companyProfile.edit(), icon: Building2Icon },
+        ],
+    },
+
+    {
+        heading: 'User Management',
+        items: [
+            { title: 'Users', href: users.index(), icon: UserCogIcon },
+            { title: 'Orders', href: orders.index(), icon: ReceiptIcon },
+        ],
     },
 ];
 
-const footerNavItems: NavItem[] = [
+const footerNavItems: NavItemGroup[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        heading: 'Developer',
+        items: [
+            {
+                title: 'Repository',
+                href: 'https://github.com/laravel/react-starter-kit',
+                icon: FolderIcon,
+            },
+            {
+                title: 'Documentation',
+                href: 'https://laravel.com/docs/starter-kits#react',
+                icon: BookOpenIcon,
+            },
+        ],
     },
 ];
 
@@ -65,11 +100,15 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                {mainNavItems.map((group) => (
+                    <NavMain key={group.heading} group={group} />
+                ))}
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                {footerNavItems.map((group) => (
+                    <NavFooter key={group.heading} group={group} className="mt-auto p-0" />
+                ))}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
