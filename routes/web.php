@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TestimonialController;
@@ -134,6 +135,15 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
 
         Route::delete('/{banner}', [BannerController::class, 'destroy'])
             ->name('destroy');
+    });
+
+    Route::prefix('company-profile')->name('company-profile.')->group(function () {
+
+        Route::get('/edit', [CompanyProfileController::class, 'edit'])
+            ->name('edit');
+
+        Route::put('/', [CompanyProfileController::class, 'update'])
+            ->name('update');
     });
 });
 
