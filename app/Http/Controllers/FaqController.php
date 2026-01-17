@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FlashHelper;
-use App\Http\Requests\Faq\CreateFaqRequest;
+use App\Http\Requests\Faq\StoreFaqRequest;
 use App\Http\Requests\Faq\UpdateFaqRequest;
 use App\Models\Faq;
 use App\Services\FaqService;
@@ -32,7 +32,7 @@ class FaqController extends Controller
         return Inertia::render('faqs/create');
     }
 
-    public function store(CreateFaqRequest $request)
+    public function store(StoreFaqRequest $request)
     {
         $this->faqService->store($request->validated());
 

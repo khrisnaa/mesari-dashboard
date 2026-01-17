@@ -4,7 +4,7 @@ namespace App\Http\Requests\Faq;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateFaqRequest extends FormRequest
+class StoreFaqRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

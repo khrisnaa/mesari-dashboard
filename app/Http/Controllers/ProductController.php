@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FlashHelper;
-use App\Http\Requests\Product\CreateProductRequest;
+use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Attribute;
 use App\Models\Category;
@@ -78,7 +78,7 @@ class ProductController extends Controller
     }
 
 
-    public function store(CreateProductRequest $request)
+    public function store(StoreProductRequest $request)
     {
         try {
             $this->productService->store($request->validated());

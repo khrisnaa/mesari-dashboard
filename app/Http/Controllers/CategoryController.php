@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FlashHelper;
-use App\Http\Requests\Category\CreateCategoryRequest;
+use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Services\CategoryService;
@@ -36,7 +36,7 @@ class CategoryController extends Controller
     }
 
     // store a new category in the database
-    public function store(CreateCategoryRequest $request)
+    public function store(StoreCategoryRequest $request)
     {
         $category = $this->categoryService->store($request->validated());
 
@@ -76,7 +76,7 @@ class CategoryController extends Controller
     }
 
     // store a new category without redirect to categories.index
-    public function storeForModal(CreateCategoryRequest $request)
+    public function storeForModal(StoreCategoryRequest $request)
     {
         $this->categoryService->store($request->validated());
 

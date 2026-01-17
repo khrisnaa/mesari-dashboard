@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FlashHelper;
-use App\Http\Requests\Testimonial\CreateTestimonialRequest;
+use App\Http\Requests\Testimonial\StoreTestimonialRequest;
 use App\Http\Requests\Testimonial\UpdateTestimonialRequest;
 use App\Models\Testimonial;
 use App\Services\TestimonialService;
@@ -32,7 +32,7 @@ class TestimonialController extends Controller
         return Inertia::render('testimonials/create');
     }
 
-    public function store(CreateTestimonialRequest $request)
+    public function store(StoreTestimonialRequest $request)
     {
         $this->testimonialService->store($request->validated());
 
