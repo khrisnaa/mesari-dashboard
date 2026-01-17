@@ -4,6 +4,7 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\UserController;
@@ -156,6 +157,21 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('edit');
 
         Route::put('/{user}', [UserController::class, 'update'])
+            ->name('update');
+    });
+
+    Route::prefix('orders')->name('orders.')->group(function () {
+
+        Route::get('/', [OrderController::class, 'index'])
+            ->name('index');
+
+        Route::get('/{order}', [OrderController::class, 'show'])
+            ->name('show');
+
+        Route::get('/{order}/edit', [OrderController::class, 'edit'])
+            ->name('edit');
+
+        Route::put('/{order}', [OrderController::class, 'update'])
             ->name('update');
     });
 });

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\OrderItem>
@@ -17,9 +18,9 @@ class OrderItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'order_id' => null,
-            'product_id' => null,
-            'product_variant_id' => null,
+            'order_id' => Str::uuid(),
+            'product_id' => Str::uuid(),
+            'product_variant_id' => Str::uuid(),
             'product_name' => null,
             'variant_name' => null,
             'price' => 0,
