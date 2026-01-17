@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BannerController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\ProductController;
@@ -94,6 +95,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
     });
 
     Route::prefix('faqs')->name('faqs.')->group(function () {
+
         Route::get('/', [FaqController::class, 'index'])
             ->name('index');
 
@@ -110,6 +112,27 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('update');
 
         Route::delete('/{faq}', [FaqController::class, 'destroy'])
+            ->name('destroy');
+    });
+
+    Route::prefix('banners')->name('banners.')->group(function () {
+
+        Route::get('/', [BannerController::class, 'index'])
+            ->name('index');
+
+        Route::get('/create', [BannerController::class, 'create'])
+            ->name('create');
+
+        Route::post('/', [BannerController::class, 'store'])
+            ->name('store');
+
+        Route::get('/{banner}/edit', [BannerController::class, 'edit'])
+            ->name('edit');
+
+        Route::put('/{banner}', [BannerController::class, 'update'])
+            ->name('update');
+
+        Route::delete('/{banner}', [BannerController::class, 'destroy'])
             ->name('destroy');
     });
 });
