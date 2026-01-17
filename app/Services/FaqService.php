@@ -15,7 +15,8 @@ class FaqService
             'question',
             'created_at',
             'sort_order',
-        ]) ? $params['sort'] : 'sort_order';
+            'is_published',
+        ]) ? $params['sort'] : 'created_at';
 
         $direction = ($params['direction'] ?? '') === 'asc' ? 'asc' : 'desc';
 

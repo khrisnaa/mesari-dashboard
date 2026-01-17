@@ -93,14 +93,8 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
         Route::get('/', [FaqController::class, 'index'])
             ->name('index');
 
-        Route::get('/create', [FaqController::class, 'create'])
-            ->name('create');
-
         Route::post('/', [FaqController::class, 'store'])
             ->name('store');
-
-        Route::get('/{faq}/edit', [FaqController::class, 'edit'])
-            ->name('edit');
 
         Route::put('/{faq}', [FaqController::class, 'update'])
             ->name('update');

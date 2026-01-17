@@ -19,7 +19,6 @@ beforeEach(function () {
 });
 
 
-// INDEX
 it('can access faq index page', function () {
     Faq::factory()->count(3)->create();
 
@@ -33,14 +32,14 @@ it('can access faq index page', function () {
 });
 
 
-it('can access faq create page', function () {
-    $this->get(route('faqs.create'))
-        ->assertStatus(200)
-        ->assertInertia(
-            fn($page) => $page
-                ->component('faqs/create')
-        );
-});
+// it('can access faq create page', function () {
+//     $this->get(route('faqs.create'))
+//         ->assertStatus(200)
+//         ->assertInertia(
+//             fn($page) => $page
+//                 ->component('faqs/create')
+//         );
+// });
 
 
 it('can store a faq', function () {
@@ -61,17 +60,17 @@ it('can store a faq', function () {
 });
 
 
-it('can access faq edit page', function () {
-    $faq = Faq::factory()->create();
+// it('can access faq edit page', function () {
+//     $faq = Faq::factory()->create();
 
-    $this->get(route('faqs.edit', $faq))
-        ->assertStatus(200)
-        ->assertInertia(
-            fn($page) => $page
-                ->component('faqs/edit')
-                ->has('faq')
-        );
-});
+//     $this->get(route('faqs.edit', $faq))
+//         ->assertStatus(200)
+//         ->assertInertia(
+//             fn($page) => $page
+//                 ->component('faqs/edit')
+//                 ->has('faq')
+//         );
+// });
 
 
 it('can update a faq', function () {

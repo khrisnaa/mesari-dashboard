@@ -7,14 +7,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { Category } from '@/types/category';
+import { Faq } from '@/types/faq';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpIcon, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
 export const getColumns = (
-    onEdit: (category: Category) => void,
-    onDelete: (category: Category) => void,
-): ColumnDef<Category>[] => [
+    onEdit: (faq: Faq) => void,
+    onDelete: (faq: Faq) => void,
+): ColumnDef<Faq>[] => [
     {
         id: 'rowNumber',
         header: '#',
@@ -32,7 +32,7 @@ export const getColumns = (
         meta: { width: { type: 'fixed', px: 56 } },
     },
     {
-        accessorKey: 'name',
+        accessorKey: 'question',
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -40,7 +40,7 @@ export const getColumns = (
                 className="flex cursor-pointer items-center justify-center"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Name
+                Question
                 <ArrowUpIcon
                     className={cn(
                         'size-3 transition-all duration-300',
@@ -52,20 +52,84 @@ export const getColumns = (
             </Button>
         ),
         cell: ({ row }) => {
-            const name = row.original.name;
-            return <div className="px-3">{name}</div>;
+            const question = row.original.question;
+            return <div className="px-3">{question}</div>;
         },
-        meta: { width: { type: 'flex', fr: 2 } },
+        meta: { width: { type: 'flex', fr: 1 } },
     },
     {
-        accessorKey: 'slug',
-        header: 'Slug',
+        accessorKey: 'answer',
+        header: 'Answer',
         meta: { width: { type: 'flex', fr: 1 } },
+    },
+    {
+        accessorKey: 'sort_order',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="flex cursor-pointer items-center justify-center"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Order
+                <ArrowUpIcon
+                    className={cn(
+                        'size-3 transition-all duration-300',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : '-rotate-180 opacity-40',
+                    )}
+                />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const order = row.original.sort_order;
+            return <div className="px-3 text-center">{order}</div>;
+        },
+        meta: { width: { type: 'fixed', px: 100 } },
+    },
+    {
+        accessorKey: 'is_published',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="flex cursor-pointer items-center justify-center"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Status
+                <ArrowUpIcon
+                    className={cn(
+                        'size-3 transition-all duration-300',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : '-rotate-180 opacity-40',
+                    )}
+                />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const published = row.original.is_published;
+
+            return (
+                <div className="flex justify-center px-3">
+                    <span
+                        className={cn(
+                            'rounded-full px-2 py-0.5 text-xs font-medium',
+                            published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600',
+                        )}
+                    >
+                        {published ? 'Published' : 'Draft'}
+                    </span>
+                </div>
+            );
+        },
+        meta: { width: { type: 'fixed', px: 120 } },
     },
     {
         id: 'actions',
         cell: ({ row }) => {
-            const category = row.original;
+            const faq = row.original;
             return (
                 <>
                     <DropdownMenu>
@@ -78,7 +142,7 @@ export const getColumns = (
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem>
                                 <Button
-                                    onClick={() => onEdit(category)}
+                                    onClick={() => onEdit(faq)}
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-between"
@@ -92,7 +156,7 @@ export const getColumns = (
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-between text-red-500 hover:text-red-600"
-                                    onClick={() => onDelete(category)}
+                                    onClick={() => onDelete(faq)}
                                 >
                                     Delete <Trash className="text-red-500" />
                                 </Button>
