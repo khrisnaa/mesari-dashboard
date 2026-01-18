@@ -138,11 +138,11 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
         Route::get('/', [UserController::class, 'index'])
             ->name('index');
 
-        Route::get('/{user}/edit', [UserController::class, 'edit'])
-            ->name('edit');
-
         Route::put('/{user}', [UserController::class, 'update'])
             ->name('update');
+
+        Route::put('/{user}/status', [UserController::class, 'updateStatus'])
+            ->name('update.status');
     });
 
     Route::prefix('orders')->name('orders.')->group(function () {

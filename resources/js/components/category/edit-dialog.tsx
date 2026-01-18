@@ -67,7 +67,7 @@ export const EditDialog = ({
                                     Cancel
                                 </Button>
 
-                                <SubmitButton processing={processing}>Save</SubmitButton>
+                                <SubmitButton processing={processing}>Update</SubmitButton>
                             </DialogFooter>
                         </>
                     )}

@@ -9,7 +9,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Testimonial } from '@/types/testimonial';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { ArrowUpIcon, MoreHorizontal, PencilIcon, TrashIcon } from 'lucide-react';
 
 export const getColumns = (
     onEdit: (testimonials: Testimonial) => void,
@@ -152,7 +152,7 @@ export const getColumns = (
                                     size="sm"
                                     className="w-full justify-between"
                                 >
-                                    Edit <Pencil />
+                                    Edit <PencilIcon />
                                 </Button>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -163,7 +163,7 @@ export const getColumns = (
                                     className="w-full justify-between text-red-500 hover:text-red-600"
                                     onClick={() => onDelete(testimonial)}
                                 >
-                                    Delete <Trash className="text-red-500" />
+                                    Delete <TrashIcon className="text-red-500" />
                                 </Button>
                             </DropdownMenuItem>
                         </DropdownMenuContent>

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserStatus;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -15,6 +16,8 @@ class UserService
             'name',
             'email',
             'created_at',
+            'email_verified_at',
+            'status',
         ]) ? $params['sort'] : 'created_at';
 
         $direction = ($params['direction'] ?? '') === 'asc' ? 'asc' : 'desc';
@@ -42,5 +45,17 @@ class UserService
         }
 
         return $user->update($data);
+    }
+
+    public function updateStatus(User $user, string $status): bool
+    {
+        // Extra safety: pastikan status valid
+        if (! in_array($status, array_column(UserStatus::cases(), 'value'), true)) {
+            throw new \InvalidArgumentException('Invalid user status.');
+        }
+
+        return $user->update([
+            'status' => $status,
+        ]);
     }
 }

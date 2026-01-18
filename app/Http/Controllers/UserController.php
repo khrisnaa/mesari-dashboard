@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserStatus;
+use App\Helpers\FlashHelper;
 use App\Models\User;
 use App\Services\UserService;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Requests\User\UpdateUserStatusRequest;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -22,18 +26,20 @@ class UserController extends Controller
         ]);
     }
 
-    public function edit(User $user)
-    {
-        return Inertia::render('users/edit', [
-            'user' => $user,
-        ]);
-    }
 
     public function update(UpdateUserRequest $request, User $user)
     {
         $this->userService->update($user, $request->validated());
 
         return redirect()->route('users.index')
-            ->with('success', 'User successfully updated.');
+            ->with('success', FlashHelper::stamp('User successfully updated.'));
+    }
+
+
+    public function updateStatus(UpdateUserStatusRequest $request, User $user)
+    {
+        $this->userService->updateStatus($user, $request->validated('status'));
+
+        return back()->with('success', FlashHelper::stamp('User status successfully updated.'));
     }
 }

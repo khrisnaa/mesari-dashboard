@@ -7,14 +7,16 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { Faq } from '@/types/faq';
+
+import { User, UserStatus } from '@/types/user';
+import { formatDate } from '@/utils/formatDate';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, MoreHorizontal, PencilIcon, TrashIcon } from 'lucide-react';
+import { ArrowUpIcon, BanIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
 
 export const getColumns = (
-    onEdit: (faq: Faq) => void,
-    onDelete: (faq: Faq) => void,
-): ColumnDef<Faq>[] => [
+    onEdit: (users: User) => void,
+    onBan: (users: User) => void,
+): ColumnDef<User>[] => [
     {
         id: 'rowNumber',
         header: '#',
@@ -32,7 +34,7 @@ export const getColumns = (
         meta: { width: { type: 'fixed', px: 56 } },
     },
     {
-        accessorKey: 'question',
+        accessorKey: 'name',
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -40,7 +42,7 @@ export const getColumns = (
                 className="flex cursor-pointer items-center justify-center"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Question
+                Name
                 <ArrowUpIcon
                     className={cn(
                         'size-3 transition-all duration-300',
@@ -52,18 +54,13 @@ export const getColumns = (
             </Button>
         ),
         cell: ({ row }) => {
-            const question = row.original.question;
-            return <div className="px-3">{question}</div>;
+            const name = row.original.name;
+            return <div className="px-3">{name}</div>;
         },
-        meta: { width: { type: 'flex', fr: 1 } },
+        meta: { width: { type: 'flex', fr: 2 } },
     },
     {
-        accessorKey: 'answer',
-        header: 'Answer',
-        meta: { width: { type: 'flex', fr: 1 } },
-    },
-    {
-        accessorKey: 'sort_order',
+        accessorKey: 'email',
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -71,7 +68,7 @@ export const getColumns = (
                 className="flex cursor-pointer items-center justify-center"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Order
+                Email
                 <ArrowUpIcon
                     className={cn(
                         'size-3 transition-all duration-300',
@@ -83,13 +80,81 @@ export const getColumns = (
             </Button>
         ),
         cell: ({ row }) => {
-            const order = row.original.sort_order;
-            return <div className="px-3 text-center">{order}</div>;
+            const email = row.original.email;
+            return <div className="px-3">{email}</div>;
         },
-        meta: { width: { type: 'fixed', px: 100 } },
+        meta: { width: { type: 'flex', fr: 1 } },
+    },
+
+    {
+        accessorKey: 'created_at',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="flex cursor-pointer items-center justify-center"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Created At
+                <ArrowUpIcon
+                    className={cn(
+                        'size-3 transition-all duration-300',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : '-rotate-180 opacity-40',
+                    )}
+                />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const createdAt = row.original.created_at;
+
+            return <div className="px-3 whitespace-nowrap">{formatDate(createdAt)}</div>;
+        },
+        meta: { width: { type: 'fixed', px: 160 } },
+    },
+
+    {
+        accessorKey: 'email_verified_at',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="flex cursor-pointer items-center justify-center"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Verified
+                <ArrowUpIcon
+                    className={cn(
+                        'size-3 transition-all duration-300',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : '-rotate-180 opacity-40',
+                    )}
+                />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const verifiedAt = row.original.email_verified_at;
+
+            return (
+                <div className="flex justify-center px-3">
+                    {verifiedAt ? (
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                            Verified
+                        </span>
+                    ) : (
+                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                            Not Verified
+                        </span>
+                    )}
+                </div>
+            );
+        },
+        meta: { width: { type: 'fixed', px: 140 } },
     },
     {
-        accessorKey: 'is_published',
+        accessorKey: 'status',
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -109,27 +174,33 @@ export const getColumns = (
             </Button>
         ),
         cell: ({ row }) => {
-            const published = row.original.is_published;
+            const status = row.original.status;
+
+            const statusStyles: Record<UserStatus, string> = {
+                [UserStatus.ACTIVE]: 'bg-green-100 text-green-700',
+                [UserStatus.INACTIVE]: 'bg-gray-100 text-gray-600',
+                [UserStatus.SUSPENDED]: 'bg-red-100 text-red-700',
+            };
 
             return (
                 <div className="flex justify-center px-3">
                     <span
                         className={cn(
                             'rounded-full px-2 py-0.5 text-xs font-medium',
-                            published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600',
+                            statusStyles[status],
                         )}
                     >
-                        {published ? 'Published' : 'Draft'}
+                        {status}
                     </span>
                 </div>
             );
         },
-        meta: { width: { type: 'fixed', px: 120 } },
+        meta: { width: { type: 'fixed', px: 140 } },
     },
     {
         id: 'actions',
         cell: ({ row }) => {
-            const faq = row.original;
+            const user = row.original;
             return (
                 <>
                     <DropdownMenu>
@@ -142,7 +213,7 @@ export const getColumns = (
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem>
                                 <Button
-                                    onClick={() => onEdit(faq)}
+                                    onClick={() => onEdit(user)}
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-between"
@@ -156,9 +227,10 @@ export const getColumns = (
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-between text-red-500 hover:text-red-600"
-                                    onClick={() => onDelete(faq)}
+                                    onClick={() => onBan(user)}
                                 >
-                                    Delete <TrashIcon className="text-red-500" />
+                                    Suspend User
+                                    <BanIcon className="text-red-500" />
                                 </Button>
                             </DropdownMenuItem>
                         </DropdownMenuContent>

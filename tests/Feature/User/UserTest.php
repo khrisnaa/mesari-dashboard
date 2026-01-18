@@ -32,17 +32,17 @@ it('can access the users index page', function () {
 });
 
 
-it('can access user edit page', function () {
-    $user = User::factory()->create();
+// it('can access user edit page', function () {
+//     $user = User::factory()->create();
 
-    $this->get(route('users.edit', $user))
-        ->assertStatus(200)
-        ->assertInertia(
-            fn($page) => $page
-                ->component('users/edit')
-                ->has('user')
-        );
-});
+//     $this->get(route('users.edit', $user))
+//         ->assertStatus(200)
+//         ->assertInertia(
+//             fn($page) => $page
+//                 ->component('users/edit')
+//                 ->has('user')
+//         );
+// });
 
 
 it('can update a user', function () {

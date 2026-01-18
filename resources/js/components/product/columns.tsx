@@ -1,6 +1,6 @@
 import { Product } from '@/types/product';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Eye, MoreHorizontal, Pencil } from 'lucide-react';
+import { ArrowUpDown, EyeIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
 
 import { formatRupiah } from '@/utils/formatRupiah';
 
@@ -112,14 +112,14 @@ export const columns: ColumnDef<Product>[] = [
                                 size="sm"
                                 className="w-full"
                             >
-                                <Pencil />
+                                <PencilIcon />
                                 Edit
                             </Button>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
                             <Button variant="ghost" size="sm" className="w-full">
-                                <Eye />
+                                <EyeIcon />
                                 Show
                             </Button>
                         </DropdownMenuItem>
