@@ -15,4 +15,8 @@ class Faq extends Model
     public $incrementing = false;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'is_published' => 'boolean'
+    ];
 }

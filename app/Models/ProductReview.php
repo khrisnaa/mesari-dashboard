@@ -15,6 +15,10 @@ class ProductReview extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'is_published' => 'boolean'
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class);
