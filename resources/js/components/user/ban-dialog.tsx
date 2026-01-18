@@ -23,7 +23,7 @@ export const BanDialog = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="w-sm">
+            <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
                     <DialogTitle>Suspend User</DialogTitle>
                     <DialogDescription>

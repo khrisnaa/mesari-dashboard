@@ -28,7 +28,7 @@ export const EditDialog = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-md">
+            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>Edit Testimonial</DialogTitle>
                     <DialogDescription>Update the testimonial information.</DialogDescription>

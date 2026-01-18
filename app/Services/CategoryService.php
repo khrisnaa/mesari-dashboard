@@ -46,6 +46,11 @@ class CategoryService
         return Category::create($data);
     }
 
+    public function update(Category $category, array $data): bool
+    {
+        return $category->update($data);
+    }
+
     // delete a category
     public function delete(Category $category): bool
     {

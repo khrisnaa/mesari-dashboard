@@ -20,7 +20,7 @@ import { Textarea } from '../ui/textarea';
 export const CreateDialog = ({ isOpen, close, onOpenChange }: DialogComponentProps) => {
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-md">
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Create Testimonial</DialogTitle>
                     <DialogDescription>

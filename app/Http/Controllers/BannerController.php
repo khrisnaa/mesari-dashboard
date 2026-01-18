@@ -7,6 +7,7 @@ use App\Services\BannerService;
 use App\Http\Requests\Banner\StoreBannerRequest;
 use App\Http\Requests\Banner\UpdateBannerRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class BannerController extends Controller
@@ -40,8 +41,16 @@ class BannerController extends Controller
 
     public function edit(Banner $banner)
     {
+        $banner->backdrop_path = $banner->backdrop_path
+            ? '/storage/' . $banner->backdrop_path
+            : null;
+
+        $banner->image_path = $banner->image_path
+            ? '/storage/' . $banner->image_path
+            : null;
+
         return Inertia::render('banners/edit', [
-            'banner' => $banner,
+            'banner' => $banner
         ]);
     }
 

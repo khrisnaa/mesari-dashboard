@@ -26,7 +26,7 @@ export const EditDialog = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-md">
+            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>Edit Category</DialogTitle>
                     <DialogDescription>Update the selected category information.</DialogDescription>

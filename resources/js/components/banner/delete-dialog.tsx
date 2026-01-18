@@ -1,5 +1,5 @@
-import categories from '@/routes/categories';
-import { Category } from '@/types/category';
+import banners from '@/routes/banners';
+import { Banner } from '@/types/banner';
 import { DialogComponentProps } from '@/types/dialog';
 import { Form } from '@inertiajs/react';
 import { SubmitButton } from '../buttons/submit-button';
@@ -17,25 +17,21 @@ export const DeleteDialog = ({
     isOpen,
     close,
     onOpenChange,
-    payload: category,
-}: DialogComponentProps<Category>) => {
-    if (!category) return null;
+    payload: banner,
+}: DialogComponentProps<Banner>) => {
+    if (!banner) return null;
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
-                    <DialogTitle>Delete Category</DialogTitle>
+                    <DialogTitle>Delete Banner</DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. Are you sure you want to delete this item?
+                        This action cannot be undone. Are you sure you want to delete this banner?
                     </DialogDescription>
                 </DialogHeader>
 
-                <Form
-                    {...categories.destroy.form(category)}
-                    disableWhileProcessing
-                    onSuccess={close}
-                >
+                <Form {...banners.destroy.form(banner)} disableWhileProcessing onSuccess={close}>
                     {({ processing }) => (
                         <DialogFooter>
                             <Button

@@ -327,7 +327,7 @@ export const ColorPickerDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-md p-4 [&>#btn-close]:hidden">
+            <DialogContent className="p-4 [&>#btn-close]:hidden">
                 <DialogTitle className="text-sm">Add a new color</DialogTitle>
                 <div className="space-y-4">
                     <section className="relative z-10 space-y-4">

@@ -1,4 +1,3 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
@@ -10,6 +9,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import banners from '@/routes/banners';
 import categories from '@/routes/categories';
 import companyProfile from '@/routes/company-profile';
 import faqs from '@/routes/faqs';
@@ -24,6 +24,7 @@ import {
     Building2Icon,
     FolderIcon,
     HelpCircleIcon,
+    ImageIcon,
     LayoutGridIcon,
     MessageSquareIcon,
     PackageIcon,
@@ -51,6 +52,7 @@ const mainNavItems: NavItemGroup[] = [
     {
         heading: 'Content Management',
         items: [
+            { title: 'Banners', href: banners.index(), icon: ImageIcon },
             { title: 'Testimonials', href: testimonials.index(), icon: MessageSquareIcon },
             { title: 'FAQs', href: faqs.index(), icon: HelpCircleIcon },
             { title: 'Company Profile', href: companyProfile.edit(), icon: Building2Icon },
@@ -106,9 +108,9 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                {footerNavItems.map((group) => (
+                {/* {footerNavItems.map((group) => (
                     <NavFooter key={group.heading} group={group} className="mt-auto p-0" />
-                ))}
+                ))} */}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

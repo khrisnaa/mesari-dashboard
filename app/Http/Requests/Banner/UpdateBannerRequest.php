@@ -22,16 +22,16 @@ class UpdateBannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'          => ['nullable', 'string', 'max:255'],
-            'description'    => ['nullable', 'string', 'max:255'],
-            'backdrop_path'  => ['required', 'string', 'max:255'],
-            'backdrop_url'   => ['nullable', 'string', 'max:255'],
-            'image_path'     => ['required', 'string', 'max:255'],
-            'image_url'      => ['nullable', 'string', 'max:255'],
-            'cta_text'       => ['nullable', 'string', 'max:255'],
-            'cta_link'       => ['nullable', 'string', 'max:255'],
-            'sort_order'     => ['nullable', 'integer', 'min:0'],
-            'is_active'      => ['required', 'boolean'],
+            'title'       => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:255'],
+
+            'backdrop' => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'image'    => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+
+            'cta_text'  => ['nullable', 'string', 'max:255'],
+            'cta_link'  => ['nullable', 'string', 'max:255'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
+            'is_active' => ['required', 'boolean'],
         ];
     }
 
@@ -44,19 +44,13 @@ class UpdateBannerRequest extends FormRequest
             'description.string'  => 'Description must be a valid string.',
             'description.max'     => 'Description cannot exceed 255 characters.',
 
-            'backdrop_path.required' => 'Backdrop path is required.',
-            'backdrop_path.string'   => 'Backdrop path must be a valid string.',
-            'backdrop_path.max'      => 'Backdrop path cannot exceed 255 characters.',
+            'backdrop.file'    => 'Backdrop must be a valid file.',
+            'backdrop.mimes'   => 'Backdrop must be JPEG, PNG, JPG, or WEBP.',
+            'backdrop.max'     => 'Backdrop file cannot exceed 2MB.',
 
-            'backdrop_url.string' => 'Backdrop URL must be a valid string.',
-            'backdrop_url.max'    => 'Backdrop URL cannot exceed 255 characters.',
-
-            'image_path.required' => 'Image path is required.',
-            'image_path.string'   => 'Image path must be a valid string.',
-            'image_path.max'      => 'Image path cannot exceed 255 characters.',
-
-            'image_url.string'    => 'Image URL must be a valid string.',
-            'image_url.max'       => 'Image URL cannot exceed 255 characters.',
+            'image.file'       => 'Image must be a valid file.',
+            'image.mimes'      => 'Image must be JPEG, PNG, JPG, or WEBP.',
+            'image.max'        => 'Image file cannot exceed 2MB.',
 
             'cta_text.string'     => 'CTA text must be a valid string.',
             'cta_text.max'        => 'CTA text cannot exceed 255 characters.',

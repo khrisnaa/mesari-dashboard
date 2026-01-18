@@ -42,7 +42,7 @@ class CategoryController extends Controller
     // update category
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $category->update($request->validated());
+        $this->categoryService->update($category, $request->validated());
 
         return redirect()->route('categories.index')
             ->with('success', FlashHelper::stamp('Category successfully updated.'));
