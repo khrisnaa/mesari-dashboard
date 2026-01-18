@@ -35,7 +35,7 @@ const Index = ({ products }: PageProps) => {
                     actions={
                         <Button asChild>
                             <Link href={create()}>
-                                <Plus /> Create product
+                                <Plus /> Create Product
                             </Link>
                         </Button>
                     }

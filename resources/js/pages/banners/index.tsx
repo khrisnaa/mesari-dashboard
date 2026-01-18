@@ -62,7 +62,7 @@ const Index = ({ banners }: PageProps) => {
                     actions={
                         <Button asChild>
                             <Link href={create()}>
-                                <Plus /> Create banner
+                                <Plus /> Create Banner
                             </Link>
                         </Button>
                     }

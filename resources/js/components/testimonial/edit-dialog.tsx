@@ -44,7 +44,6 @@ export const EditDialog = ({
                     {({ processing, errors }) => (
                         <>
                             <div className="space-y-6">
-                                {/* Name */}
                                 <div className="space-y-2">
                                     <Label htmlFor="name">Name</Label>
                                     <Input
@@ -57,7 +56,6 @@ export const EditDialog = ({
                                     <InputError message={errors.name} />
                                 </div>
 
-                                {/* Role */}
                                 <div className="space-y-2">
                                     <Label htmlFor="role">Role</Label>
                                     <Input
@@ -70,7 +68,6 @@ export const EditDialog = ({
                                     <InputError message={errors.role} />
                                 </div>
 
-                                {/* Content */}
                                 <div className="space-y-2">
                                     <Label htmlFor="content">Content</Label>
                                     <Textarea
@@ -82,7 +79,6 @@ export const EditDialog = ({
                                     <InputError message={errors.content} />
                                 </div>
 
-                                {/* Sort Order */}
                                 <div className="space-y-2">
                                     <Label htmlFor="sort_order">Sort Order</Label>
                                     <Input
@@ -95,7 +91,6 @@ export const EditDialog = ({
                                     <InputError message={errors.sort_order} />
                                 </div>
 
-                                {/* Published */}
                                 <div className="flex items-center justify-between">
                                     <Label htmlFor="is_published">Published</Label>
 

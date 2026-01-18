@@ -63,7 +63,7 @@ const Edit = ({ banner }: PageProps) => {
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div className="space-y-2">
-                            <Label>Title</Label>
+                            <Label htmlFor="title">Title</Label>
                             <Input
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
@@ -72,7 +72,7 @@ const Edit = ({ banner }: PageProps) => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Sort Order</Label>
+                            <Label htmlFor="sort_order">Sort Order</Label>
                             <Input
                                 type="number"
                                 min={0}
@@ -83,7 +83,7 @@ const Edit = ({ banner }: PageProps) => {
                         </div>
 
                         <div className="space-y-2 md:col-span-2">
-                            <Label>Description</Label>
+                            <Label htmlFor="description">Description</Label>
                             <Textarea
                                 rows={3}
                                 value={data.description}
@@ -94,7 +94,7 @@ const Edit = ({ banner }: PageProps) => {
 
                         <div className="flex gap-6 md:col-span-2">
                             <div className="flex-1 space-y-2">
-                                <Label>Backdrop Image</Label>
+                                <Label htmlFor="backdrop">Backdrop Image</Label>
                                 <SingleImageUpload
                                     value={backdrop}
                                     existingImage={
@@ -115,7 +115,7 @@ const Edit = ({ banner }: PageProps) => {
                             </div>
 
                             <div className="flex-[0.565] space-y-2">
-                                <Label>Main Image</Label>
+                                <Label htmlFor="image">Main Image</Label>
                                 <SingleImageUpload
                                     value={image}
                                     existingImage={
@@ -137,7 +137,7 @@ const Edit = ({ banner }: PageProps) => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>CTA Text</Label>
+                            <Label htmlFor="cta_text">CTA Text</Label>
                             <Input
                                 value={data.cta_text}
                                 onChange={(e) => setData('cta_text', e.target.value)}
@@ -146,7 +146,7 @@ const Edit = ({ banner }: PageProps) => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>CTA Link</Label>
+                            <Label htmlFor="cta_link">CTA Link</Label>
                             <Input
                                 value={data.cta_link}
                                 onChange={(e) => setData('cta_link', e.target.value)}
@@ -155,7 +155,7 @@ const Edit = ({ banner }: PageProps) => {
                         </div>
 
                         <div className="flex items-center justify-between md:col-span-2">
-                            <Label>Active</Label>
+                            <Label htmlFor="is_active">Active</Label>
                             <Switch
                                 checked={data.is_active}
                                 onCheckedChange={(val) => setData('is_active', val)}
