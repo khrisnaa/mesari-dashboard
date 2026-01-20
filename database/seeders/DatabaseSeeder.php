@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             OrderAddressSeeder::class,
             TestimonialSeeder::class,
             FaqSeeder::class,
+            CompanyProfileSeeder::class
         ]);
     }
 }
