@@ -26,21 +26,6 @@ interface PageProps {
 
 const Index = ({ banners }: PageProps) => {
     const {
-        isOpen: isCreateOpen,
-        open: openCreate,
-        close: closeCreate,
-        onOpenChange: onCreateOpenChange,
-    } = useDialog();
-
-    const {
-        isOpen: isEditOpen,
-        open: openEdit,
-        close: closeEdit,
-        onOpenChange: onEditOpenChange,
-        payload: editData,
-    } = useDialog<Banner>();
-
-    const {
         isOpen: isDeleteOpen,
         open: openDelete,
         close: closeDelete,

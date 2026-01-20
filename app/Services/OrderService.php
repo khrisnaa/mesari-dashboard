@@ -11,20 +11,36 @@ class OrderService
     {
         $perPage = $params['per_page'] ?? 10;
 
-        $sort = in_array($params['sort'] ?? '', ['created_at', 'status'])
+        $sort = in_array($params['sort'] ?? '', [
+            'created_at',
+            'status',
+            'payment_status',
+            'user_name',
+        ])
             ? $params['sort']
             : 'created_at';
 
         $direction = ($params['direction'] ?? '') === 'asc' ? 'asc' : 'desc';
 
-        return Order::query()
-            ->when($params['search'] ?? null, function ($q, $search) {
-                $q->where('id', 'like', "%{$search}%")
-                    ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%"));
-            })
-            ->orderBy($sort, $direction)
-            ->paginate($perPage)
-            ->withQueryString();
+        $query = Order::query()
+            ->with(['user', 'items', 'address']);
+
+        $query->when($params['search'] ?? null, function ($q, $search) {
+            $q->where('id', 'like', "%{$search}%")
+                ->orWhereHas('user', function ($u) use ($search) {
+                    $u->where('name', 'like', "%{$search}%");
+                });
+        });
+
+        if ($sort === 'user_name') {
+            $query->leftJoin('users', 'users.id', '=', 'orders.user_id')
+                ->select('orders.*')
+                ->orderBy('users.name', $direction);
+        } else {
+            $query->orderBy($sort, $direction);
+        }
+
+        return $query->paginate($perPage)->withQueryString();
     }
 
     public function find(string $id): Order
