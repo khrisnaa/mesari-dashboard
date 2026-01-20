@@ -55,7 +55,7 @@ const mainNavItems: NavItemGroup[] = [
             { title: 'Banners', href: banners.index(), icon: ImageIcon },
             { title: 'Testimonials', href: testimonials.index(), icon: MessageSquareIcon },
             { title: 'FAQs', href: faqs.index(), icon: HelpCircleIcon },
-            { title: 'Company Profile', href: companyProfile.edit(), icon: Building2Icon },
+            { title: 'Company Profile', href: companyProfile.index(), icon: Building2Icon },
         ],
     },
 

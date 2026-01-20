@@ -126,6 +126,9 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
 
     Route::prefix('company-profile')->name('company-profile.')->group(function () {
 
+        Route::get('/', [CompanyProfileController::class, 'index'])
+            ->name('index');
+
         Route::get('/edit', [CompanyProfileController::class, 'edit'])
             ->name('edit');
 

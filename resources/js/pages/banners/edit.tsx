@@ -9,9 +9,21 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import banners from '@/routes/banners';
+import { BreadcrumbItem } from '@/types';
 import { Banner } from '@/types/banner';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Products',
+        href: banners.index(),
+    },
+    {
+        title: 'Edit',
+        href: '',
+    },
+];
 
 interface PageProps {
     banner: Banner;
@@ -20,8 +32,6 @@ interface PageProps {
 const Edit = ({ banner }: PageProps) => {
     const [backdrop, setBackdrop] = useState<ImageValue | null>(null);
     const [image, setImage] = useState<ImageValue | null>(null);
-
-    console.log(banner);
 
     const { data, setData, post, processing, errors } = useForm({
         title: banner.title ?? '',
@@ -49,12 +59,7 @@ const Edit = ({ banner }: PageProps) => {
     };
 
     return (
-        <AppLayout
-            breadcrumbs={[
-                { title: 'Banners', href: banners.index() },
-                { title: 'Edit', href: '' },
-            ]}
-        >
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Banner" />
 
             <div className="flex h-full max-w-4xl flex-1 flex-col gap-8 rounded-xl p-4">

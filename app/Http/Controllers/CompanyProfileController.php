@@ -12,6 +12,16 @@ class CompanyProfileController extends Controller
         protected CompanyProfileService $companyProfileService
     ) {}
 
+    public function index()
+    {
+        $profile = $this->companyProfileService->get()
+            ?? $this->companyProfileService->initialize();
+
+        return Inertia::render('company-profile/index', [
+            'profile' => $profile,
+        ]);
+    }
+
     public function edit()
     {
         $profile = $this->companyProfileService->get()
