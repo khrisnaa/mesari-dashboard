@@ -53,13 +53,17 @@ export const getColumns = (
         ),
         cell: ({ row }) => {
             const question = row.original.question;
-            return <div className="px-3">{question}</div>;
+            return <div className="px-3 text-wrap">{question}</div>;
         },
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         accessorKey: 'answer',
         header: 'Answer',
+        cell: ({ row }) => {
+            const answer = row.original.answer;
+            return <div className="line-clamp-3 text-wrap">{answer}</div>;
+        },
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {

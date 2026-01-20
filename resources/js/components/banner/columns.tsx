@@ -59,11 +59,19 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
     {
         accessorKey: 'description',
         header: 'Description',
+        cell: ({ row }) => {
+            const description = row.original.description;
+            return <div className="line-clamp-3 text-wrap">{description}</div>;
+        },
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         accessorKey: 'cta_text',
         header: 'CTA Text',
+        cell: ({ row }) => {
+            const cta_text = row.original.cta_text;
+            return <div className="text-wrap">{cta_text}</div>;
+        },
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {

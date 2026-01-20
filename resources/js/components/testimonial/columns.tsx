@@ -60,11 +60,19 @@ export const getColumns = (
     {
         accessorKey: 'role',
         header: 'Role',
+        cell: ({ row }) => {
+            const role = row.original.role;
+            return <div className="text-wrap">{role}</div>;
+        },
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         accessorKey: 'content',
         header: 'Content',
+        cell: ({ row }) => {
+            const content = row.original.content;
+            return <div className="line-clamp-3 text-wrap">{content}</div>;
+        },
         meta: { width: { type: 'flex', fr: 2 } },
     },
     {
