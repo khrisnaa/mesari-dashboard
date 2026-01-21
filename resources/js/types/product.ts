@@ -9,7 +9,7 @@ export interface Product {
     variants: ProductVariant[];
     category: Category;
     images: ProductImage[];
-    discounts?: ProductDiscount[];
+    discounts?: ProductDiscount;
     total_stock?: number;
     created_at: string;
     updated_at: string;

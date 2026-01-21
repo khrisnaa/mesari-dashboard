@@ -80,7 +80,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         };
     });
 
-    const existingDiscount = product.discounts?.[0] ?? null;
+    const existingDiscount = product.discounts ?? null;
 
     const form = useForm<UpdateProductInput>({
         resolver: zodResolver(updateProductSchema),

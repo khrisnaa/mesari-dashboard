@@ -22,7 +22,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
@@ -87,7 +86,6 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                 value: 0,
                 start_at: '',
                 end_at: '',
-                is_active: false,
             },
         },
     });
@@ -679,24 +677,6 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <FormField
-                                            control={form.control}
-                                            name="discount.is_active"
-                                            render={({ field }) => (
-                                                <FormItem className="flex w-full flex-row items-center justify-between">
-                                                    <FormLabel>Active</FormLabel>
-                                                    <FormControl>
-                                                        <Switch
-                                                            checked={field.value ?? false}
-                                                            onCheckedChange={field.onChange}
-                                                        />
-                                                    </FormControl>
                                                 </FormItem>
                                             )}
                                         />

@@ -74,7 +74,6 @@ export const createProductSchema = z.object({
             value: z.number().optional(),
             start_at: z.string().optional(),
             end_at: z.string().optional(),
-            is_active: z.boolean().optional(),
         })
         .optional(),
 });
