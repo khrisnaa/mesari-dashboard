@@ -132,7 +132,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
         Route::get('/edit', [CompanyProfileController::class, 'edit'])
             ->name('edit');
 
-        Route::put('/', [CompanyProfileController::class, 'update'])
+        Route::put('/{profile}', [CompanyProfileController::class, 'update'])
             ->name('update');
     });
 

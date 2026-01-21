@@ -1,12 +1,14 @@
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import companyProfile from '@/routes/company-profile';
+import { edit } from '@/routes/company-profile';
 import { BreadcrumbItem } from '@/types';
 import { CompanyProfile } from '@/types/company-profile';
 import { Head, Link } from '@inertiajs/react';
+import { EditIcon } from 'lucide-react';
 
 interface PageProps {
     profile: CompanyProfile;
@@ -24,86 +26,66 @@ const Index = ({ profile }: PageProps) => {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Company Profile" />
 
-            <div className="flex h-full max-w-4xl flex-1 flex-col gap-6 rounded-xl p-4">
-                <PageHeader title="Company Profile" description="Detail informasi perusahaan." />
-
-                {/* MAIN CARD */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-xl">{profile.company_name}</CardTitle>
-                        {profile.tagline && (
-                            <p className="text-sm text-muted-foreground">{profile.tagline}</p>
-                        )}
-                    </CardHeader>
-
-                    <Separator />
-
-                    <CardContent className="space-y-6 pt-6">
-                        {/* DESCRIPTION */}
-                        <div className="space-y-2">
-                            <p className="text-sm font-semibold text-muted-foreground">
-                                Description
-                            </p>
-                            <p className="whitespace-pre-line">{profile.description ?? '-'}</p>
-                        </div>
-
-                        <Separator />
-
-                        {/* CONTACT */}
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <Info label="Email" value={profile.email} />
-                            <Info label="Phone" value={profile.phone} />
-                            <Info label="WhatsApp" value={profile.whatsapp} />
-                            <Info label="Working Hours" value={profile.working_hours} />
-                        </div>
-
-                        <Separator />
-
-                        {/* ADDRESS */}
-                        <div className="space-y-2">
-                            <p className="text-sm font-semibold text-muted-foreground">Address</p>
-                            <p>
-                                {profile.address}, {profile.city}, {profile.province}{' '}
-                                {profile.postal_code}
-                            </p>
-
-                            <Link
-                                href={profile.google_map_url}
-                                target="_blank"
-                                className="text-sm text-primary hover:underline"
-                            >
-                                View on Google Maps
+            <div className="flex h-full w-full flex-1 flex-col gap-8 rounded-xl p-4">
+                <PageHeader
+                    title="Company Profile"
+                    description="Detail informasi perusahaan."
+                    actions={
+                        <Button asChild>
+                            <Link href={edit()}>
+                                <EditIcon /> Edit Profile
                             </Link>
-                        </div>
+                        </Button>
+                    }
+                />
 
-                        <Separator />
+                <div className="space-y-4">
+                    <Section label="Company Name" value={profile.company_name} />
 
-                        {/* SOCIAL MEDIA */}
-                        <div className="space-y-3">
-                            <p className="text-sm font-semibold text-muted-foreground">
-                                Social Media
-                            </p>
+                    {profile.tagline && <Section label="Tagline" value={profile.tagline} />}
 
-                            <div className="flex flex-wrap gap-2">
-                                <SocialBadge label="Instagram" value={profile.instagram} />
-                                <SocialBadge label="TikTok" value={profile.tiktok} />
-                                <SocialBadge label="Facebook" value={profile.facebook} />
-                                <SocialBadge label="Shopee" value={profile.shopee} />
-                                <SocialBadge label="Tokopedia" value={profile.tokopedia} />
-                            </div>
-                        </div>
+                    <Section label="Description" value={profile.description ?? '-'} multiline />
+                </div>
 
-                        {/* ACTION */}
-                        <div className="flex justify-end">
-                            <Link
-                                href={companyProfile.edit()}
-                                className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90"
-                            >
-                                Edit Profile
-                            </Link>
-                        </div>
-                    </CardContent>
-                </Card>
+                <Separator />
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <Section label="Email" value={profile.email} />
+                    <Section label="Phone" value={profile.phone} />
+                    <Section label="WhatsApp" value={profile.whatsapp} />
+                    <Section label="Working Hours" value={profile.working_hours} />
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                    <Section
+                        label="Address"
+                        value={`${profile.address}, ${profile.city}, ${profile.province} ${profile.postal_code}`}
+                    />
+
+                    <Link
+                        href={profile.google_map_url}
+                        target="_blank"
+                        className="text-sm text-primary hover:underline"
+                    >
+                        View on Google Maps
+                    </Link>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                    <Label className="text-sm text-muted-foreground">Social Media</Label>
+
+                    <div className="flex flex-wrap gap-2">
+                        <SocialBadge label="Instagram" value={profile.instagram} />
+                        <SocialBadge label="TikTok" value={profile.tiktok} />
+                        <SocialBadge label="Facebook" value={profile.facebook} />
+                        <SocialBadge label="Shopee" value={profile.shopee} />
+                        <SocialBadge label="Tokopedia" value={profile.tokopedia} />
+                    </div>
+                </div>
             </div>
         </AppLayout>
     );
@@ -111,10 +93,18 @@ const Index = ({ profile }: PageProps) => {
 
 export default Index;
 
-const Info = ({ label, value }: { label: string; value?: string }) => (
+const Section = ({
+    label,
+    value,
+    multiline = false,
+}: {
+    label: string;
+    value: string;
+    multiline?: boolean;
+}) => (
     <div className="space-y-1">
-        <p className="text-sm font-semibold text-muted-foreground">{label}</p>
-        <p>{value || '-'}</p>
+        <Label className="text-sm">{label}</Label>
+        <p className={multiline ? 'max-w-4xl text-sm whitespace-pre-line' : 'text-sm'}>{value}</p>
     </div>
 );
 
@@ -122,10 +112,10 @@ const SocialBadge = ({ label, value }: { label: string; value?: string | null })
     if (!value) return <Badge variant="secondary">{label}</Badge>;
 
     return (
-        <Badge asChild>
-            <a href={value} target="_blank" className="hover:underline">
+        <Badge asChild className="px-4 py-2">
+            <Link href={value} target="_blank" className="hover:underline">
                 {label}
-            </a>
+            </Link>
         </Badge>
     );
 };

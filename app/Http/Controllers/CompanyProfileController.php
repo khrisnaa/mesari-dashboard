@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FlashHelper;
 use App\Http\Requests\CompanyProfile\UpdateCompanyProfileRequest;
+use App\Models\CompanyProfile;
 use App\Services\CompanyProfileService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CompanyProfileController extends Controller
@@ -32,14 +35,11 @@ class CompanyProfileController extends Controller
         ]);
     }
 
-    public function update(UpdateCompanyProfileRequest $request)
+    public function update(UpdateCompanyProfileRequest $request, CompanyProfile $profile)
     {
-        $profile = $this->companyProfileService->get()
-            ?? $this->companyProfileService->initialize();
-
         $this->companyProfileService->update($profile, $request->validated());
 
-        return redirect()->route('company-profile.edit')
-            ->with('success', 'Company profile successfully updated.');
+        return redirect()->route('company-profile.index')
+            ->with('success', FlashHelper::stamp('Company profile successfully updated.'));
     }
 }
