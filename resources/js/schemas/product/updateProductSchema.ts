@@ -32,6 +32,7 @@ export const updateProductSchema = z.object({
         .optional(),
     base_price: z.number().optional(),
     base_stock: z.number().optional(),
+    selected_sizes: z.array(z.string().min(1)).nonempty('Select at least one size'),
     variants: z
         .array(VariantSchema)
         .max(200, 'Too many variants')

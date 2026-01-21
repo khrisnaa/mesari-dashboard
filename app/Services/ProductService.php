@@ -126,7 +126,7 @@ class ProductService
 
 
                     if (!empty($discount['type'])) {
-                        $product->discounts()->create($discount);
+                        $product->discount()->create($discount);
                     }
                 }
 
@@ -270,17 +270,17 @@ class ProductService
 
                     if (empty($discountInput['type'])) {
 
-                        $product->discounts()->delete();
+                        $product->discount()->delete();
                     } else {
 
-                        $existingDiscount = $product->discounts()->latest()->first();
+                        $existingDiscount = $product->discount()->latest()->first();
 
                         if ($existingDiscount) {
 
                             $existingDiscount->update($discountInput);
                         } else {
 
-                            $product->discounts()->create($discountInput);
+                            $product->discount()->create($discountInput);
                         }
                     }
                 }

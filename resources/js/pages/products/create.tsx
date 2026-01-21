@@ -1,5 +1,6 @@
 import { ColorPickerDialog } from '@/components/color-picker';
 import { DateTimePicker } from '@/components/date-time-picker';
+import { PageHeader } from '@/components/page-header';
 import { GalleryUploader } from '@/components/product/form/gallery-uploader';
 import { NewCategoryDialog } from '@/components/product/form/new-category';
 import PricingForm, { Variant } from '@/components/product/form/pricing-form';
@@ -34,7 +35,7 @@ import { Attribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
-import { ChevronLeftIcon, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -235,24 +236,16 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
         });
     };
 
-    console.log('ERRORS=>', form.formState.errors);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
+
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
-                    <section className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => router.get(products.index(), { replace: true })}
-                            >
-                                <ChevronLeftIcon />
-                            </Button>
-                            <h3 className="text-xl font-semibold">Add New Product</h3>
-                        </div>
-                        <div>
+                    <PageHeader
+                        title="Create Product"
+                        description="Add a new product to your catalogue."
+                        actions={
                             <Button
                                 onClick={() => {
                                     form.handleSubmit(onSubmit)();
@@ -262,10 +255,10 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                 className="rounded-full"
                             >
                                 <Plus />
-                                Add Product
+                                Save Product
                             </Button>
-                        </div>
-                    </section>
+                        }
+                    />
 
                     <section className="flex gap-6">
                         {/* Left section */}
@@ -397,7 +390,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                 <h4 className="font-semibold">Pricing and Stock</h4>
                                 <div className="grid gap-4">
                                     {isDifferentPricing ? (
-                                        <PriceList />
+                                        <VariantSummaryList />
                                     ) : (
                                         <div className="grid grid-cols-2 gap-4">
                                             <FormField
@@ -746,6 +739,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                     onOpenChange={pricesDialog.onOpenChange}
                     colors={selectedColors}
                     sizes={selectedSizes}
+                    differentPricing={isDifferentPricing}
                     onDifferentPricing={setIsDifferentPricing}
                 />
 
@@ -760,22 +754,27 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
 
 export default Create;
 
-const PriceList = () => {
+const VariantSummaryList = () => {
     const form = useFormContext();
-
     const variants: Variant[] = form.watch('variants') ?? [];
+
+    const visible = variants.slice(0, 3);
+    const hiddenCount = variants.length > 3 ? variants.length - 3 : 0;
+
     return (
         <div className="space-y-2">
-            {variants.map((variant, i) => (
+            {visible.map((variant, i) => (
                 <div
-                    key={i}
+                    key={`${variant.size?.id}-${variant.color?.id}`}
                     className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2"
                 >
                     <div className="flex items-center gap-2">
                         {variant.color && (
                             <div
                                 className="h-4 w-4 rounded-full border"
-                                style={{ backgroundColor: variant.color.hex ?? '#fff' }}
+                                style={{
+                                    backgroundColor: variant.color.hex ?? '#fff',
+                                }}
                             />
                         )}
 
@@ -793,11 +792,9 @@ const PriceList = () => {
                 </div>
             ))}
 
-            {/* {hiddenCount > 0 && (
-        <div className="text-sm text-neutral-500 ml-1">
-            +{hiddenCount} more
-        </div>
-    )} */}
+            {hiddenCount > 0 && (
+                <div className="ml-1 text-sm text-neutral-500">+{hiddenCount} more</div>
+            )}
         </div>
     );
 };

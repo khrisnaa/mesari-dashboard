@@ -26,8 +26,10 @@ import { cn } from '@/lib/utils';
 import products from '@/routes/products';
 
 import { DateTimePicker } from '@/components/date-time-picker';
+import { PageHeader } from '@/components/page-header';
 import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
 import { Switch } from '@/components/ui/switch';
+import { useDialog } from '@/hooks/use-dialog';
 import { UpdateProductInput, updateProductSchema } from '@/schemas/product/updateProductSchema';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
@@ -35,11 +37,11 @@ import { Attribute, Product } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
-import { ChevronLeftIcon, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
-import { DISCOUNT_EVENT_TYPES, ImageState } from './create-copy';
+import { DISCOUNT_EVENT_TYPES, ImageState } from './create';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -47,7 +49,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: products.index(),
     },
     {
-        title: 'Create',
+        title: 'Edit',
         href: '',
     },
 ];
@@ -63,7 +65,9 @@ export interface SortOrder {
     id: string;
     sort_order: number;
 }
+
 const Edit = ({ categories, colors, sizes, product }: PageProps) => {
+    // format variant
     const formattedvariants: Variant[] = product.variants.map((v) => {
         const sizeAttr = v.attributes?.find((a) => a.type == 'size');
         const colorAttr = v.attributes?.find((a) => a.type == 'color');
@@ -79,9 +83,9 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                 : undefined,
         };
     });
+    // console.log('🚀 ~ Edit ~ formattedvariants:', formattedvariants);
 
-    const existingDiscount = product.discounts ?? null;
-
+    // react hook form handler
     const form = useForm<UpdateProductInput>({
         resolver: zodResolver(updateProductSchema),
         defaultValues: {
@@ -91,58 +95,21 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
             category_id: product.category.id,
             base_price: 0,
             base_stock: 0,
+            selected_sizes: [],
             discount: {
-                type: existingDiscount?.type ?? '',
-                value: Number(existingDiscount?.value) ?? 0,
-                start_at: existingDiscount?.start_at ?? '',
-                end_at: existingDiscount?.end_at ?? '',
-                is_active: existingDiscount?.is_active ?? false,
+                type: product?.discount?.type ?? '',
+                value: Number(product?.discount?.value) ?? 0,
+                start_at: product?.discount?.start_at ?? '',
+                end_at: product?.discount?.end_at ?? '',
+                is_active: product?.discount?.is_active ?? false,
             },
         },
     });
 
-    const onSubmit = (data: UpdateProductInput) => {
-        const formData = new FormData();
-
-        formData.append('_method', 'PUT');
-        formData.append('name', data.name);
-        formData.append('variants', JSON.stringify(data.variants));
-        formData.append('category_id', data.category_id);
-        formData.append('description', data.description || '');
-
-        Object.entries(data.discount ?? {}).forEach(([key, val]) => {
-            if (key === 'is_active') {
-                formData.append(`discount[${key}]`, val ? '1' : '0');
-            } else {
-                formData.append(`discount[${key}]`, val != null ? String(val) : '');
-            }
-        });
-
-        formData.append(
-            'image_state',
-            JSON.stringify(
-                images.map((img) => ({
-                    id: img.id ?? null,
-                    type: img.type,
-                    sort_order: img.sort_order,
-                })),
-            ),
-        );
-
-        images
-            .filter((img) => img.file)
-            .forEach((img, i) => {
-                formData.append(`images_upload[${i}]`, img.file!);
-            });
-
-        router.post(products.update(product), formData, {
-            forceFormData: true,
-            onError: (errors) => {
-                const errorMessage = Object.values(errors)[0];
-                toast.error(errorMessage);
-            },
-        });
-    };
+    // dialog handler
+    const pricesDialog = useDialog();
+    const categoryDialog = useDialog();
+    const colorPickerDialog = useDialog();
 
     // select sizes handler
     const productSizes = product.variants
@@ -150,18 +117,24 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         .filter((attr, index, self) => index === self.findIndex((a) => a.name === attr.name));
 
     const [selectedSizes, setSelectedSizes] = useState<Attribute[] | []>(productSizes);
+
     const toggleSize = (size: Attribute) => {
         setSelectedSizes((prev) => {
             const exists = prev.some((s) => s.id === size.id);
             const next = exists ? prev.filter((s) => s.id !== size.id) : [...prev, size];
 
-            if (next.length > 0) {
-                setSizeError(false);
-            }
+            const selectedNames = next.map((s) => s.name);
 
+            form.setValue('selected_sizes', selectedNames, { shouldValidate: true });
             return next;
         });
     };
+
+    useEffect(() => {
+        const sizeNames = selectedSizes.map((s) => s.name).filter(Boolean);
+
+        form.setValue('selected_sizes', sizeNames, { shouldDirty: true });
+    }, [selectedSizes]);
 
     // select colors handler
     const productColors = product.variants
@@ -169,6 +142,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         .filter((attr, index, self) => index === self.findIndex((a) => a.name === attr.name));
 
     const [selectedColors, setSelectedColors] = useState<Attribute[] | []>(productColors);
+
     const toggleColor = (color: Attribute) => {
         setSelectedColors((prev) => {
             const exists = prev.some((c) => c.hex === color.hex && c.name === color.name);
@@ -181,25 +155,12 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         });
     };
 
-    const [showColorPicker, setShowColorPicker] = useState(false);
+    // custom colors
     const [customColors, setCustomColors] = useState<Attribute[]>([]);
+
     const handleAddColor = (color: Attribute) => {
         setSelectedColors((prev) => [...prev, color]);
         setCustomColors((prev) => [...prev, color]);
-    };
-
-    // dialog handler
-    const [showPricesDialog, setShowPricesDialog] = useState(false);
-    const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
-
-    // validate size
-    const [sizeError, setSizeError] = useState(false);
-
-    const validateSize = () => {
-        const isValid = selectedSizes.length > 0;
-
-        setSizeError(!isValid);
-        return isValid;
     };
 
     // images handler
@@ -269,35 +230,67 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         .filter((img) => img.type === 'gallery')
         .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
-    // handle discount start and end date
+    // handle discount type, start and end date
     const startValue = form.watch('discount.start_at');
     const endValue = form.watch('discount.end_at');
     const discountType = form.watch('discount.type');
 
-    console.log(product);
-    useEffect(() => {
-        console.log('ALL ERRORS:', form.formState.errors);
-    }, [form.formState.errors]);
+    // form submit handler
+    const onSubmit = (data: UpdateProductInput) => {
+        const formData = new FormData();
+
+        formData.append('_method', 'PUT');
+        formData.append('name', data.name);
+        formData.append('variants', JSON.stringify(data.variants));
+        formData.append('category_id', data.category_id);
+        formData.append('description', data.description || '');
+
+        Object.entries(data.discount ?? {}).forEach(([key, val]) => {
+            if (key === 'is_active') {
+                formData.append(`discount[${key}]`, val ? '1' : '0');
+            } else {
+                formData.append(`discount[${key}]`, val != null ? String(val) : '');
+            }
+        });
+
+        formData.append(
+            'image_state',
+            JSON.stringify(
+                images.map((img) => ({
+                    id: img.id ?? null,
+                    type: img.type,
+                    sort_order: img.sort_order,
+                })),
+            ),
+        );
+
+        images
+            .filter((img) => img.file)
+            .forEach((img, i) => {
+                formData.append(`images_upload[${i}]`, img.file!);
+            });
+
+        router.post(products.update(product), formData, {
+            forceFormData: true,
+            onError: (errors) => {
+                const errorMessage = Object.values(errors)[0];
+                toast.error(errorMessage);
+            },
+        });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create Product" />
+            <Head title="Edit Product" />
+
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
-                    <section className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => router.get(products.index(), { replace: true })}
-                            >
-                                <ChevronLeftIcon />
-                            </Button>
-                            <h3 className="text-xl font-semibold">Add New Product</h3>
-                        </div>
-                        <div>
+                    <PageHeader
+                        title="Edit Product"
+                        description="Update product information and manage details."
+                        actions={
                             <Button
                                 onClick={() => {
-                                    if (!validateSize()) return;
                                     form.handleSubmit(onSubmit)();
                                 }}
                                 type="button"
@@ -305,10 +298,10 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                 className="rounded-full"
                             >
                                 <Plus />
-                                Add Product
+                                Save Product
                             </Button>
-                        </div>
-                    </section>
+                        }
+                    />
 
                     <section className="flex gap-6">
                         {/* Left section */}
@@ -377,8 +370,10 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                                 })}
                                             </div>
                                         </FormControl>
-                                        {sizeError && (
-                                            <FormMessage>At least one size is required</FormMessage>
+                                        {form.formState.errors.selected_sizes && (
+                                            <FormMessage>
+                                                {form.formState.errors.selected_sizes.message}
+                                            </FormMessage>
                                         )}
                                     </FormItem>
 
@@ -423,7 +418,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full border-2"
-                                                    onClick={() => setShowColorPicker(true)}
+                                                    onClick={() => colorPickerDialog.open()}
                                                 >
                                                     <Plus />
                                                 </Button>
@@ -437,65 +432,21 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h4 className="font-semibold">Pricing and Stock</h4>
                                 <div className="grid gap-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="base_price"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Base Price</FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder="0"
-                                                            inputMode="numeric"
-                                                            {...field}
-                                                            value={formatNumber(field.value)}
-                                                            onChange={(e) => {
-                                                                const numericValue = parseNumber(
-                                                                    e.target.value,
-                                                                );
-                                                                field.onChange(numericValue);
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="base_stock"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Base Stock</FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder="0"
-                                                            inputMode="numeric"
-                                                            {...field}
-                                                            value={formatNumber(field.value)}
-                                                            onChange={(e) => {
-                                                                const numericValue = parseNumber(
-                                                                    e.target.value,
-                                                                );
-                                                                field.onChange(numericValue);
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
+                                    <VariantSummaryList />
 
                                     <div className="flex justify-end">
                                         <Button
-                                            onClick={() =>
-                                                selectedSizes.length == 0
-                                                    ? setSizeError(true)
-                                                    : setShowPricesDialog(true)
-                                            }
+                                            onClick={() => {
+                                                if (selectedSizes.length === 0) {
+                                                    form.setError('selected_sizes', {
+                                                        type: 'manual',
+                                                        message: 'Select at least one size',
+                                                    });
+                                                    return;
+                                                }
+                                                form.clearErrors('selected_sizes');
+                                                pricesDialog.open();
+                                            }}
                                             size="lg"
                                             className="w-fit rounded-full"
                                         >
@@ -772,7 +723,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
 
                                 <div className="flex justify-end">
                                     <Button
-                                        onClick={() => !sizeError && setShowNewCategoryDialog(true)}
+                                        onClick={() => categoryDialog.open()}
                                         type="button"
                                         size="lg"
                                         className="rounded-full"
@@ -786,25 +737,71 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                 </form>
                 {/* Dialog Components */}
                 <ColorPickerDialog
-                    open={showColorPicker}
-                    onOpenChange={setShowColorPicker}
+                    open={colorPickerDialog.isOpen}
+                    onOpenChange={colorPickerDialog.onOpenChange}
                     onColorSelect={handleAddColor}
                 />
 
                 <PricingForm
-                    isEdit
-                    open={showPricesDialog}
-                    onOpenChange={setShowPricesDialog}
+                    differentPricing
+                    open={pricesDialog.isOpen}
+                    onOpenChange={pricesDialog.onOpenChange}
                     colors={selectedColors}
                     sizes={selectedSizes}
                 />
 
                 <NewCategoryDialog
-                    open={showNewCategoryDialog}
-                    onOpenChange={setShowNewCategoryDialog}
+                    open={categoryDialog.isOpen}
+                    onOpenChange={categoryDialog.onOpenChange}
                 />
             </Form>
         </AppLayout>
     );
 };
 export default Edit;
+
+const VariantSummaryList = () => {
+    const form = useFormContext();
+    const variants: Variant[] = form.watch('variants') ?? [];
+
+    // Only show first 3 items
+    const visible = variants.slice(0, 3);
+    const hiddenCount = variants.length > 3 ? variants.length - 3 : 0;
+
+    return (
+        <div className="space-y-2">
+            {visible.map((variant, i) => (
+                <div
+                    key={i}
+                    className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2"
+                >
+                    <div className="flex items-center gap-2">
+                        {variant.color && (
+                            <div
+                                className="h-4 w-4 rounded-full border"
+                                style={{
+                                    backgroundColor: variant.color.hex ?? '#fff',
+                                }}
+                            />
+                        )}
+
+                        <span className="text-sm font-medium">
+                            {variant.size?.name}
+                            {variant.color ? ` / ${variant.color.name}` : ''}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-sm text-neutral-700">
+                        <span>Rp {formatNumber(variant.price)}</span>
+                        <span className="text-neutral-400">•</span>
+                        <span>{formatNumber(variant.stock)} pcs</span>
+                    </div>
+                </div>
+            ))}
+
+            {hiddenCount > 0 && (
+                <div className="ml-1 text-sm text-neutral-500">+{hiddenCount} more</div>
+            )}
+        </div>
+    );
+};

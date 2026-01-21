@@ -32,8 +32,8 @@ interface PricingFormProps {
     onOpenChange: (value: boolean) => void;
     sizes: Attribute[];
     colors: Attribute[];
-    isEdit?: boolean;
-    onDifferentPricing: (value: boolean) => void;
+    differentPricing?: boolean;
+    onDifferentPricing?: (value: boolean) => void;
 }
 
 const PricingForm = ({
@@ -41,7 +41,7 @@ const PricingForm = ({
     onOpenChange,
     colors,
     sizes,
-    isEdit,
+    differentPricing,
     onDifferentPricing,
 }: PricingFormProps) => {
     const form = useFormContext();
@@ -58,7 +58,9 @@ const PricingForm = ({
     const namesMatch = (a?: string, b?: string) =>
         a?.trim().toLowerCase() === b?.trim().toLowerCase();
 
-    const getKey = (v: Variant) => `${v.size?.id || 'size'}-${v.color?.id || 'color'}`;
+    const normalize = (v?: string) => v?.trim().toLowerCase() ?? '';
+
+    const getKey = (v: Variant) => `${normalize(v.size?.name)}::${normalize(v.color?.name)}`;
 
     // generate combinations
     const generateCombinations = (): Variant[] => {
@@ -98,35 +100,35 @@ const PricingForm = ({
         const combinations = generateCombinations();
 
         setVariants((prev) => {
-            const stillValid = prev.filter((v) => {
-                const sizeMatch = sizes.some((s) => namesMatch(s.name, v.size?.name));
+            const valid = prev.filter((v) => {
+                const sizeExists = sizes.some((s) => namesMatch(s.name, v.size?.name));
 
-                if (colors.length === 0) {
-                    return sizeMatch && !v.color;
-                }
+                if (!sizeExists) return false;
 
-                const colorMatch = colors.some((c) => namesMatch(c.name, v.color?.name));
+                if (colors.length === 0) return !v.color;
 
-                return sizeMatch && colorMatch;
+                const colorExists = colors.some((c) => namesMatch(c.name, v.color?.name));
+
+                return colorExists;
             });
 
-            const newOnes = combinations
-                .filter((co) => {
-                    return !stillValid.some(
-                        (v) =>
-                            namesMatch(v.size?.name, co.size?.name) &&
-                            namesMatch(v.color?.name, co.color?.name),
-                    );
-                })
-                .map((v) => ({
-                    ...v,
-                    price: basePrice ?? 0,
-                    stock: baseStock ?? 0,
-                    isPriceAuto: true,
-                    isStockAuto: true,
-                }));
+            const map = new Map<string, Variant>();
+            valid.forEach((v) => map.set(getKey(v), v));
 
-            return [...stillValid, ...newOnes];
+            combinations.forEach((co) => {
+                const key = getKey(co);
+                if (!map.has(key)) {
+                    map.set(key, {
+                        ...co,
+                        price: basePrice ?? 0,
+                        stock: baseStock ?? 0,
+                        isPriceAuto: true,
+                        isStockAuto: true,
+                    });
+                }
+            });
+
+            return Array.from(map.values());
         });
     }, [sizes, colors, open]);
 
@@ -180,7 +182,9 @@ const PricingForm = ({
     const handleSave = () => {
         form.setValue('variants', variants, { shouldDirty: true });
         handleClose();
-        onDifferentPricing(true);
+        if (onDifferentPricing) {
+            onDifferentPricing(true);
+        }
     };
 
     const handleClose = () => {
@@ -210,7 +214,7 @@ const PricingForm = ({
     };
 
     useEffect(() => {
-        if (!open) {
+        if (!differentPricing && !open) {
             handleSimplePricing();
         }
     }, [baseParentPrice, baseParentStock, sizes, colors]);
