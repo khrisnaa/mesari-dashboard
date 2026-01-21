@@ -1,15 +1,9 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { Order } from '@/types/order';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
+import { ArrowUpIcon } from 'lucide-react';
+import { StatusBadge } from '../status-badge';
 
 export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] => [
     {
@@ -93,66 +87,75 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
         accessorKey: 'status',
         header: 'Order Status',
         cell: ({ row }) => {
-            const status = row.original.status;
+            const order = row.original;
+            const status: string = row.original.status;
 
-            const variantMap: Record<string, string> = {
-                pending: 'bg-yellow-100 text-yellow-700',
-                processing: 'bg-blue-100 text-blue-700',
-                shipped: 'bg-indigo-100 text-indigo-700',
-                completed: 'bg-green-100 text-green-700',
-                cancelled: 'bg-red-100 text-red-700',
+            const statusVariantMap: Record<
+                string,
+                'success' | 'warning' | 'info' | 'danger' | 'default'
+            > = {
+                pending: 'warning',
+                processing: 'info',
+                shipped: 'info',
+                completed: 'success',
+                cancelled: 'danger',
             };
 
+            const variant = statusVariantMap[status] ?? 'default';
+
             return (
-                <div className="px-3">
-                    <Badge variant="secondary" className={cn('capitalize', variantMap[status])}>
-                        {status}
-                    </Badge>
+                <div
+                    onClick={() => onEdit(order)}
+                    className="cursor-pointer rounded-full hover:bg-muted"
+                >
+                    <StatusBadge variant={variant} label={status} />
                 </div>
             );
         },
-        meta: { width: { type: 'fixed', px: 140 } },
+        meta: { width: { type: 'fixed', px: 200 } },
     },
 
     {
         accessorKey: 'payment_status',
         header: 'Payment',
-        cell: ({ row }) => (
-            <div className="px-3">
-                <Badge
-                    variant={row.original.payment_status === 'paid' ? 'default' : 'secondary'}
-                    className="capitalize"
-                >
-                    {row.original.payment_status}
-                </Badge>
-            </div>
-        ),
-        meta: { width: { type: 'fixed', px: 120 } },
-    },
-
-    {
-        id: 'actions',
         cell: ({ row }) => {
-            const order = row.original;
+            const status = row.original.payment_status;
 
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(order)} className="cursor-pointer">
-                            <PencilIcon className="mr-2 h-4 w-4" />
-                            Edit Status
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <div>
+                    <StatusBadge
+                        variant={status === 'paid' ? 'success' : 'warning'}
+                        label={status}
+                    />
+                </div>
             );
         },
-        meta: { width: { type: 'fixed', px: 64 } },
+        meta: { width: { type: 'fixed', px: 200 } },
     },
+
+    // {
+    //     id: 'actions',
+    //     cell: ({ row }) => {
+    //         const order = row.original;
+
+    //         return (
+    //             <DropdownMenu>
+    //                 <DropdownMenuTrigger asChild>
+    //                     <Button variant="ghost" className="h-8 w-8 p-0">
+    //                         <span className="sr-only">Open menu</span>
+    //                         <MoreHorizontal className="h-4 w-4" />
+    //                     </Button>
+    //                 </DropdownMenuTrigger>
+
+    //                 <DropdownMenuContent align="end">
+    //                     <DropdownMenuItem onClick={() => onEdit(order)} className="cursor-pointer">
+    //                         <PencilIcon className="mr-2 h-4 w-4" />
+    //                         Edit Status
+    //                     </DropdownMenuItem>
+    //                 </DropdownMenuContent>
+    //             </DropdownMenu>
+    //         );
+    //     },
+    //     meta: { width: { type: 'fixed', px: 64 } },
+    // },
 ];
