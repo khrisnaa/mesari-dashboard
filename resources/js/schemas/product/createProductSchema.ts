@@ -37,6 +37,7 @@ export const createProductSchema = z.object({
         .optional(),
     base_price: z.number().optional(),
     base_stock: z.number().optional(),
+    selected_sizes: z.array(z.string().min(1)).nonempty('Select at least one size'),
     variants: z
         .array(VariantSchema)
         .min(1, 'At least one variant is required')
@@ -66,6 +67,16 @@ export const createProductSchema = z.object({
     images: z.array(ImageSchema).max(20, 'Too many images').optional(),
 
     category_id: z.string().min(1, 'Product category is required'),
+
+    discount: z
+        .object({
+            type: z.string().optional(),
+            value: z.number().optional(),
+            start_at: z.string().optional(),
+            end_at: z.string().optional(),
+            is_active: z.boolean().optional(),
+        })
+        .optional(),
 });
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;

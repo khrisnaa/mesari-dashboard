@@ -30,6 +30,14 @@ class StoreProductRequest extends FormRequest
             'images' => ['sometimes', 'array'],
             'images.*.type' => ['required', 'in:thumbnail,gallery'],
             'images.*.file' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+
+            'discount' => ['nullable', 'array'],
+
+            'discount.type' => ['nullable', 'in:percentage,fixed'],
+            'discount.value' => ['nullable', 'numeric', 'min:0'],
+            'discount.start_at' => ['nullable', 'date'],
+            'discount.end_at' => ['nullable', 'date', 'after_or_equal:discount.start_at'],
+            'discount.is_active' => ['nullable', 'boolean'],
         ];
     }
 
@@ -58,6 +66,13 @@ class StoreProductRequest extends FormRequest
             'images.*.file.image' => 'Each file must be an image.',
             'images.*.file.mimes' => 'Each image must be in JPG, JPEG, PNG, or WEBP format.',
             'images.*.file.max' => 'Each image may not exceed 10MB.',
+
+            'discount.type.in' => 'Discount type must be "percentage" or "fixed".',
+            'discount.value.numeric' => 'Discount value must be a number.',
+            'discount.start_at.date' => 'Start date must be a valid date.',
+            'discount.end_at.date' => 'End date must be a valid date.',
+            'discount.end_at.after_or_equal' => 'End date must be on or after the start date.',
+            'discount.is_active.boolean' => 'Discount active must be a boolean value.',
         ];
     }
 }

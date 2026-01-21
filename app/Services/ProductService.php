@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -105,6 +106,28 @@ class ProductService
                     ])->filter();
 
                     $productVariant->attributes()->sync($attributeIds);
+                }
+
+
+                if (!empty($data['discount']) && is_array($data['discount'])) {
+
+
+                    $discount = [
+                        'type'      => $data['discount']['type'] ?? null,
+                        'value'     => $data['discount']['value'] ?? 0,
+                        'start_at'  => !empty($data['discount']['start_at'])
+                            ? Carbon::parse($data['discount']['start_at'])
+                            : null,
+                        'end_at'    => !empty($data['discount']['end_at'])
+                            ? Carbon::parse($data['discount']['end_at'])
+                            : null,
+                        'is_active' => filter_var($data['discount']['is_active'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                    ];
+
+
+                    if (!empty($discount['type'])) {
+                        $product->discounts()->create($discount);
+                    }
                 }
 
 
@@ -231,6 +254,36 @@ class ProductService
                     ->whereNotIn('id', $activeVariantIds)
                     ->each(fn($v) => $v->delete());
 
+                if (!empty($data['discount']) && is_array($data['discount'])) {
+
+                    $discountInput = [
+                        'type'      => $data['discount']['type'] ?? null,
+                        'value'     => $data['discount']['value'] ?? 0,
+                        'start_at'  => !empty($data['discount']['start_at'])
+                            ? Carbon::parse($data['discount']['start_at'])
+                            : null,
+                        'end_at'    => !empty($data['discount']['end_at'])
+                            ? Carbon::parse($data['discount']['end_at'])
+                            : null,
+                        'is_active' => filter_var($data['discount']['is_active'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                    ];
+
+                    if (empty($discountInput['type'])) {
+
+                        $product->discounts()->delete();
+                    } else {
+
+                        $existingDiscount = $product->discounts()->latest()->first();
+
+                        if ($existingDiscount) {
+
+                            $existingDiscount->update($discountInput);
+                        } else {
+
+                            $product->discounts()->create($discountInput);
+                        }
+                    }
+                }
 
                 $this->syncImages(
                     product: $product,

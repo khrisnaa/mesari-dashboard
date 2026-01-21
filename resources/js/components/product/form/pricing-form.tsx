@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { Attribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export interface Variant {
@@ -36,22 +36,21 @@ interface PricingFormProps {
 
 const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) => {
     const form = useFormContext();
-    const { watch } = form;
 
-    const [basePrice, setBasePrice] = useState<number | null>(null);
-    const [baseStock, setBaseStock] = useState<number | null>(null);
+    const parentBasePrice = form.watch('base_price');
+    const parentBaseStock = form.watch('base_stock');
+
+    const [basePrice, setBasePrice] = useState<number | null>(parentBasePrice);
+    const [baseStock, setBaseStock] = useState<number | null>(parentBaseStock);
 
     useEffect(() => {
-        const price = watch('base_price');
-        const stock = watch('base_stock');
+        if (open) {
+            setBasePrice(parentBasePrice);
+            setBaseStock(parentBaseStock);
+        }
+    }, [open, parentBasePrice, parentBaseStock]);
 
-        setBasePrice(price);
-        setBaseStock(stock);
-
-        handleSave();
-    }, [watch('base_price'), watch('base_stock'), open]);
-
-    const baseVariants: Variant[] = watch('variants');
+    const baseVariants: Variant[] = form.watch('variants');
     const [variants, setVariants] = useState<Variant[] | []>(baseVariants || []);
 
     const generateCombinations = () => {
@@ -132,8 +131,6 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
         });
     }, [colors, sizes, baseVariants]);
 
-    const variantsRef = useRef<Variant[]>([]);
-
     useEffect(() => {
         if (basePrice === null && baseStock === null) return;
 
@@ -170,6 +167,9 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
     };
 
     const handleSave = () => {
+        form.setValue('base_price', basePrice);
+        form.setValue('base_stock', baseStock);
+
         const finalData: Variant[] = variants.map((variant) => ({
             color: variant.color,
             size: variant.size,
@@ -179,13 +179,6 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
 
         form.setValue('variants', finalData);
     };
-
-    useEffect(() => {
-        if (JSON.stringify(variantsRef.current) !== JSON.stringify(variants)) {
-            variantsRef.current = variants;
-            handleSave();
-        }
-    }, [variants]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

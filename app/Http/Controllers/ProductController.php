@@ -80,6 +80,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
+
         try {
             $this->productService->store($request->validated());
 

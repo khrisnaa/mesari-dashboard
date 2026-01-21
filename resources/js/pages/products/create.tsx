@@ -1,4 +1,5 @@
 import { ColorPickerDialog } from '@/components/color-picker';
+import { DateTimePicker } from '@/components/date-time-picker';
 import { GalleryUploader } from '@/components/product/form/gallery-uploader';
 import { NewCategoryDialog } from '@/components/product/form/new-category';
 import PricingForm from '@/components/product/form/pricing-form';
@@ -21,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
@@ -33,9 +35,14 @@ import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+
+export const DISCOUNT_EVENT_TYPES = [
+    { value: 'percentage', label: 'Percentage' },
+    { value: 'fixed', label: 'Fixed' },
+];
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -46,21 +53,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Create',
         href: '',
     },
-];
-
-export const DISCOUNT_EVENT_TYPES = [
-    { value: 'NEW_YEAR', label: 'New Year' },
-    { value: 'CHRISTMAS', label: 'Christmas' },
-    { value: 'BLACK_FRIDAY', label: 'Black Friday' },
-    { value: 'CYBER_MONDAY', label: 'Cyber Monday' },
-    { value: 'RAMADAN', label: 'Ramadan' },
-    { value: 'EID', label: 'Eid al-Fitr' },
-    { value: 'INDEPENDENCE_DAY', label: 'Independence Day' },
-    { value: 'HALLOWEEN', label: 'Halloween' },
-    { value: 'BACK_TO_SCHOOL', label: 'Back to School' },
-    { value: 'FLASH_SALE', label: 'Flash Sale' },
-    { value: 'CLEARANCE', label: 'Clearance Sale' },
-    { value: 'BIRTHDAY', label: 'Birthday Sale' },
 ];
 
 interface PageProps {
@@ -89,6 +81,14 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
             category_id: '',
             base_price: 0,
             base_stock: 0,
+            selected_sizes: [],
+            discount: {
+                type: '',
+                value: 0,
+                start_at: '',
+                end_at: '',
+                is_active: false,
+            },
         },
     });
 
@@ -104,6 +104,14 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
             formData.append(`images[${index}][type]`, img.type);
             if (img.file) {
                 formData.append(`images[${index}][file]`, img.file);
+            }
+        });
+
+        Object.entries(data.discount ?? {}).forEach(([key, val]) => {
+            if (key === 'is_active') {
+                formData.append(`discount[${key}]`, val ? '1' : '0');
+            } else {
+                formData.append(`discount[${key}]`, val != null ? String(val) : '');
             }
         });
 
@@ -123,10 +131,9 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
             const exists = prev.some((s) => s.id === size.id);
             const next = exists ? prev.filter((s) => s.id !== size.id) : [...prev, size];
 
-            if (next.length > 0) {
-                setSizeError(false);
-            }
+            const selectedNames = next.map((s) => s.name);
 
+            form.setValue('selected_sizes', selectedNames, { shouldValidate: true });
             return next;
         });
     };
@@ -155,16 +162,6 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
     // dialog handler
     const [showPricesDialog, setShowPricesDialog] = useState(false);
     const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
-
-    // validate size
-    const [sizeError, setSizeError] = useState(false);
-
-    const validateSize = () => {
-        const isValid = selectedSizes.length > 0;
-
-        setSizeError(!isValid);
-        return isValid;
-    };
 
     // images handler
 
@@ -226,6 +223,49 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
         });
     };
 
+    // handle discount start and end date
+    const startValue = form.watch('discount.start_at');
+    const endValue = form.watch('discount.end_at');
+    const discountType = form.watch('discount.type');
+
+    // handle variants if modal is not opened
+    const basePrice = form.watch('base_price');
+    const baseStock = form.watch('base_stock');
+
+    useEffect(() => {
+        if (selectedSizes.length === 0) return;
+
+        const generateCombinations = () => {
+            if (selectedColors.length === 0) {
+                return selectedSizes.map((size) => ({
+                    size: {
+                        id: size.id,
+                        name: size.name,
+                        hex: size.hex ?? null,
+                    },
+                    price: basePrice ?? 0,
+                    stock: baseStock ?? 0,
+                }));
+            }
+
+            return selectedSizes.flatMap((size) =>
+                selectedColors.map((color) => ({
+                    size,
+                    color,
+                    price: basePrice ?? 0,
+                    stock: baseStock ?? 0,
+                })),
+            );
+        };
+
+        const updated = generateCombinations();
+
+        form.setValue('variants', updated, {
+            shouldDirty: true,
+            shouldTouch: true,
+        });
+    }, [selectedSizes, selectedColors, basePrice, baseStock]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
@@ -245,7 +285,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                         <div>
                             <Button
                                 onClick={() => {
-                                    if (!validateSize()) return;
+                                    // if (!validateSize()) return;
                                     form.handleSubmit(onSubmit)();
                                 }}
                                 type="button"
@@ -325,8 +365,10 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                                 })}
                                             </div>
                                         </FormControl>
-                                        {sizeError && (
-                                            <FormMessage>At least one size is required</FormMessage>
+                                        {form.formState.errors.selected_sizes && (
+                                            <FormMessage>
+                                                {form.formState.errors.selected_sizes.message}
+                                            </FormMessage>
                                         )}
                                     </FormItem>
 
@@ -437,65 +479,227 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                         />
                                     </div>
 
-                                    {/* <div className="grid grid-cols-2 gap-4">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="pricing">
-                                                Discount
-                                            </Label>
-                                            <Input
-                                                id="pricing"
-                                                type="text"
-                                                autoComplete="off"
-                                                name="pricing"
-                                                placeholder="50000"
-                                            />
-                                            <InputError
-                                                message=""
-                                                className="mt-2"
-                                            />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="stock">
-                                                Discount Type
-                                            </Label>
-                                            <Select>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select discount type" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {DISCOUNT_EVENT_TYPES.map(
-                                                        (discount, i) => (
-                                                            <SelectItem
-                                                                key={i}
-                                                                value={
-                                                                    discount.value
-                                                                }
-                                                            >
-                                                                {discount.label}
-                                                            </SelectItem>
-                                                        ),
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                            <InputError
-                                                message=""
-                                                className="mt-2"
-                                            />
-                                        </div>
-                                    </div> */}
-
                                     <div className="flex justify-end">
                                         <Button
                                             onClick={() =>
-                                                selectedSizes.length == 0
-                                                    ? setSizeError(true)
-                                                    : setShowPricesDialog(true)
+                                                selectedSizes.length !== 0 &&
+                                                setShowPricesDialog(true)
                                             }
                                             size="lg"
                                             className="w-fit rounded-full"
                                         >
                                             Add more prices
                                         </Button>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.value"
+                                            render={({ field }) => {
+                                                const isPercentage = discountType === 'percentage';
+
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Discount {isPercentage ? '(%)' : ''}
+                                                        </FormLabel>
+
+                                                        <FormControl>
+                                                            <div className="relative">
+                                                                <Input
+                                                                    placeholder={
+                                                                        isPercentage
+                                                                            ? '0 - 100'
+                                                                            : '0'
+                                                                    }
+                                                                    inputMode="numeric"
+                                                                    {...field}
+                                                                    value={
+                                                                        isPercentage
+                                                                            ? (field.value ?? '')
+                                                                            : formatNumber(
+                                                                                  field.value,
+                                                                              )
+                                                                    }
+                                                                    onChange={(e) => {
+                                                                        let raw = e.target.value;
+
+                                                                        if (isPercentage) {
+                                                                            let numeric = Number(
+                                                                                raw.replace(
+                                                                                    /[^0-9]/g,
+                                                                                    '',
+                                                                                ),
+                                                                            );
+
+                                                                            if (numeric > 100) {
+                                                                                form.setError(
+                                                                                    'discount.value',
+                                                                                    {
+                                                                                        type: 'manual',
+                                                                                        message:
+                                                                                            'Percentage cannot exceed 100',
+                                                                                    },
+                                                                                );
+                                                                                numeric = 100;
+                                                                            } else {
+                                                                                form.clearErrors(
+                                                                                    'discount.value',
+                                                                                );
+                                                                            }
+
+                                                                            field.onChange(
+                                                                                Number.isNaN(
+                                                                                    numeric,
+                                                                                )
+                                                                                    ? null
+                                                                                    : numeric,
+                                                                            );
+                                                                            return;
+                                                                        }
+
+                                                                        const numericValue =
+                                                                            parseNumber(raw);
+                                                                        field.onChange(
+                                                                            numericValue,
+                                                                        );
+                                                                    }}
+                                                                    className={
+                                                                        isPercentage ? 'pr-10' : ''
+                                                                    }
+                                                                />
+
+                                                                {isPercentage && (
+                                                                    <span className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500">
+                                                                        %
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </FormControl>
+
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                );
+                                            }}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.type"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Discount Type</FormLabel>
+                                                    <FormControl>
+                                                        <Select
+                                                            onValueChange={(value) => {
+                                                                const current =
+                                                                    form.getValues(
+                                                                        'discount.value',
+                                                                    ) ?? 0;
+
+                                                                if (
+                                                                    value === 'percentage' &&
+                                                                    current > 100
+                                                                ) {
+                                                                    form.setValue(
+                                                                        'discount.value',
+                                                                        100,
+                                                                        {
+                                                                            shouldValidate: true,
+                                                                            shouldDirty: true,
+                                                                        },
+                                                                    );
+                                                                }
+
+                                                                form.clearErrors('discount.value');
+                                                                field.onChange(value);
+                                                            }}
+                                                            defaultValue={field.value ?? undefined}
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select discount type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {DISCOUNT_EVENT_TYPES.map(
+                                                                    (discount, i) => (
+                                                                        <SelectItem
+                                                                            key={i}
+                                                                            value={discount.value}
+                                                                        >
+                                                                            {discount.label}
+                                                                        </SelectItem>
+                                                                    ),
+                                                                )}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.start_at"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Start Date</FormLabel>
+                                                    <FormControl>
+                                                        <DateTimePicker
+                                                            value={field.value}
+                                                            onChange={field.onChange}
+                                                            maxDate={
+                                                                endValue ? new Date(endValue) : null
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.end_at"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>End Date</FormLabel>
+                                                    <FormControl>
+                                                        <DateTimePicker
+                                                            value={field.value}
+                                                            onChange={field.onChange}
+                                                            minDate={
+                                                                startValue
+                                                                    ? new Date(startValue)
+                                                                    : null
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="mt-4 flex items-center justify-between">
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.is_active"
+                                            render={({ field }) => (
+                                                <FormItem className="flex w-full flex-row items-center justify-between">
+                                                    <FormLabel>Active</FormLabel>
+                                                    <FormControl>
+                                                        <Switch
+                                                            checked={field.value ?? false}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -552,7 +756,10 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
                                 <div className="flex justify-end">
                                     <Button
-                                        onClick={() => !sizeError && setShowNewCategoryDialog(true)}
+                                        onClick={() =>
+                                            selectedSizes.length > 0 &&
+                                            setShowNewCategoryDialog(true)
+                                        }
                                         type="button"
                                         size="lg"
                                         className="rounded-full"

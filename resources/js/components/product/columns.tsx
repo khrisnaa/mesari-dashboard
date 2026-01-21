@@ -1,6 +1,6 @@
 import { Product } from '@/types/product';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, EyeIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
+import { ArrowUpIcon, EyeIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
 
 import { formatRupiah } from '@/utils/formatRupiah';
 
@@ -13,6 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import products from '@/routes/products';
 import { router } from '@inertiajs/react';
 
@@ -38,6 +39,7 @@ export const columns: ColumnDef<Product>[] = [
         ),
         enableSorting: false,
         enableHiding: false,
+        meta: { width: { type: 'fixed', px: 56 } },
     },
     {
         accessorKey: 'name',
@@ -48,16 +50,26 @@ export const columns: ColumnDef<Product>[] = [
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
                 Name
-                <ArrowUpDown className="ml-2 h-4 w-4" />
+                <ArrowUpIcon
+                    className={cn(
+                        'ml-1 size-3 transition-all',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : '-rotate-180 opacity-40',
+                    )}
+                />
             </Button>
         ),
+        cell: ({ row }) => <div className="px-3">{row.original.name}</div>,
+        meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         accessorKey: 'description',
         header: 'Description',
         cell: ({ row }) => {
-            return <span className="block max-w-sm truncate">{row.original.description}</span>;
+            return <div className="line-clamp-2 text-wrap">{row.original.description}</div>;
         },
+        meta: { width: { type: 'flex', fr: 2 } },
     },
     {
         id: 'price',
@@ -70,13 +82,21 @@ export const columns: ColumnDef<Product>[] = [
                     onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                 >
                     Price
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                    <ArrowUpIcon
+                        className={cn(
+                            'ml-1 size-3 transition-all',
+                            column.getIsSorted() === 'asc'
+                                ? 'rotate-0 opacity-100'
+                                : '-rotate-180 opacity-40',
+                        )}
+                    />
                 </Button>
             );
         },
         cell: ({ row }) => (
-            <span className="px-2.5">{formatRupiah(row.original.variants[0].price)}</span>
+            <div className="px-3 font-medium">{formatRupiah(row.original.variants[0].price)}</div>
         ),
+        meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         accessorKey: 'total_stock',
@@ -87,10 +107,18 @@ export const columns: ColumnDef<Product>[] = [
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
                 Total Stock
-                <ArrowUpDown className="ml-2 h-4 w-4" />
+                <ArrowUpIcon
+                    className={cn(
+                        'ml-1 size-3 transition-all',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : '-rotate-180 opacity-40',
+                    )}
+                />
             </Button>
         ),
-        cell: ({ row }) => <span className="px-4">{row.original.total_stock}</span>,
+        cell: ({ row }) => <div className="px-3 font-medium">{row.original.total_stock}</div>,
+        meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         id: 'actions',
@@ -127,5 +155,6 @@ export const columns: ColumnDef<Product>[] = [
                 </DropdownMenu>
             );
         },
+        meta: { width: { type: 'fixed', px: 64 } },
     },
 ];
