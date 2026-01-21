@@ -31,9 +31,9 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
-    public function discounts()
+    public function discount()
     {
-        return $this->hasMany(ProductDiscount::class);
+        return $this->hasOne(ProductDiscount::class);
     }
 
     public function cartItems()

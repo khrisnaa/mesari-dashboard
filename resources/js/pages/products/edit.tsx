@@ -39,7 +39,7 @@ import { ChevronLeftIcon, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { DISCOUNT_EVENT_TYPES, ImageState } from './create';
+import { DISCOUNT_EVENT_TYPES, ImageState } from './create-copy';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

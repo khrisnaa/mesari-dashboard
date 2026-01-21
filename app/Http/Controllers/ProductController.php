@@ -80,7 +80,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-
+        dd($request->validated());
         try {
             $this->productService->store($request->validated());
 
@@ -129,7 +129,7 @@ class ProductController extends Controller
             )
             ->get();
 
-        $product = Product::with(['category', 'variants.attributes', 'images', 'discounts'])
+        $product = Product::with(['category', 'variants.attributes', 'images', 'discount'])
             ->where('id', $product->id)
             ->first();
 

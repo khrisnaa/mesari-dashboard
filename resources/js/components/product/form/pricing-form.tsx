@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -10,7 +11,6 @@ import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/f
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { Attribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
@@ -33,175 +33,190 @@ interface PricingFormProps {
     sizes: Attribute[];
     colors: Attribute[];
     isEdit?: boolean;
+    onDifferentPricing: (value: boolean) => void;
 }
 
-const PricingForm = ({ open, onOpenChange, colors, sizes, isEdit }: PricingFormProps) => {
+const PricingForm = ({
+    open,
+    onOpenChange,
+    colors,
+    sizes,
+    isEdit,
+    onDifferentPricing,
+}: PricingFormProps) => {
     const form = useFormContext();
 
-    const parentBasePrice = form.watch('base_price');
-    const parentBaseStock = form.watch('base_stock');
+    // base states
+    const [initialVariants, setInitialVariants] = useState<Variant[]>([]);
+    const [variants, setVariants] = useState<Variant[]>([]);
+    const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
 
-    const [basePrice, setBasePrice] = useState<number | null>(parentBasePrice);
-    const [baseStock, setBaseStock] = useState<number | null>(parentBaseStock);
+    const [basePrice, setBasePrice] = useState<number | null>(null);
+    const [baseStock, setBaseStock] = useState<number | null>(null);
 
-    useEffect(() => {
-        if (open) {
-            setBasePrice(parentBasePrice);
-            setBaseStock(parentBaseStock);
-        }
-    }, [open, parentBasePrice, parentBaseStock]);
+    // helper
+    const namesMatch = (a?: string, b?: string) =>
+        a?.trim().toLowerCase() === b?.trim().toLowerCase();
 
-    const baseVariants: Variant[] = form.watch('variants');
-    const [variants, setVariants] = useState<Variant[] | []>(baseVariants || []);
+    const getKey = (v: Variant) => `${v.size?.id || 'size'}-${v.color?.id || 'color'}`;
 
-    const generateCombinations = () => {
+    // generate combinations
+    const generateCombinations = (): Variant[] => {
         if (colors.length === 0) {
-            return sizes.map((size) => ({
-                size: { name: size.name, id: size.id, hex: size.hex ?? null },
+            return sizes.map((s) => ({
+                size: { ...s },
                 price: 0,
                 stock: 0,
             }));
         }
 
-        return sizes.flatMap((size) =>
-            colors.map((color) => ({
-                size: { name: size.name, id: size.id, hex: size.hex ?? null },
-                color: { name: color.name, id: color.id, hex: color.hex ?? null },
+        return sizes.flatMap((s) =>
+            colors.map((c) => ({
+                size: { ...s },
+                color: { ...c },
                 price: 0,
                 stock: 0,
             })),
         );
     };
 
-    const namesMatch = (name1?: string, name2?: string): boolean => {
-        return name1?.trim().toLowerCase() === name2?.trim().toLowerCase();
-    };
-
+    // load snapshot
     useEffect(() => {
-        const combinations: Variant[] = generateCombinations();
+        if (open) {
+            const snapshot = form.getValues('variants') ?? [];
+
+            setInitialVariants(snapshot);
+            setVariants(snapshot);
+            setSelectedVariants([]);
+        }
+    }, [open]);
+
+    // update variants
+    useEffect(() => {
+        if (!open) return;
+
+        const combinations = generateCombinations();
+
         setVariants((prev) => {
             const stillValid = prev.filter((v) => {
-                const sizeExists = sizes.some(
-                    (s) => s.name.trim().toLowerCase() === v.size?.name.trim().toLowerCase(),
-                );
+                const sizeMatch = sizes.some((s) => namesMatch(s.name, v.size?.name));
 
                 if (colors.length === 0) {
-                    return sizeExists && !v.color;
+                    return sizeMatch && !v.color;
                 }
 
-                const colorExists = colors.some(
-                    (c) => c.name.trim().toLowerCase() === v.color?.name?.trim().toLowerCase(),
-                );
+                const colorMatch = colors.some((c) => namesMatch(c.name, v.color?.name));
 
-                return sizeExists && colorExists;
+                return sizeMatch && colorMatch;
             });
 
-            const newVariants = combinations
-                .filter((comb) => {
-                    return !stillValid.some((v) => {
-                        const sizeMatch = namesMatch(v.size?.name, comb.size?.name);
-                        const colorMatch = namesMatch(v.color?.name, comb.color?.name);
-                        return sizeMatch && colorMatch;
-                    });
+            const newOnes = combinations
+                .filter((co) => {
+                    return !stillValid.some(
+                        (v) =>
+                            namesMatch(v.size?.name, co.size?.name) &&
+                            namesMatch(v.color?.name, co.color?.name),
+                    );
                 })
-                .map((comb) => {
-                    const existingInBase = baseVariants?.find((base) => {
-                        const sizeMatch = namesMatch(base.size?.name, comb.size?.name);
-                        const colorMatch = namesMatch(base.color?.name, comb.color?.name);
-                        return sizeMatch && colorMatch;
-                    });
+                .map((v) => ({
+                    ...v,
+                    price: basePrice ?? 0,
+                    stock: baseStock ?? 0,
+                    isPriceAuto: true,
+                    isStockAuto: true,
+                }));
 
-                    return existingInBase
-                        ? {
-                              ...comb,
-                              price: existingInBase.price ?? basePrice,
-                              stock: existingInBase.stock ?? baseStock,
-                              isPriceAuto: true,
-                              isStockAuto: true,
-                          }
-                        : {
-                              ...comb,
-                              price: basePrice ?? comb.price,
-                              stock: baseStock ?? comb.stock,
-                              isPriceAuto: true,
-                              isStockAuto: true,
-                          };
-                });
-
-            return [...stillValid, ...newVariants];
+            return [...stillValid, ...newOnes];
         });
-    }, [colors, sizes, baseVariants]);
+    }, [sizes, colors, open]);
 
-    useEffect(() => {
-        if (basePrice === null && baseStock === null) return;
+    // bulk apply
+    const handleBulkApplyPrice = () => {
+        const updated = variants.map((v) => {
+            const key = getKey(v);
+            const allow = selectedVariants.length === 0 || selectedVariants.includes(key);
 
-        setVariants((prev) =>
-            prev.map((variant) => ({
-                ...variant,
-                price: variant.isPriceAuto ? (basePrice ?? variant.price) : variant.price,
-                stock: variant.isStockAuto ? (baseStock ?? variant.stock) : variant.stock,
-            })),
-        );
-    }, [basePrice, baseStock]);
-
-    const handleResetVariantsToDefault = () => {
-        setVariants((prev) =>
-            prev.map((variant) => {
-                const baseVariant = baseVariants?.find((base) => {
-                    const sizeMatch = namesMatch(base.size?.name, variant.size?.name);
-                    const colorMatch = namesMatch(base.color?.name, variant.color?.name);
-                    return sizeMatch && colorMatch;
-                });
-
-                const hasBaseVariantDefault =
-                    baseVariant?.price !== undefined || baseVariant?.stock !== undefined;
-
-                return {
-                    ...variant,
-                    price: baseVariant?.price ?? basePrice ?? variant.price,
-                    stock: baseVariant?.stock ?? baseStock ?? variant.stock,
-                    isPriceAuto: hasBaseVariantDefault ? false : true,
-                    isStockAuto: hasBaseVariantDefault ? false : true,
-                };
-            }),
-        );
-    };
-
-    const handleSave = () => {
-        form.setValue('base_price', basePrice);
-        form.setValue('base_stock', baseStock);
-
-        const finalData: Variant[] = variants.map((variant) => ({
-            color: variant.color,
-            size: variant.size,
-            price: variant.price,
-            stock: variant.stock,
-        }));
-
-        form.setValue('variants', finalData);
-    };
-
-    const handleBulkSave = () => {
-        form.setValue('base_price', basePrice);
-        form.setValue('base_stock', baseStock);
-
-        const updated = variants.map((v) => ({
-            ...v,
-            price: basePrice ?? 0,
-            stock: baseStock ?? 0,
-        }));
+            return allow ? { ...v, price: basePrice ?? 0, isPriceAuto: true } : v;
+        });
 
         setVariants(updated);
     };
 
+    const handleBulkApplyStock = () => {
+        const updated = variants.map((v) => {
+            const key = getKey(v);
+            const allow = selectedVariants.length === 0 || selectedVariants.includes(key);
+
+            return allow ? { ...v, stock: baseStock ?? 0, isStockAuto: true } : v;
+        });
+
+        setVariants(updated);
+    };
+
+    // reset handler (reset price & stock only)
+    const handleReset = () => {
+        setVariants((prev) =>
+            prev.map((v) => {
+                const match = initialVariants.find(
+                    (iv) =>
+                        namesMatch(iv.size?.name, v.size?.name) &&
+                        namesMatch(iv.color?.name, v.color?.name),
+                );
+
+                return {
+                    ...v,
+                    price: match?.price ?? 0,
+                    stock: match?.stock ?? 0,
+                    isPriceAuto: true,
+                    isStockAuto: true,
+                };
+            }),
+        );
+
+        setSelectedVariants([]);
+    };
+
+    // save
+    const handleSave = () => {
+        form.setValue('variants', variants, { shouldDirty: true });
+        handleClose();
+        onDifferentPricing(true);
+    };
+
+    const handleClose = () => {
+        onOpenChange(false);
+        setBasePrice(null);
+        setBaseStock(null);
+    };
+
+    const baseParentPrice = form.watch('base_price');
+    const baseParentStock = form.watch('base_stock');
+
+    const handleSimplePricing = () => {
+        const combinations = generateCombinations();
+
+        const finalData: Variant[] = combinations.map((v) => ({
+            size: {
+                id: v.size?.id ?? '',
+                name: v.size?.name ?? '',
+                hex: v.size?.hex ?? null,
+            },
+            color: v.color ? { ...v.color } : undefined,
+            price: baseParentPrice ?? 0,
+            stock: baseParentStock ?? 0,
+        }));
+
+        form.setValue('variants', finalData, { shouldDirty: true });
+    };
+
+    useEffect(() => {
+        if (!open) {
+            handleSimplePricing();
+        }
+    }, [baseParentPrice, baseParentStock, sizes, colors]);
+
     return (
-        <Dialog
-            open={open}
-            onOpenChange={() => {
-                onOpenChange(false);
-                handleResetVariantsToDefault();
-            }}
-        >
+        <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="sm:max-w-xl">
                 <DialogHeader>
                     <DialogTitle>Pricing and Stock</DialogTitle>
@@ -244,46 +259,75 @@ const PricingForm = ({ open, onOpenChange, colors, sizes, isEdit }: PricingFormP
                                 <FormMessage />
                             </FormItem>
                         </div>
-                        {isEdit && (
-                            <div className="mt-4 flex justify-end">
-                                <Button onClick={handleBulkSave} className="rounded-full">
-                                    Apply for all
-                                </Button>
-                            </div>
-                        )}
+
+                        <div className="mt-4 flex justify-end gap-4">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-full text-xs"
+                                onClick={handleBulkApplyPrice}
+                            >
+                                Apply Price
+                            </Button>
+
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-full text-xs"
+                                onClick={handleBulkApplyStock}
+                            >
+                                Apply Stock
+                            </Button>
+                        </div>
                     </div>
                     <Separator />
                     <div className="custom-scrollbar flex h-[50dvh] flex-col justify-between gap-4 overflow-y-auto pr-4">
                         <div className="grid gap-4">
-                            <div className="grid h-fit grid-cols-5 gap-4">
-                                <Label>Variant</Label>
-                                <Label className="col-span-2">Pricing</Label>
-                                <Label className="col-span-2">Stock</Label>
+                            <div className="grid h-fit grid-cols-10 gap-4">
+                                <Label>#</Label>
+                                <Label className="col-span-3">Variant</Label>
+                                <Label className="col-span-3">Pricing</Label>
+                                <Label className="col-span-3">Stock</Label>
                             </div>
                             {/* Variants mapp */}
                             {variants.map((variant, i) => {
                                 return (
-                                    <div key={i} className="grid h-fit grid-cols-5 gap-4">
-                                        <div className="col-span-1 flex items-center gap-2">
-                                            {variant.color && (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <div
-                                                            style={{
-                                                                backgroundColor:
-                                                                    variant.color.hex ?? '#fff',
-                                                            }}
-                                                            className="aspect-square h-5 rounded-full border"
-                                                        />
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>{variant.color.name}</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            )}
-                                            <h4>{variant?.size?.name}</h4>
+                                    <div
+                                        key={getKey(variant)}
+                                        className="grid h-fit grid-cols-10 gap-4"
+                                    >
+                                        <div>
+                                            <Checkbox
+                                                className="border-neutral-500"
+                                                checked={selectedVariants.includes(getKey(variant))}
+                                                onCheckedChange={(checked) => {
+                                                    setSelectedVariants((prev) =>
+                                                        checked
+                                                            ? [...prev, getKey(variant)]
+                                                            : prev.filter(
+                                                                  (id) => id !== getKey(variant),
+                                                              ),
+                                                    );
+                                                }}
+                                            />
                                         </div>
-                                        <div className="col-span-2">
+                                        <div className="col-span-3 flex items-center gap-2">
+                                            {variant.color && (
+                                                <div
+                                                    className="h-4 w-4 rounded-full border border-neutral-500"
+                                                    style={{
+                                                        backgroundColor:
+                                                            variant.color.hex ?? '#fff',
+                                                    }}
+                                                />
+                                            )}
+
+                                            <span className="text-sm font-medium">
+                                                {variant.size?.name}
+                                                {variant.color ? ` / ${variant.color.name}` : ''}
+                                            </span>
+                                        </div>
+                                        <div className="col-span-3">
                                             <Input
                                                 type="text"
                                                 inputMode="numeric"
@@ -310,7 +354,7 @@ const PricingForm = ({ open, onOpenChange, colors, sizes, isEdit }: PricingFormP
                                                 }}
                                             />
                                         </div>
-                                        <div className="col-span-2">
+                                        <div className="col-span-3">
                                             <Input
                                                 type="text"
                                                 inputMode="numeric"
@@ -349,18 +393,11 @@ const PricingForm = ({ open, onOpenChange, colors, sizes, isEdit }: PricingFormP
                                 size="lg"
                                 variant="outline"
                                 className="rounded-full"
-                                onClick={handleResetVariantsToDefault}
+                                onClick={handleReset}
                             >
                                 Reset
                             </Button>
-                            <Button
-                                size="lg"
-                                className="rounded-full"
-                                onClick={() => {
-                                    handleSave();
-                                    onOpenChange(false);
-                                }}
-                            >
+                            <Button size="lg" className="rounded-full" onClick={handleSave}>
                                 Save
                             </Button>
                         </div>

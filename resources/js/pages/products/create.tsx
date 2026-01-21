@@ -2,7 +2,7 @@ import { ColorPickerDialog } from '@/components/color-picker';
 import { DateTimePicker } from '@/components/date-time-picker';
 import { GalleryUploader } from '@/components/product/form/gallery-uploader';
 import { NewCategoryDialog } from '@/components/product/form/new-category';
-import PricingForm from '@/components/product/form/pricing-form';
+import PricingForm, { Variant } from '@/components/product/form/pricing-form';
 import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +23,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useDialog } from '@/hooks/use-dialog';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import products from '@/routes/products';
@@ -34,8 +35,8 @@ import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm, useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
 
 export const DISCOUNT_EVENT_TYPES = [
@@ -69,7 +70,8 @@ export interface ImageState {
     sort_order?: number;
 }
 
-const Create = ({ categories, colors, sizes }: PageProps) => {
+const Create = ({ colors, sizes, categories }: PageProps) => {
+    // react hook form handler
     const form = useForm<CreateProductInput>({
         resolver: zodResolver(createProductSchema),
         defaultValues: {
@@ -90,40 +92,14 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
         },
     });
 
-    const onSubmit = (data: CreateProductInput) => {
-        const formData = new FormData();
-
-        formData.append('name', data.name);
-        formData.append('variants', JSON.stringify(data.variants));
-        formData.append('category_id', data.category_id);
-        formData.append('description', data.description || '');
-
-        images.forEach((img, index) => {
-            formData.append(`images[${index}][type]`, img.type);
-            if (img.file) {
-                formData.append(`images[${index}][file]`, img.file);
-            }
-        });
-
-        Object.entries(data.discount ?? {}).forEach(([key, val]) => {
-            if (key === 'is_active') {
-                formData.append(`discount[${key}]`, val ? '1' : '0');
-            } else {
-                formData.append(`discount[${key}]`, val != null ? String(val) : '');
-            }
-        });
-
-        router.post(products.store(), formData, {
-            forceFormData: true,
-            onError: (errors) => {
-                const errorMessage = Object.values(errors)[0];
-                toast.error(errorMessage);
-            },
-        });
-    };
+    // dialog handler
+    const pricesDialog = useDialog();
+    const categoryDialog = useDialog();
+    const colorPickerDialog = useDialog();
 
     // select sizes handler
     const [selectedSizes, setSelectedSizes] = useState<Attribute[] | []>([]);
+
     const toggleSize = (size: Attribute) => {
         setSelectedSizes((prev) => {
             const exists = prev.some((s) => s.id === size.id);
@@ -138,6 +114,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
     // select colors handler
     const [selectedColors, setSelectedColors] = useState<Attribute[] | []>([]);
+
     const toggleColor = (color: Attribute) => {
         setSelectedColors((prev) => {
             const exists = prev.some((c) => c.hex === color.hex && c.name === color.name);
@@ -150,19 +127,15 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
         });
     };
 
-    const [showColorPicker, setShowColorPicker] = useState(false);
+    // custom colors
     const [customColors, setCustomColors] = useState<Attribute[]>([]);
+
     const handleAddColor = (color: Attribute) => {
         setSelectedColors((prev) => [...prev, color]);
         setCustomColors((prev) => [...prev, color]);
     };
 
-    // dialog handler
-    const [showPricesDialog, setShowPricesDialog] = useState(false);
-    const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
-
     // images handler
-
     const [images, setImages] = useState<ImageState[]>([]);
 
     const handleThumbnailChange = (file: ImageState) => {
@@ -221,49 +194,48 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
         });
     };
 
-    // handle discount start and end date
+    // handle discount type, start and end date
     const startValue = form.watch('discount.start_at');
     const endValue = form.watch('discount.end_at');
     const discountType = form.watch('discount.type');
 
-    // handle variants if modal is not opened
-    const basePrice = form.watch('base_price');
-    const baseStock = form.watch('base_stock');
+    // handle variant pricing
+    const [isDifferentPricing, setIsDifferentPricing] = useState(false);
 
-    useEffect(() => {
-        if (selectedSizes.length === 0) return;
+    // form submit handler
+    const onSubmit = (data: CreateProductInput) => {
+        const formData = new FormData();
 
-        const generateCombinations = () => {
-            if (selectedColors.length === 0) {
-                return selectedSizes.map((size) => ({
-                    size: {
-                        id: size.id,
-                        name: size.name,
-                        hex: size.hex ?? null,
-                    },
-                    price: basePrice ?? 0,
-                    stock: baseStock ?? 0,
-                }));
+        formData.append('name', data.name);
+        formData.append('variants', JSON.stringify(data.variants));
+        formData.append('category_id', data.category_id);
+        formData.append('description', data.description || '');
+
+        images.forEach((img, index) => {
+            formData.append(`images[${index}][type]`, img.type);
+            if (img.file) {
+                formData.append(`images[${index}][file]`, img.file);
             }
-
-            return selectedSizes.flatMap((size) =>
-                selectedColors.map((color) => ({
-                    size,
-                    color,
-                    price: basePrice ?? 0,
-                    stock: baseStock ?? 0,
-                })),
-            );
-        };
-
-        const updated = generateCombinations();
-
-        form.setValue('variants', updated, {
-            shouldDirty: true,
-            shouldTouch: true,
         });
-    }, [selectedSizes, selectedColors, basePrice, baseStock]);
 
+        Object.entries(data.discount ?? {}).forEach(([key, val]) => {
+            if (key === 'is_active') {
+                formData.append(`discount[${key}]`, val ? '1' : '0');
+            } else {
+                formData.append(`discount[${key}]`, val != null ? String(val) : '');
+            }
+        });
+
+        router.post(products.store(), formData, {
+            forceFormData: true,
+            onError: (errors) => {
+                const errorMessage = Object.values(errors)[0];
+                toast.error(errorMessage);
+            },
+        });
+    };
+
+    console.log('ERRORS=>', form.formState.errors);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
@@ -283,7 +255,6 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                         <div>
                             <Button
                                 onClick={() => {
-                                    // if (!validateSize()) return;
                                     form.handleSubmit(onSubmit)();
                                 }}
                                 type="button"
@@ -411,7 +382,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="rounded-full border-2"
-                                                    onClick={() => setShowColorPicker(true)}
+                                                    onClick={() => colorPickerDialog.open()}
                                                 >
                                                     <Plus />
                                                 </Button>
@@ -425,64 +396,79 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h4 className="font-semibold">Pricing and Stock</h4>
                                 <div className="grid gap-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="base_price"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Base Price</FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder="0"
-                                                            inputMode="numeric"
-                                                            {...field}
-                                                            value={formatNumber(field.value)}
-                                                            onChange={(e) => {
-                                                                const numericValue = parseNumber(
-                                                                    e.target.value,
-                                                                );
-                                                                field.onChange(numericValue);
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                    {isDifferentPricing ? (
+                                        <PriceList />
+                                    ) : (
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <FormField
+                                                control={form.control}
+                                                name="base_price"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Base Price</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="0"
+                                                                inputMode="numeric"
+                                                                {...field}
+                                                                value={formatNumber(field.value)}
+                                                                onChange={(e) => {
+                                                                    const numericValue =
+                                                                        parseNumber(e.target.value);
+                                                                    field.onChange(numericValue);
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
 
-                                        <FormField
-                                            control={form.control}
-                                            name="base_stock"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Base Stock</FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder="0"
-                                                            inputMode="numeric"
-                                                            {...field}
-                                                            value={formatNumber(field.value)}
-                                                            onChange={(e) => {
-                                                                const numericValue = parseNumber(
-                                                                    e.target.value,
-                                                                );
-                                                                field.onChange(numericValue);
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
+                                            <FormField
+                                                control={form.control}
+                                                name="base_stock"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Base Stock</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="0"
+                                                                inputMode="numeric"
+                                                                {...field}
+                                                                value={formatNumber(field.value)}
+                                                                onChange={(e) => {
+                                                                    const numericValue =
+                                                                        parseNumber(e.target.value);
+                                                                    field.onChange(numericValue);
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    )}
 
                                     <div className="flex justify-end">
                                         <Button
-                                            onClick={() =>
-                                                selectedSizes.length !== 0 &&
-                                                setShowPricesDialog(true)
-                                            }
+                                            onClick={() => {
+                                                if (selectedSizes.length === 0) {
+                                                    form.setError('selected_sizes', {
+                                                        type: 'manual',
+                                                        message: 'Select at least one size',
+                                                    });
+                                                    return;
+                                                }
+                                                form.clearErrors('selected_sizes');
+                                                form.setValue('base_price', undefined, {
+                                                    shouldDirty: true,
+                                                });
+                                                form.setValue('base_stock', undefined, {
+                                                    shouldDirty: true,
+                                                });
+                                                pricesDialog.open();
+                                            }}
                                             size="lg"
                                             className="w-fit rounded-full"
                                         >
@@ -736,10 +722,7 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
 
                                 <div className="flex justify-end">
                                     <Button
-                                        onClick={() =>
-                                            selectedSizes.length > 0 &&
-                                            setShowNewCategoryDialog(true)
-                                        }
+                                        onClick={() => categoryDialog.open()}
                                         type="button"
                                         size="lg"
                                         className="rounded-full"
@@ -751,26 +734,70 @@ const Create = ({ categories, colors, sizes }: PageProps) => {
                         </section>
                     </section>
                 </form>
-                {/* Dialog Components */}
+                {/* dialog components */}
                 <ColorPickerDialog
-                    open={showColorPicker}
-                    onOpenChange={setShowColorPicker}
+                    open={colorPickerDialog.isOpen}
+                    onOpenChange={colorPickerDialog.onOpenChange}
                     onColorSelect={handleAddColor}
                 />
 
                 <PricingForm
-                    open={showPricesDialog}
-                    onOpenChange={setShowPricesDialog}
+                    open={pricesDialog.isOpen}
+                    onOpenChange={pricesDialog.onOpenChange}
                     colors={selectedColors}
                     sizes={selectedSizes}
+                    onDifferentPricing={setIsDifferentPricing}
                 />
 
                 <NewCategoryDialog
-                    open={showNewCategoryDialog}
-                    onOpenChange={setShowNewCategoryDialog}
+                    open={categoryDialog.isOpen}
+                    onOpenChange={categoryDialog.onOpenChange}
                 />
             </Form>
         </AppLayout>
     );
 };
+
 export default Create;
+
+const PriceList = () => {
+    const form = useFormContext();
+
+    const variants: Variant[] = form.watch('variants') ?? [];
+    return (
+        <div className="space-y-2">
+            {variants.map((variant, i) => (
+                <div
+                    key={i}
+                    className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2"
+                >
+                    <div className="flex items-center gap-2">
+                        {variant.color && (
+                            <div
+                                className="h-4 w-4 rounded-full border"
+                                style={{ backgroundColor: variant.color.hex ?? '#fff' }}
+                            />
+                        )}
+
+                        <span className="text-sm font-medium">
+                            {variant.size?.name}
+                            {variant.color ? ` / ${variant.color.name}` : ''}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-sm text-neutral-700">
+                        <span>Rp {formatNumber(variant.price)}</span>
+                        <span className="text-neutral-400">•</span>
+                        <span>{formatNumber(variant.stock)} pcs</span>
+                    </div>
+                </div>
+            ))}
+
+            {/* {hiddenCount > 0 && (
+        <div className="text-sm text-neutral-500 ml-1">
+            +{hiddenCount} more
+        </div>
+    )} */}
+        </div>
+    );
+};
