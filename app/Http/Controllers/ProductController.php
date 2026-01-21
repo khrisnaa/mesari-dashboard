@@ -169,4 +169,19 @@ class ProductController extends Controller
             ->route('products.index')
             ->with('success', FlashHelper::stamp('Product successfully deleted.'));
     }
+
+    public function updateStatus(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:active,inactive,draft,archived',
+        ]);
+
+        $product->update([
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('success', FlashHelper::stamp('Product successfully updated.'));
+    }
 }

@@ -1,6 +1,6 @@
-import { Product } from '@/types/product';
+import { Product, ProductVariant } from '@/types/product';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, EyeIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
+import { ArchiveIcon, ArrowUpIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
 
 import { formatRupiah } from '@/utils/formatRupiah';
 
@@ -16,8 +16,9 @@ import {
 import { cn } from '@/lib/utils';
 import products from '@/routes/products';
 import { router } from '@inertiajs/react';
+import { Badge } from '../ui/badge';
 
-export const columns: ColumnDef<Product>[] = [
+export const getColumns = (onArchive: (product: Product) => void): ColumnDef<Product>[] => [
     {
         id: 'select',
         header: ({ table }) => (
@@ -60,20 +61,15 @@ export const columns: ColumnDef<Product>[] = [
                 />
             </Button>
         ),
-        cell: ({ row }) => <div className="px-3">{row.original.name}</div>,
+        cell: ({ row }) => {
+            const name = row.original.name;
+            return <div className="px-3">{name}</div>;
+        },
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {
-        accessorKey: 'description',
-        header: 'Description',
-        cell: ({ row }) => {
-            return <div className="line-clamp-2 text-wrap">{row.original.description}</div>;
-        },
-        meta: { width: { type: 'flex', fr: 2 } },
-    },
-    {
         id: 'price',
-        accessorFn: (row) => row.variants[0].price,
+        accessorKey: 'variants',
         header: ({ column }) => {
             return (
                 <Button
@@ -93,9 +89,22 @@ export const columns: ColumnDef<Product>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) => (
-            <div className="px-3 font-medium">{formatRupiah(row.original.variants[0].price)}</div>
-        ),
+        cell: ({ row }) => {
+            const variants = row.original.variants;
+            const getPriceRange = (variants: ProductVariant[]) => {
+                if (!variants || variants.length === 0) return '-';
+
+                const prices = variants.map((v) => v.price);
+                const min = Math.min(...prices);
+                const max = Math.max(...prices);
+
+                if (min === max) return formatRupiah(min);
+
+                return `${formatRupiah(min)} - ${formatRupiah(max)}`;
+            };
+            return <div className="px-3 font-medium">{getPriceRange(variants)}</div>;
+        },
+
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {
@@ -117,7 +126,45 @@ export const columns: ColumnDef<Product>[] = [
                 />
             </Button>
         ),
-        cell: ({ row }) => <div className="px-3 font-medium">{row.original.total_stock}</div>,
+        cell: ({ row }) => {
+            const total_stock = row.original.total_stock;
+            return <div className="px-3 font-medium">{total_stock}</div>;
+        },
+        meta: { width: { type: 'flex', fr: 1 } },
+    },
+    {
+        accessorKey: 'status',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                Status
+                <ArrowUpIcon
+                    className={cn(
+                        'ml-1 size-3 transition-all',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : '-rotate-180 opacity-40',
+                    )}
+                />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const status = row.original.status;
+
+            const color =
+                status === 'published'
+                    ? 'bg-green-500'
+                    : status === 'archived'
+                      ? 'bg-gray-400'
+                      : status === 'draft'
+                        ? 'bg-yellow-500'
+                        : 'bg-slate-500';
+
+            return <Badge className={`${color} text-white`}>{status}</Badge>;
+        },
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {
@@ -138,17 +185,22 @@ export const columns: ColumnDef<Product>[] = [
                                 onClick={() => router.get(products.edit(product))}
                                 variant="ghost"
                                 size="sm"
-                                className="w-full"
+                                className="w-full justify-between"
                             >
-                                <PencilIcon />
                                 Edit
+                                <PencilIcon />
                             </Button>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                            <Button variant="ghost" size="sm" className="w-full">
-                                <EyeIcon />
-                                Show
+                            <Button
+                                onClick={() => onArchive(product)}
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-between"
+                            >
+                                Archive
+                                <ArchiveIcon />
                             </Button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

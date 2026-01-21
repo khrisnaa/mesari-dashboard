@@ -64,6 +64,9 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
 
         Route::post('/variant', [ProductController::class, 'storeVariant'])
             ->name('store.variant');
+
+        Route::put('/products/{product}/status', [ProductController::class, 'updateStatus'])
+            ->name('update.status');
     });
 
     // Testimonials

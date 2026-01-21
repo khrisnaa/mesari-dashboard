@@ -1,8 +1,10 @@
 import { DataTable } from '@/components/data-table/data-table';
 import FlashToast from '@/components/flash-toast';
 import { PageHeader } from '@/components/page-header';
-import { columns } from '@/components/product/columns';
+import { ArchiveDialog } from '@/components/product/archive-dialog';
+import { getColumns } from '@/components/product/columns';
 import { Button } from '@/components/ui/button';
+import { useDialog } from '@/hooks/use-dialog';
 import AppLayout from '@/layouts/app-layout';
 import { create } from '@/routes/products';
 import { BreadcrumbItem } from '@/types';
@@ -23,6 +25,16 @@ interface PageProps {
 }
 
 const Index = ({ products }: PageProps) => {
+    const {
+        isOpen: isArchiveOpen,
+        open: openArchive,
+        close: closeArchive,
+        onOpenChange: onArchiveOpenChange,
+        payload: archiveData,
+    } = useDialog<Product>();
+
+    const columns = getColumns(openArchive);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Products" />
@@ -48,6 +60,13 @@ const Index = ({ products }: PageProps) => {
                     />
                 </div>
             </div>
+
+            <ArchiveDialog
+                isOpen={isArchiveOpen}
+                close={closeArchive}
+                onOpenChange={onArchiveOpenChange}
+                payload={archiveData}
+            />
         </AppLayout>
     );
 };
