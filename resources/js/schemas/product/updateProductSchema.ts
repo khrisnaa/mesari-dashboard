@@ -53,7 +53,18 @@ export const updateProductSchema = z.object({
             },
         )
         .optional(),
+
     category_id: z.string().min(1, 'Product category is required'),
+
+    discount: z
+        .object({
+            type: z.string().optional(),
+            value: z.number().optional(),
+            start_at: z.string().optional(),
+            end_at: z.string().optional(),
+            is_active: z.boolean().optional(),
+        })
+        .optional(),
 });
 
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;

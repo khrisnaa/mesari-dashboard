@@ -9,6 +9,7 @@ export interface Product {
     variants: ProductVariant[];
     category: Category;
     images: ProductImage[];
+    discounts?: ProductDiscount[];
     total_stock?: number;
     created_at: string;
     updated_at: string;
@@ -48,5 +49,18 @@ export interface ProductImage {
     sort_order: number;
     created_at?: string;
     updated_at?: string;
+    deleted_at?: string | null;
+}
+
+export interface ProductDiscount {
+    id: string;
+    product_id: string;
+    type: 'percentage' | 'fixed';
+    value: number;
+    start_at?: string | null;
+    end_at?: string | null;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
     deleted_at?: string | null;
 }

@@ -32,9 +32,10 @@ interface PricingFormProps {
     onOpenChange: (value: boolean) => void;
     sizes: Attribute[];
     colors: Attribute[];
+    isEdit?: boolean;
 }
 
-const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) => {
+const PricingForm = ({ open, onOpenChange, colors, sizes, isEdit }: PricingFormProps) => {
     const form = useFormContext();
 
     const parentBasePrice = form.watch('base_price');
@@ -180,8 +181,27 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
         form.setValue('variants', finalData);
     };
 
+    const handleBulkSave = () => {
+        form.setValue('base_price', basePrice);
+        form.setValue('base_stock', baseStock);
+
+        const updated = variants.map((v) => ({
+            ...v,
+            price: basePrice ?? 0,
+            stock: baseStock ?? 0,
+        }));
+
+        setVariants(updated);
+    };
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog
+            open={open}
+            onOpenChange={() => {
+                onOpenChange(false);
+                handleResetVariantsToDefault();
+            }}
+        >
             <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="sm:max-w-xl">
                 <DialogHeader>
                     <DialogTitle>Pricing and Stock</DialogTitle>
@@ -190,38 +210,47 @@ const PricingForm = ({ open, onOpenChange, colors, sizes }: PricingFormProps) =>
                     Dialog for adding price and stock to product variants
                 </DialogDescription>
                 <div className="flex flex-col gap-4 py-6">
-                    <div className="grid h-fit grid-cols-2 gap-4">
-                        <FormItem>
-                            <FormLabel>Base Price</FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder="0"
-                                    inputMode="numeric"
-                                    value={formatNumber(basePrice?.toString())}
-                                    onChange={(e) => {
-                                        const numericValue = parseNumber(e.target.value);
-                                        setBasePrice(numericValue);
-                                    }}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+                    <div>
+                        <div className="grid h-fit grid-cols-2 gap-4">
+                            <FormItem>
+                                <FormLabel>Base Price</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="0"
+                                        inputMode="numeric"
+                                        value={formatNumber(basePrice?.toString())}
+                                        onChange={(e) => {
+                                            const numericValue = parseNumber(e.target.value);
+                                            setBasePrice(numericValue);
+                                        }}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
 
-                        <FormItem>
-                            <FormLabel>Base Stock</FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder="0"
-                                    inputMode="numeric"
-                                    value={formatNumber(baseStock?.toString())}
-                                    onChange={(e) => {
-                                        const numericValue = parseNumber(e.target.value);
-                                        setBaseStock(numericValue);
-                                    }}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+                            <FormItem>
+                                <FormLabel>Base Stock</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="0"
+                                        inputMode="numeric"
+                                        value={formatNumber(baseStock?.toString())}
+                                        onChange={(e) => {
+                                            const numericValue = parseNumber(e.target.value);
+                                            setBaseStock(numericValue);
+                                        }}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        </div>
+                        {isEdit && (
+                            <div className="mt-4 flex justify-end">
+                                <Button onClick={handleBulkSave} className="rounded-full">
+                                    Apply for all
+                                </Button>
+                            </div>
+                        )}
                     </div>
                     <Separator />
                     <div className="custom-scrollbar flex h-[50dvh] flex-col justify-between gap-4 overflow-y-auto pr-4">

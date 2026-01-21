@@ -129,7 +129,7 @@ class ProductController extends Controller
             )
             ->get();
 
-        $product = Product::with(['category', 'variants.attributes', 'images'])
+        $product = Product::with(['category', 'variants.attributes', 'images', 'discounts'])
             ->where('id', $product->id)
             ->first();
 
@@ -144,6 +144,7 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
+
         try {
             $this->productService->update($product, $request->validated());
 

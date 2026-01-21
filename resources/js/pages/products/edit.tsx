@@ -25,7 +25,9 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import products from '@/routes/products';
 
+import { DateTimePicker } from '@/components/date-time-picker';
 import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
+import { Switch } from '@/components/ui/switch';
 import { UpdateProductInput, updateProductSchema } from '@/schemas/product/updateProductSchema';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
@@ -34,10 +36,10 @@ import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
 import { ChevronLeftIcon, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { ImageState } from './create';
+import { DISCOUNT_EVENT_TYPES, ImageState } from './create';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -48,21 +50,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Create',
         href: '',
     },
-];
-
-export const DISCOUNT_EVENT_TYPES = [
-    { value: 'NEW_YEAR', label: 'New Year' },
-    { value: 'CHRISTMAS', label: 'Christmas' },
-    { value: 'BLACK_FRIDAY', label: 'Black Friday' },
-    { value: 'CYBER_MONDAY', label: 'Cyber Monday' },
-    { value: 'RAMADAN', label: 'Ramadan' },
-    { value: 'EID', label: 'Eid al-Fitr' },
-    { value: 'INDEPENDENCE_DAY', label: 'Independence Day' },
-    { value: 'HALLOWEEN', label: 'Halloween' },
-    { value: 'BACK_TO_SCHOOL', label: 'Back to School' },
-    { value: 'FLASH_SALE', label: 'Flash Sale' },
-    { value: 'CLEARANCE', label: 'Clearance Sale' },
-    { value: 'BIRTHDAY', label: 'Birthday Sale' },
 ];
 
 interface PageProps {
@@ -76,7 +63,7 @@ export interface SortOrder {
     id: string;
     sort_order: number;
 }
-const Create = ({ categories, colors, sizes, product }: PageProps) => {
+const Edit = ({ categories, colors, sizes, product }: PageProps) => {
     const formattedvariants: Variant[] = product.variants.map((v) => {
         const sizeAttr = v.attributes?.find((a) => a.type == 'size');
         const colorAttr = v.attributes?.find((a) => a.type == 'color');
@@ -93,6 +80,8 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
         };
     });
 
+    const existingDiscount = product.discounts?.[0] ?? null;
+
     const form = useForm<UpdateProductInput>({
         resolver: zodResolver(updateProductSchema),
         defaultValues: {
@@ -102,6 +91,13 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
             category_id: product.category.id,
             base_price: 0,
             base_stock: 0,
+            discount: {
+                type: existingDiscount?.type ?? '',
+                value: Number(existingDiscount?.value) ?? 0,
+                start_at: existingDiscount?.start_at ?? '',
+                end_at: existingDiscount?.end_at ?? '',
+                is_active: existingDiscount?.is_active ?? false,
+            },
         },
     });
 
@@ -113,6 +109,14 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
         formData.append('variants', JSON.stringify(data.variants));
         formData.append('category_id', data.category_id);
         formData.append('description', data.description || '');
+
+        Object.entries(data.discount ?? {}).forEach(([key, val]) => {
+            if (key === 'is_active') {
+                formData.append(`discount[${key}]`, val ? '1' : '0');
+            } else {
+                formData.append(`discount[${key}]`, val != null ? String(val) : '');
+            }
+        });
 
         formData.append(
             'image_state',
@@ -265,6 +269,15 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
         .filter((img) => img.type === 'gallery')
         .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
+    // handle discount start and end date
+    const startValue = form.watch('discount.start_at');
+    const endValue = form.watch('discount.end_at');
+    const discountType = form.watch('discount.type');
+
+    console.log(product);
+    useEffect(() => {
+        console.log('ALL ERRORS:', form.formState.errors);
+    }, [form.formState.errors]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
@@ -489,6 +502,219 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
                                             Edit prices
                                         </Button>
                                     </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.value"
+                                            render={({ field }) => {
+                                                const isPercentage =
+                                                    form.getValues('discount.type') ===
+                                                    'percentage';
+
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Discount {isPercentage ? '(%)' : ''}
+                                                        </FormLabel>
+
+                                                        <FormControl>
+                                                            <div className="relative">
+                                                                <Input
+                                                                    placeholder={
+                                                                        isPercentage
+                                                                            ? '0 - 100'
+                                                                            : '0'
+                                                                    }
+                                                                    inputMode="numeric"
+                                                                    {...field}
+                                                                    value={
+                                                                        isPercentage
+                                                                            ? (field.value ?? '')
+                                                                            : formatNumber(
+                                                                                  field.value,
+                                                                              )
+                                                                    }
+                                                                    onChange={(e) => {
+                                                                        let raw = e.target.value;
+
+                                                                        if (isPercentage) {
+                                                                            let numeric = Number(
+                                                                                raw.replace(
+                                                                                    /[^0-9]/g,
+                                                                                    '',
+                                                                                ),
+                                                                            );
+
+                                                                            if (numeric > 100) {
+                                                                                form.setError(
+                                                                                    'discount.value',
+                                                                                    {
+                                                                                        type: 'manual',
+                                                                                        message:
+                                                                                            'Percentage cannot exceed 100',
+                                                                                    },
+                                                                                );
+                                                                                numeric = 100;
+                                                                            } else {
+                                                                                form.clearErrors(
+                                                                                    'discount.value',
+                                                                                );
+                                                                            }
+
+                                                                            field.onChange(
+                                                                                Number.isNaN(
+                                                                                    numeric,
+                                                                                )
+                                                                                    ? null
+                                                                                    : numeric,
+                                                                            );
+                                                                            return;
+                                                                        }
+
+                                                                        const numericValue =
+                                                                            parseNumber(raw);
+                                                                        field.onChange(
+                                                                            numericValue,
+                                                                        );
+                                                                    }}
+                                                                    className={
+                                                                        isPercentage ? 'pr-10' : ''
+                                                                    }
+                                                                />
+
+                                                                {isPercentage && (
+                                                                    <span className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500">
+                                                                        %
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </FormControl>
+
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                );
+                                            }}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.type"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Discount Type</FormLabel>
+                                                    <FormControl>
+                                                        <Select
+                                                            onValueChange={(value) => {
+                                                                const current =
+                                                                    form.getValues(
+                                                                        'discount.value',
+                                                                    ) ?? 0;
+
+                                                                // auto clamp if changing to %
+                                                                if (
+                                                                    value === 'percentage' &&
+                                                                    current > 100
+                                                                ) {
+                                                                    form.setValue(
+                                                                        'discount.value',
+                                                                        100,
+                                                                        {
+                                                                            shouldValidate: true,
+                                                                            shouldDirty: true,
+                                                                        },
+                                                                    );
+                                                                }
+
+                                                                form.clearErrors('discount.value');
+                                                                field.onChange(value);
+                                                            }}
+                                                            value={field.value || undefined}
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select discount type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {DISCOUNT_EVENT_TYPES.map(
+                                                                    (discount, i) => (
+                                                                        <SelectItem
+                                                                            key={i}
+                                                                            value={discount.value}
+                                                                        >
+                                                                            {discount.label}
+                                                                        </SelectItem>
+                                                                    ),
+                                                                )}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.start_at"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Start Date</FormLabel>
+                                                    <FormControl>
+                                                        <DateTimePicker
+                                                            value={field.value ?? null}
+                                                            onChange={(val) => field.onChange(val)}
+                                                            maxDate={
+                                                                endValue ? new Date(endValue) : null
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.end_at"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>End Date</FormLabel>
+                                                    <FormControl>
+                                                        <DateTimePicker
+                                                            value={field.value ?? null}
+                                                            onChange={(val) => field.onChange(val)}
+                                                            minDate={
+                                                                startValue
+                                                                    ? new Date(startValue)
+                                                                    : null
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="mt-4 flex items-center justify-between">
+                                        <FormField
+                                            control={form.control}
+                                            name="discount.is_active"
+                                            render={({ field }) => (
+                                                <FormItem className="flex w-full flex-row items-center justify-between">
+                                                    <FormLabel>Active</FormLabel>
+                                                    <FormControl>
+                                                        <Switch
+                                                            checked={Boolean(field.value)}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -566,6 +792,7 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
                 />
 
                 <PricingForm
+                    isEdit
                     open={showPricesDialog}
                     onOpenChange={setShowPricesDialog}
                     colors={selectedColors}
@@ -580,4 +807,4 @@ const Create = ({ categories, colors, sizes, product }: PageProps) => {
         </AppLayout>
     );
 };
-export default Create;
+export default Edit;
