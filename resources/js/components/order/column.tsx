@@ -2,14 +2,10 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Order } from '@/types/order';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, MoreHorizontalIcon, PencilIcon } from 'lucide-react';
+import { ArrowUpIcon, EditIcon } from 'lucide-react';
+import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+import { TooltipProvider } from '../ui/tooltip';
 
 export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] => [
     {
@@ -109,14 +105,7 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
 
             const variant = statusVariantMap[status] ?? 'default';
 
-            return (
-                <div
-                    onClick={() => onEdit(order)}
-                    className="cursor-pointer rounded-full hover:bg-muted"
-                >
-                    <StatusBadge variant={variant} label={status} />
-                </div>
-            );
+            return <StatusBadge variant={variant} label={status} />;
         },
         meta: { width: { type: 'fixed', px: 200 } },
     },
@@ -138,28 +127,21 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
         },
         meta: { width: { type: 'fixed', px: 200 } },
     },
-
     {
         id: 'actions',
         cell: ({ row }) => {
             const order = row.original;
 
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontalIcon className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(order)} className="cursor-pointer">
-                            <PencilIcon className="mr-2 h-4 w-4" />
-                            Edit Status
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <TooltipProvider delayDuration={150}>
+                    <div className="flex items-center justify-center px-2">
+                        <ActionIconButton
+                            icon={<EditIcon className="h-4 w-4" />}
+                            tooltip="Edit Status"
+                            onClick={() => onEdit(order)}
+                        />
+                    </div>
+                </TooltipProvider>
             );
         },
         meta: { width: { type: 'fixed', px: 64 } },

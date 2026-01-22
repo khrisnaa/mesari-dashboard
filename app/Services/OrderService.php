@@ -48,8 +48,11 @@ class OrderService
         return Order::with(['items', 'address', 'user'])->findOrFail($id);
     }
 
-    public function updateStatus(Order $order, string $status): bool
+    public function updateStatus(Order $order, array $data): bool
     {
-        return $order->update(['status' => $status]);
+        return $order->update([
+            'status' => $data['status'],
+            'payment_status' => $data['payment_status']
+        ]);
     }
 }

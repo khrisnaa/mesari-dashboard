@@ -34,7 +34,7 @@ export const EditDialog = ({
 
                 <Form
                     {...orders.update.form(order)}
-                    resetOnSuccess={['status']}
+                    resetOnSuccess={['status', 'payment_status']}
                     disableWhileProcessing
                     className="space-y-6"
                     onSuccess={close}
@@ -42,31 +42,78 @@ export const EditDialog = ({
                     {({ processing, errors }) => (
                         <>
                             <div className="space-y-4">
-                                {/* Order ID (readonly info) */}
                                 <div className="space-y-1">
                                     <p className="text-sm text-muted-foreground">Order ID</p>
                                     <p className="font-mono text-sm">{order.id}</p>
                                 </div>
 
-                                {/* Status */}
                                 <div className="space-y-2">
                                     <Label htmlFor="status">Order Status</Label>
 
-                                    <Select name="status" defaultValue={order.status}>
+                                    <Select
+                                        defaultValue={order.status}
+                                        onValueChange={(val) => {
+                                            const hidden = document.getElementById(
+                                                'status_input',
+                                            ) as HTMLInputElement | null;
+                                            if (hidden) hidden.value = val;
+                                        }}
+                                    >
                                         <SelectTrigger id="status">
-                                            <SelectValue placeholder="Select status" />
+                                            <SelectValue placeholder="Select order status" />
                                         </SelectTrigger>
 
                                         <SelectContent>
                                             <SelectItem value="pending">Pending</SelectItem>
-                                            <SelectItem value="processing">Processing</SelectItem>
+                                            <SelectItem value="paid">Paid</SelectItem>
+                                            <SelectItem value="packed">Packed</SelectItem>
                                             <SelectItem value="shipped">Shipped</SelectItem>
                                             <SelectItem value="completed">Completed</SelectItem>
                                             <SelectItem value="cancelled">Cancelled</SelectItem>
                                         </SelectContent>
                                     </Select>
 
+                                    <input
+                                        type="hidden"
+                                        id="status_input"
+                                        name="status"
+                                        defaultValue={order.status}
+                                    />
+
                                     <InputError message={errors.status} />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="payment_status">Payment Status</Label>
+
+                                    <Select
+                                        defaultValue={order.payment_status}
+                                        onValueChange={(val) => {
+                                            const hidden = document.getElementById(
+                                                'payment_status_input',
+                                            ) as HTMLInputElement | null;
+                                            if (hidden) hidden.value = val;
+                                        }}
+                                    >
+                                        <SelectTrigger id="payment_status">
+                                            <SelectValue placeholder="Select payment status" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            <SelectItem value="pending">Pending</SelectItem>
+                                            <SelectItem value="paid">Paid</SelectItem>
+                                            <SelectItem value="failed">Failed</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <input
+                                        type="hidden"
+                                        id="payment_status_input"
+                                        name="payment_status"
+                                        defaultValue={order.payment_status}
+                                    />
+
+                                    <InputError message={errors.payment_status} />
                                 </div>
                             </div>
 

@@ -40,7 +40,7 @@ class OrderController extends Controller
 
     public function update(UpdateOrderStatusRequest $request, Order $order)
     {
-        $this->orderService->updateStatus($order, $request->status);
+        $this->orderService->updateStatus($order, $request->validated());
 
         return redirect()->route('orders.index')
             ->with('success', 'Order status successfully updated.');

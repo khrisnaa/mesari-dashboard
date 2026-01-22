@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Order;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -28,6 +29,11 @@ class UpdateOrderStatusRequest extends FormRequest
                 'required',
                 Rule::in(array_column(OrderStatus::cases(), 'value')),
             ],
+
+            'payment_status' => [
+                'required',
+                Rule::in(array_column(PaymentStatus::cases(), 'value')),
+            ]
         ];
     }
 
@@ -36,6 +42,9 @@ class UpdateOrderStatusRequest extends FormRequest
         return [
             'status.required' => 'Order status is required.',
             'status.in' => 'Invalid order status value.',
+
+            'payment_status.required' => 'Order payment status is required.',
+            'payment_status.in' => 'Invalid order payment status value.',
         ];
     }
 }
