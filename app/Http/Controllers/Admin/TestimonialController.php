@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
 use App\Http\Requests\Testimonial\StoreTestimonialRequest;
 use App\Http\Requests\Testimonial\UpdateTestimonialRequest;
 use App\Models\Testimonial;
 use App\Services\TestimonialService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class TestimonialController extends Controller

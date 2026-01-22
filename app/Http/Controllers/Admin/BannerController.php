@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Services\BannerService;
 use App\Http\Requests\Banner\StoreBannerRequest;
 use App\Http\Requests\Banner\UpdateBannerRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class BannerController extends Controller

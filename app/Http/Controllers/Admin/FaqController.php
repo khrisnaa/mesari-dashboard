@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
 use App\Http\Requests\Faq\StoreFaqRequest;
 use App\Http\Requests\Faq\UpdateFaqRequest;

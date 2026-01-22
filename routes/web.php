@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\BannerController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CompanyProfileController;
-use App\Http\Controllers\FaqController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\TestimonialController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CompanyProfileController;
+use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;

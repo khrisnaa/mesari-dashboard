@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Enums\UserStatus;
+use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
 use App\Models\User;
 use App\Services\UserService;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Requests\User\UpdateUserStatusRequest;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class UserController extends Controller

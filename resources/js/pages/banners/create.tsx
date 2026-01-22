@@ -162,6 +162,8 @@ const Create = () => {
                         <Button
                             type="button"
                             variant="outline"
+                            size="lg"
+                            className="rounded-full"
                             onClick={() => history.back()}
                             disabled={processing}
                         >
