@@ -45,7 +45,7 @@ const Index = ({ products }: PageProps) => {
                     title="Products"
                     description="Track your products seamlessly, ensuring smooth organization and effortless control."
                     actions={
-                        <Button asChild>
+                        <Button asChild className="rounded-full" size="lg">
                             <Link href={create()}>
                                 <Plus /> Create Product
                             </Link>

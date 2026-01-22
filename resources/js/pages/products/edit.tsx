@@ -281,6 +281,10 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         });
     };
 
+    // useEffect(() => {
+    //     console.log('variants => ', form.watch('variants'));
+    //     console.log('ERRORS => ', form.formState.errors);
+    // }, [form.formState.errors]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Product" />

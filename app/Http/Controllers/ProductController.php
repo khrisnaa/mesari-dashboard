@@ -144,9 +144,16 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
 
-
         try {
-            $this->productService->update($product, $request->validated());
+            $validated = $request->validated();
+
+            // Log variants
+            Log::info('REQUEST VARIANTS:', [
+                'variants_raw' => $validated['variants'] ?? null,
+                'variants_decoded' => json_decode($validated['variants'] ?? '[]', true),
+            ]);
+
+            $this->productService->update($product, $validated);
 
             return redirect()
                 ->route('products.index')
@@ -173,11 +180,11 @@ class ProductController extends Controller
     public function updateStatus(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'status' => 'required|string|in:active,inactive,draft,archived',
+            'is_published' => 'required|boolean',
         ]);
 
         $product->update([
-            'status' => $validated['status'],
+            'is_published' => $validated['is_published'],
         ]);
 
         return redirect()

@@ -9,6 +9,7 @@ use App\Models\ProductVariant;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -183,6 +184,7 @@ class ProductService
         try {
             return DB::transaction(function () use ($product, $data, &$basePath) {
 
+                // update basic product fields
                 $product->update([
                     'name'        => $data['name'],
                     'description' => $data['description'],
@@ -190,38 +192,55 @@ class ProductService
                     'is_published' => $data['is_published']
                 ]);
 
-
+                // decode variants from request
                 $variants = json_decode($data['variants'], true) ?? [];
 
-                foreach ($variants as &$variant) {
+                // normalize color id 
+                foreach ($variants as $idx => $variant) {
                     if (!empty($variant['color']['name'])) {
-                        $color = Attribute::firstOrCreate([
-                            'name' => $variant['color']['name'],
-                            'hex'  => $variant['color']['hex'],
-                            'type' => 'color',
-                        ]);
+                        $color = Attribute::firstOrCreate(
+                            ['type' => 'color', 'name' => $variant['color']['name']],
+                            ['hex' => $variant['color']['hex']]
+                        );
 
-                        $variant['color']['id'] = $color->id;
+                        $variants[$idx]['color']['id'] = $color->id;
                     }
                 }
 
-                $existingVariants = ProductVariant::withTrashed()
-                    ->with('attributes')
-                    ->where('product_id', $product->id)
-                    ->get();
 
+                // active ids for final deletion
                 $activeVariantIds = [];
 
+                // loop through all incoming variants
                 foreach ($variants as $variant) {
-                    $matchedVariant = $existingVariants->first(function ($v) use ($variant) {
-                        $attrs = $v->attributes;
-                        return
-                            $attrs->contains('id', $variant['size']['id'] ?? null) &&
-                            (!isset($variant['color']['id']) ||
-                                $attrs->contains('id', $variant['color']['id']));
+
+                    // refresh existing variants every loop
+                    // (so attributes sync does not break matching)
+                    $existingVariants = ProductVariant::withTrashed()
+                        ->with('attributes')
+                        ->where('product_id', $product->id)
+                        ->get();
+
+                    // build incoming attr set (size + color)
+                    $incomingAttrIds = collect([
+                        $variant['size']['id'],
+                        $variant['color']['id'] ?? null,
+                    ])->filter()->sort()->values()->all();
+
+                    // matching (size+color)
+                    $matchedVariant = $existingVariants->first(function ($v) use ($incomingAttrIds) {
+                        $existingAttrIds = $v->attributes->pluck('id')->sort()->values()->all();
+                        return $existingAttrIds === $incomingAttrIds;
                     });
 
+                    // save
                     if ($matchedVariant) {
+
+                        Log::info('✔ MATCH FOUND', [
+                            'variant_id' => $matchedVariant->id,
+                            'incoming_attrs' => $incomingAttrIds
+                        ]);
+
                         if ($matchedVariant->trashed()) {
                             $matchedVariant->restore();
                         }
@@ -233,6 +252,11 @@ class ProductService
 
                         $productVariant = $matchedVariant;
                     } else {
+
+                        Log::info('✘ MATCH NOT FOUND → CREATE NEW', [
+                            'incoming_attrs' => $incomingAttrIds
+                        ]);
+
                         $productVariant = ProductVariant::create([
                             'product_id' => $product->id,
                             'price'      => $variant['price'],
@@ -240,23 +264,23 @@ class ProductService
                         ]);
                     }
 
-                    $productVariant->attributes()->sync(
-                        collect([
-                            $variant['size']['id'] ?? null,
-                            $variant['color']['id'] ?? null,
-                        ])->filter()
-                    );
+                    // attach attributes (always size + color)
+                    $productVariant->attributes()->sync($incomingAttrIds);
 
+                    // push fresh id
                     $activeVariantIds[] = $productVariant->id;
+
+                    Log::info("ACTIVE IDS NOW", $activeVariantIds);
                 }
 
-
-                $existingVariants
+                // remove variants not included
+                ProductVariant::withTrashed()
+                    ->where('product_id', $product->id)
                     ->whereNotIn('id', $activeVariantIds)
                     ->each(fn($v) => $v->delete());
 
+                // discount handling
                 if (!empty($data['discount']) && is_array($data['discount'])) {
-
                     $discountInput = [
                         'type'      => $data['discount']['type'] ?? null,
                         'value'     => $data['discount']['value'] ?? 0,
@@ -276,15 +300,14 @@ class ProductService
                         $existingDiscount = $product->discount()->latest()->first();
 
                         if ($existingDiscount) {
-
                             $existingDiscount->update($discountInput);
                         } else {
-
                             $product->discount()->create($discountInput);
                         }
                     }
                 }
 
+                // images sync
                 $this->syncImages(
                     product: $product,
                     imageState: json_decode($data['image_state'], true) ?? [],
@@ -303,6 +326,7 @@ class ProductService
             throw $e;
         }
     }
+
 
     public function delete(Product $product): bool
     {

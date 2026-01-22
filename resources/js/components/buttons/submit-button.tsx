@@ -17,8 +17,9 @@ export const SubmitButton = ({ processing, children, ...props }: SubmitButtonPro
     return (
         <Button
             type="submit"
+            size="lg"
             disabled={processing}
-            className={cn('relative', props.className)}
+            className={cn('relative rounded-full', props.className)}
             {...props}
         >
             {processing && (

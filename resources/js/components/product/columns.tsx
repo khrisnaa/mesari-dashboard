@@ -1,6 +1,6 @@
 import { Product, ProductVariant } from '@/types/product';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArchiveIcon, ArrowUpIcon, EditIcon } from 'lucide-react';
+import { ArchiveIcon, ArchiveRestoreIcon, ArrowUpIcon, EditIcon } from 'lucide-react';
 
 import { formatRupiah } from '@/utils/formatRupiah';
 
@@ -9,8 +9,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import products from '@/routes/products';
 import { router } from '@inertiajs/react';
+import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { TooltipProvider } from '../ui/tooltip';
 
 export const getColumns = (onArchive: (product: Product) => void): ColumnDef<Product>[] => [
     {
@@ -163,40 +164,39 @@ export const getColumns = (onArchive: (product: Product) => void): ColumnDef<Pro
         id: 'actions',
         cell: ({ row }) => {
             const product = row.original;
+
+            const isPublished = product.is_published;
+
             return (
                 <TooltipProvider delayDuration={150}>
                     <div className="flex items-center justify-center gap-2 px-2">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => router.get(products.edit(product))}
-                                >
-                                    <EditIcon className="h-4 w-4" />
-                                    <span className="sr-only">Edit</span>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent> Edit Product </TooltipContent>
-                        </Tooltip>
+                        <ActionIconButton
+                            icon={<EditIcon className="h-4 w-4" />}
+                            tooltip="Edit Product"
+                            onClick={() => router.get(products.edit(product))}
+                        />
 
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => onArchive(product)}
-                                >
-                                    <ArchiveIcon className="h-4 w-4" />
-                                    <span className="sr-only">Archive</span>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent> Archive Product </TooltipContent>
-                        </Tooltip>
+                        <ActionIconButton
+                            icon={
+                                isPublished ? (
+                                    <ArchiveIcon className="h-4 w-4 text-red-500" />
+                                ) : (
+                                    <ArchiveRestoreIcon className="h-4 w-4 text-green-600" />
+                                )
+                            }
+                            tooltip={isPublished ? 'Archive Product' : 'Publish Product'}
+                            onClick={() => onArchive(product)}
+                            className={
+                                isPublished
+                                    ? 'text-red-500 hover:text-red-600'
+                                    : 'text-green-600 hover:text-green-700'
+                            }
+                        />
                     </div>
                 </TooltipProvider>
             );
         },
+
         meta: { width: { type: 'fixed', px: 108 } },
     },
 ];

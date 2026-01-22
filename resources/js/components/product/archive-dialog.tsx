@@ -21,16 +21,24 @@ export const ArchiveDialog = ({
 }: DialogComponentProps<Product>) => {
     if (!product) return null;
 
+    const isPublished = product.is_published;
+
+    const title = isPublished ? 'Archive Product' : 'Publish Product';
+    const description = isPublished
+        ? 'This product will be archived and no longer visible to customers. You can publish it again anytime.'
+        : 'This product will be published and become visible to customers. Continue?';
+
+    const submitLabel = isPublished ? 'Archive' : 'Publish';
+    const submitVariant = isPublished ? 'destructive' : 'default';
+
+    const nextValue = isPublished ? '0' : '1';
+
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
-                    <DialogTitle>Archive Product</DialogTitle>
-                    <DialogDescription>
-                        This will archive the product. The product will no longer be visible to
-                        customers, but you can restore it anytime. Are you sure you want to
-                        continue?
-                    </DialogDescription>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
 
                 <Form
@@ -40,7 +48,8 @@ export const ArchiveDialog = ({
                 >
                     {({ processing }) => (
                         <div>
-                            <input type="hidden" name="status" value="archived" />
+                            <input type="hidden" name="is_published" value={nextValue} />
+
                             <DialogFooter>
                                 <Button
                                     type="button"
@@ -51,8 +60,8 @@ export const ArchiveDialog = ({
                                     Cancel
                                 </Button>
 
-                                <SubmitButton processing={processing} variant="destructive">
-                                    Archive
+                                <SubmitButton processing={processing} variant={submitVariant}>
+                                    {submitLabel}
                                 </SubmitButton>
                             </DialogFooter>
                         </div>

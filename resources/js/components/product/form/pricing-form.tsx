@@ -36,6 +36,19 @@ interface PricingFormProps {
     onDifferentPricing?: (value: boolean) => void;
 }
 
+// helper
+const namesMatch = (a?: string, b?: string) => a?.trim().toLowerCase() === b?.trim().toLowerCase();
+
+const normalize = (v?: string) => v?.trim().toLowerCase() ?? '';
+
+const getKey = (v: Variant) => `${normalize(v.size?.name)}::${normalize(v.color?.name)}`;
+
+const dedupe = (list: Variant[]) => {
+    const map = new Map<string, Variant>();
+    list.forEach((v) => map.set(getKey(v), v));
+    return Array.from(map.values());
+};
+
 const PricingForm = ({
     open,
     onOpenChange,
@@ -53,14 +66,6 @@ const PricingForm = ({
 
     const [basePrice, setBasePrice] = useState<number | null>(null);
     const [baseStock, setBaseStock] = useState<number | null>(null);
-
-    // helper
-    const namesMatch = (a?: string, b?: string) =>
-        a?.trim().toLowerCase() === b?.trim().toLowerCase();
-
-    const normalize = (v?: string) => v?.trim().toLowerCase() ?? '';
-
-    const getKey = (v: Variant) => `${normalize(v.size?.name)}::${normalize(v.color?.name)}`;
 
     // generate combinations
     const generateCombinations = (): Variant[] => {
@@ -87,8 +92,9 @@ const PricingForm = ({
         if (open) {
             const snapshot = form.getValues('variants') ?? [];
 
-            setInitialVariants(snapshot);
-            setVariants(snapshot);
+            const unique = dedupe(snapshot);
+            setInitialVariants(unique);
+            setVariants(unique);
             setSelectedVariants([]);
         }
     }, [open]);
@@ -100,16 +106,25 @@ const PricingForm = ({
         const combinations = generateCombinations();
 
         setVariants((prev) => {
+            // const valid = prev.filter((v) => {
+            //     const sizeExists = sizes.some((s) => namesMatch(s.name, v.size?.name));
+
+            //     if (!sizeExists) return false;
+
+            //     if (colors.length === 0) return !v.color;
+
+            //     const colorExists = colors.some((c) => namesMatch(c.name, v.color?.name));
+
+            //     return colorExists;
+            // });
+
             const valid = prev.filter((v) => {
                 const sizeExists = sizes.some((s) => namesMatch(s.name, v.size?.name));
+                const colorExists = v.color
+                    ? colors.some((c) => namesMatch(c.name, v.color?.name))
+                    : true;
 
-                if (!sizeExists) return false;
-
-                if (colors.length === 0) return !v.color;
-
-                const colorExists = colors.some((c) => namesMatch(c.name, v.color?.name));
-
-                return colorExists;
+                return sizeExists && colorExists;
             });
 
             const map = new Map<string, Variant>();
@@ -128,7 +143,7 @@ const PricingForm = ({
                 }
             });
 
-            return Array.from(map.values());
+            return dedupe(Array.from(map.values()));
         });
     }, [sizes, colors, open]);
 
@@ -180,11 +195,11 @@ const PricingForm = ({
 
     // save
     const handleSave = () => {
-        form.setValue('variants', variants, { shouldDirty: true });
+        const unique = dedupe(variants);
+
+        form.setValue('variants', unique, { shouldDirty: true });
         handleClose();
-        if (onDifferentPricing) {
-            onDifferentPricing(true);
-        }
+        onDifferentPricing?.(true);
     };
 
     const handleClose = () => {
@@ -345,14 +360,16 @@ const PricingForm = ({
                                                     );
 
                                                     setVariants((prev) =>
-                                                        prev.map((v, idx) =>
-                                                            idx === i
-                                                                ? {
-                                                                      ...v,
-                                                                      price: numericValue,
-                                                                      isPriceAuto: false,
-                                                                  }
-                                                                : v,
+                                                        dedupe(
+                                                            prev.map((v, idx) =>
+                                                                idx === i
+                                                                    ? {
+                                                                          ...v,
+                                                                          price: numericValue,
+                                                                          isPriceAuto: false,
+                                                                      }
+                                                                    : v,
+                                                            ),
                                                         ),
                                                     );
                                                 }}
@@ -374,14 +391,16 @@ const PricingForm = ({
                                                     );
 
                                                     setVariants((prev) =>
-                                                        prev.map((v, idx) =>
-                                                            idx === i
-                                                                ? {
-                                                                      ...v,
-                                                                      stock: numericValue,
-                                                                      isStockAuto: false,
-                                                                  }
-                                                                : v,
+                                                        dedupe(
+                                                            prev.map((v, idx) =>
+                                                                idx === i
+                                                                    ? {
+                                                                          ...v,
+                                                                          stock: numericValue,
+                                                                          isStockAuto: false,
+                                                                      }
+                                                                    : v,
+                                                            ),
                                                         ),
                                                     );
                                                 }}

@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { User } from '@/types/user';
 import { formatDate } from '@/utils/formatDate';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, BanIcon, CheckIcon, EditIcon } from 'lucide-react';
+import { ArrowUpIcon, BanIcon, CheckCircleIcon, EditIcon } from 'lucide-react';
 import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
 import { TooltipProvider } from '../ui/tooltip';
@@ -198,7 +198,7 @@ export const getColumns = (
                                 isActive ? (
                                     <BanIcon className="h-4 w-4 text-red-500" />
                                 ) : (
-                                    <CheckIcon className="h-4 w-4 text-green-500" />
+                                    <CheckCircleIcon className="h-4 w-4 text-green-600" />
                                 )
                             }
                             tooltip={isActive ? 'Deactivate User' : 'Activate User'}
@@ -206,7 +206,7 @@ export const getColumns = (
                             className={
                                 isActive
                                     ? 'text-red-500 hover:text-red-600'
-                                    : 'text-green-500 hover:text-green-600'
+                                    : 'text-green-600 hover:text-green-700'
                             }
                         />
                     </div>
