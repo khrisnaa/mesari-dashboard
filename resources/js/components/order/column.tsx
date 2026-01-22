@@ -2,8 +2,14 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Order } from '@/types/order';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon } from 'lucide-react';
+import { ArrowUpIcon, MoreHorizontalIcon, PencilIcon } from 'lucide-react';
 import { StatusBadge } from '../status-badge';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 
 export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] => [
     {
@@ -133,29 +139,29 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
         meta: { width: { type: 'fixed', px: 200 } },
     },
 
-    // {
-    //     id: 'actions',
-    //     cell: ({ row }) => {
-    //         const order = row.original;
+    {
+        id: 'actions',
+        cell: ({ row }) => {
+            const order = row.original;
 
-    //         return (
-    //             <DropdownMenu>
-    //                 <DropdownMenuTrigger asChild>
-    //                     <Button variant="ghost" className="h-8 w-8 p-0">
-    //                         <span className="sr-only">Open menu</span>
-    //                         <MoreHorizontal className="h-4 w-4" />
-    //                     </Button>
-    //                 </DropdownMenuTrigger>
+            return (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontalIcon className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
 
-    //                 <DropdownMenuContent align="end">
-    //                     <DropdownMenuItem onClick={() => onEdit(order)} className="cursor-pointer">
-    //                         <PencilIcon className="mr-2 h-4 w-4" />
-    //                         Edit Status
-    //                     </DropdownMenuItem>
-    //                 </DropdownMenuContent>
-    //             </DropdownMenu>
-    //         );
-    //     },
-    //     meta: { width: { type: 'fixed', px: 64 } },
-    // },
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => onEdit(order)} className="cursor-pointer">
+                            <PencilIcon className="mr-2 h-4 w-4" />
+                            Edit Status
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            );
+        },
+        meta: { width: { type: 'fixed', px: 64 } },
+    },
 ];

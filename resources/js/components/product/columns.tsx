@@ -1,22 +1,16 @@
 import { Product, ProductVariant } from '@/types/product';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArchiveIcon, ArrowUpIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
+import { ArchiveIcon, ArrowUpIcon, EditIcon } from 'lucide-react';
 
 import { formatRupiah } from '@/utils/formatRupiah';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import products from '@/routes/products';
 import { router } from '@inertiajs/react';
-import { Badge } from '../ui/badge';
+import { StatusBadge } from '../status-badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 export const getColumns = (onArchive: (product: Product) => void): ColumnDef<Product>[] => [
     {
@@ -153,17 +147,21 @@ export const getColumns = (onArchive: (product: Product) => void): ColumnDef<Pro
         ),
         cell: ({ row }) => {
             const status = row.original.status;
+            const variantMap: Record<
+                string,
+                'success' | 'warning' | 'default' | 'danger' | 'info'
+            > = {
+                published: 'success',
+                archived: 'default',
+                draft: 'warning',
+            };
+            const variant = variantMap[status] ?? 'default';
 
-            const color =
-                status === 'published'
-                    ? 'bg-green-500'
-                    : status === 'archived'
-                      ? 'bg-gray-400'
-                      : status === 'draft'
-                        ? 'bg-yellow-500'
-                        : 'bg-slate-500';
-
-            return <Badge className={`${color} text-white`}>{status}</Badge>;
+            return (
+                <div className="px-3">
+                    <StatusBadge variant={variant} label={status} />
+                </div>
+            );
         },
         meta: { width: { type: 'flex', fr: 1 } },
     },
@@ -172,41 +170,39 @@ export const getColumns = (onArchive: (product: Product) => void): ColumnDef<Pro
         cell: ({ row }) => {
             const product = row.original;
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                            <Button
-                                onClick={() => router.get(products.edit(product))}
-                                variant="ghost"
-                                size="sm"
-                                className="w-full justify-between"
-                            >
-                                Edit
-                                <PencilIcon />
-                            </Button>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <Button
-                                onClick={() => onArchive(product)}
-                                variant="ghost"
-                                size="sm"
-                                className="w-full justify-between"
-                            >
-                                Archive
-                                <ArchiveIcon />
-                            </Button>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <TooltipProvider delayDuration={150}>
+                    <div className="flex items-center justify-center gap-2 px-2">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => router.get(products.edit(product))}
+                                >
+                                    <EditIcon className="h-4 w-4" />
+                                    <span className="sr-only">Edit</span>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent> Edit Product </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => onArchive(product)}
+                                >
+                                    <ArchiveIcon className="h-4 w-4" />
+                                    <span className="sr-only">Archive</span>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent> Archive Product </TooltipContent>
+                        </Tooltip>
+                    </div>
+                </TooltipProvider>
             );
         },
-        meta: { width: { type: 'fixed', px: 64 } },
+        meta: { width: { type: 'fixed', px: 110 } },
     },
 ];

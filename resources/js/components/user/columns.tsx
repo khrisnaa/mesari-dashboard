@@ -12,6 +12,7 @@ import { User, UserStatus } from '@/types/user';
 import { formatDate } from '@/utils/formatDate';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpIcon, BanIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
+import { StatusBadge } from '../status-badge';
 
 export const getColumns = (
     onEdit: (users: User) => void,
@@ -139,19 +140,14 @@ export const getColumns = (
 
             return (
                 <div className="flex justify-center px-3">
-                    {verifiedAt ? (
-                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                            Verified
-                        </span>
-                    ) : (
-                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                            Not Verified
-                        </span>
-                    )}
+                    <StatusBadge
+                        variant={verifiedAt ? 'success' : 'default'}
+                        label={verifiedAt ? 'Verified' : 'Not Verified'}
+                    />
                 </div>
             );
         },
-        meta: { width: { type: 'fixed', px: 140 } },
+        meta: { width: { type: 'fixed', px: 200 } },
     },
     {
         accessorKey: 'status',
@@ -176,26 +172,20 @@ export const getColumns = (
         cell: ({ row }) => {
             const status = row.original.status;
 
-            const statusStyles: Record<UserStatus, string> = {
-                [UserStatus.ACTIVE]: 'bg-green-100 text-green-700',
-                [UserStatus.INACTIVE]: 'bg-gray-100 text-gray-600',
-                [UserStatus.SUSPENDED]: 'bg-red-100 text-red-700',
+            const statusVariantMap: Record<UserStatus, 'success' | 'default' | 'danger'> = {
+                [UserStatus.ACTIVE]: 'success',
+                [UserStatus.INACTIVE]: 'default',
+                [UserStatus.SUSPENDED]: 'danger',
             };
+            const variant = statusVariantMap[status] ?? 'default';
 
             return (
                 <div className="flex justify-center px-3">
-                    <span
-                        className={cn(
-                            'rounded-full px-2 py-0.5 text-xs font-medium',
-                            statusStyles[status],
-                        )}
-                    >
-                        {status}
-                    </span>
+                    <StatusBadge variant={variant} label={status} />
                 </div>
             );
         },
-        meta: { width: { type: 'fixed', px: 140 } },
+        meta: { width: { type: 'fixed', px: 200 } },
     },
     {
         id: 'actions',

@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Faq } from '@/types/faq';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpIcon, MoreHorizontal, PencilIcon, TrashIcon } from 'lucide-react';
+import { StatusBadge } from '../status-badge';
 
 export const getColumns = (
     onEdit: (faq: Faq) => void,
@@ -117,14 +118,10 @@ export const getColumns = (
 
             return (
                 <div className="flex justify-center px-3">
-                    <span
-                        className={cn(
-                            'rounded-full px-2 py-0.5 text-xs font-medium',
-                            published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600',
-                        )}
-                    >
-                        {published ? 'Published' : 'Draft'}
-                    </span>
+                    <StatusBadge
+                        variant={published ? 'success' : 'default'}
+                        label={published ? 'Published' : 'Draft'}
+                    />
                 </div>
             );
         },
