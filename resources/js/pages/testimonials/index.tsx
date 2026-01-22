@@ -61,7 +61,7 @@ const Index = ({ testimonials }: PageProps) => {
                     title="Testimonials"
                     description="Manage customer testimonials to build trust and improve credibility."
                     actions={
-                        <Button onClick={() => openCreate()}>
+                        <Button className="rounded-full" size="lg" onClick={() => openCreate()}>
                             <Plus /> Create Testimonial
                         </Button>
                     }

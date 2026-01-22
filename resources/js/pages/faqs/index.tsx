@@ -61,7 +61,7 @@ const Index = ({ faqs }: PageProps) => {
                     title="Faqs"
                     description="Manage your categories efficiently and keep your products organized."
                     actions={
-                        <Button onClick={() => openCreate()}>
+                        <Button className="rounded-full" size="lg" onClick={() => openCreate()}>
                             <Plus /> Create Faq
                         </Button>
                     }

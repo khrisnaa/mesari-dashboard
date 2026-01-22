@@ -1,16 +1,11 @@
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { Testimonial } from '@/types/testimonial';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, MoreHorizontal, PencilIcon, TrashIcon } from 'lucide-react';
+import { ArrowUpIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
+import { TooltipProvider } from '../ui/tooltip';
 
 export const getColumns = (
     onEdit: (testimonials: Testimonial) => void,
@@ -129,7 +124,7 @@ export const getColumns = (
                 <div className="flex justify-center px-3">
                     <StatusBadge
                         variant={published ? 'success' : 'default'}
-                        label={published ? 'Published' : 'Draft'}
+                        label={published ? 'Published' : 'Archived'}
                     />
                 </div>
             );
@@ -140,42 +135,27 @@ export const getColumns = (
         id: 'actions',
         cell: ({ row }) => {
             const testimonial = row.original;
+
             return (
-                <>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                                <Button
-                                    onClick={() => onEdit(testimonial)}
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-between"
-                                >
-                                    Edit <PencilIcon />
-                                </Button>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-between text-red-500 hover:text-red-600"
-                                    onClick={() => onDelete(testimonial)}
-                                >
-                                    Delete <TrashIcon className="text-red-500" />
-                                </Button>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </>
+                <TooltipProvider delayDuration={150}>
+                    <div className="flex items-center justify-center gap-2 px-2">
+                        <ActionIconButton
+                            icon={<PencilIcon className="h-4 w-4" />}
+                            tooltip="Edit Testimonial"
+                            onClick={() => onEdit(testimonial)}
+                        />
+
+                        <ActionIconButton
+                            icon={<TrashIcon className="h-4 w-4 text-red-500" />}
+                            tooltip="Delete Testimonial"
+                            onClick={() => onDelete(testimonial)}
+                            className="text-red-500 hover:text-red-600"
+                        />
+                    </div>
+                </TooltipProvider>
             );
         },
-        meta: { width: { type: 'fixed', px: 64 } },
+
+        meta: { width: { type: 'fixed', px: 108 } },
     },
 ];
