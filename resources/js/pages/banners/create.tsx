@@ -36,7 +36,7 @@ const Create = () => {
         cta_text: '',
         cta_link: '',
         sort_order: 0,
-        is_active: true,
+        is_published: true,
     });
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -103,7 +103,7 @@ const Create = () => {
                                         setBackdrop(v);
                                         setData('backdrop', v?.file ?? null);
                                     }}
-                                    aspect="banner"
+                                    aspect="video"
                                 />
 
                                 <InputError message={errors.backdrop} />
@@ -148,14 +148,14 @@ const Create = () => {
                         </div>
 
                         <div className="flex items-center justify-between md:col-span-2">
-                            <Label htmlFor="is_active">Active</Label>
+                            <Label htmlFor="is_published">Published</Label>
                             <Switch
-                                id="is_active"
-                                checked={data.is_active}
-                                onCheckedChange={(val) => setData('is_active', val)}
+                                id="is_published"
+                                checked={data.is_published}
+                                onCheckedChange={(val) => setData('is_published', val)}
                             />
                         </div>
-                        <InputError message={errors.is_active} />
+                        <InputError message={errors.is_published} />
                     </div>
 
                     <div className="mt3 flex justify-end gap-3">

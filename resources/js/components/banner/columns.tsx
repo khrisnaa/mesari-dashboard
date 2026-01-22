@@ -1,18 +1,13 @@
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import banners from '@/routes/banners';
 import { Banner } from '@/types/banner';
-import { Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, MoreHorizontal, PencilIcon, TrashIcon } from 'lucide-react';
+import { ArrowUpIcon, EditIcon, Trash2Icon } from 'lucide-react';
+import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
+import { TooltipProvider } from '../ui/tooltip';
 
 export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner>[] => [
     {
@@ -102,7 +97,7 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
         meta: { width: { type: 'fixed', px: 100 } },
     },
     {
-        accessorKey: 'is_active',
+        accessorKey: 'is_published',
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -122,13 +117,13 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
             </Button>
         ),
         cell: ({ row }) => {
-            const active = row.original.is_active;
+            const active = row.original.is_published;
 
             return (
                 <div className="flex justify-center px-3">
                     <StatusBadge
                         variant={active ? 'success' : 'default'}
-                        label={active ? 'Published' : 'Draft'}
+                        label={active ? 'Published' : 'Archived'}
                     />
                 </div>
             );
@@ -139,44 +134,27 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
         id: 'actions',
         cell: ({ row }) => {
             const banner = row.original;
+
             return (
-                <>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                                <Button
-                                    asChild
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-between"
-                                >
-                                    <Link href={banners.edit(banner)}>
-                                        Edit <PencilIcon />
-                                    </Link>
-                                </Button>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-between text-red-500 hover:text-red-600"
-                                    onClick={() => onDelete(banner)}
-                                >
-                                    Delete <TrashIcon className="text-red-500" />
-                                </Button>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </>
+                <TooltipProvider delayDuration={150}>
+                    <div className="flex items-center justify-center gap-2 px-2">
+                        <ActionIconButton
+                            icon={<EditIcon className="h-4 w-4" />}
+                            tooltip="Edit Banner"
+                            onClick={() => router.get(banners.edit(banner))}
+                        />
+
+                        <ActionIconButton
+                            icon={<Trash2Icon className="h-4 w-4 text-red-500" />}
+                            tooltip="Delete Banner"
+                            onClick={() => onDelete(banner)}
+                            className="text-red-500 hover:text-red-600"
+                        />
+                    </div>
+                </TooltipProvider>
             );
         },
-        meta: { width: { type: 'fixed', px: 64 } },
+
+        meta: { width: { type: 'fixed', px: 108 } },
     },
 ];

@@ -41,7 +41,7 @@ const Edit = ({ banner }: PageProps) => {
         cta_text: banner.cta_text ?? '',
         cta_link: banner.cta_link ?? '',
         sort_order: banner.sort_order ?? 0,
-        is_active: banner.is_active ?? true,
+        is_published: banner.is_published ?? true,
     });
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -160,13 +160,13 @@ const Edit = ({ banner }: PageProps) => {
                         </div>
 
                         <div className="flex items-center justify-between md:col-span-2">
-                            <Label htmlFor="is_active">Active</Label>
+                            <Label htmlFor="is_published">Active</Label>
                             <Switch
-                                checked={data.is_active}
-                                onCheckedChange={(val) => setData('is_active', val)}
+                                checked={data.is_published}
+                                onCheckedChange={(val) => setData('is_published', val)}
                             />
                         </div>
-                        <InputError message={errors.is_active} />
+                        <InputError message={errors.is_published} />
                     </div>
 
                     <div className="flex justify-end gap-3">

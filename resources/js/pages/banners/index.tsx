@@ -45,7 +45,7 @@ const Index = ({ banners }: PageProps) => {
                     title="Banners"
                     description="Manage homepage banners and promotional content."
                     actions={
-                        <Button asChild>
+                        <Button asChild className="rounded-full" size="lg">
                             <Link href={create()}>
                                 <Plus /> Create Banner
                             </Link>
