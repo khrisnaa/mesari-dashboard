@@ -54,6 +54,8 @@ export const ArchiveDialog = ({
                                 <Button
                                     type="button"
                                     variant="outline"
+                                    size="lg"
+                                    className="rounded-full"
                                     onClick={close}
                                     disabled={processing}
                                 >

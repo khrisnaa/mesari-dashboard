@@ -107,6 +107,8 @@ export const EditDialog = ({
                                 <Button
                                     type="button"
                                     variant="outline"
+                                    size="lg"
+                                    className="rounded-full"
                                     onClick={close}
                                     disabled={processing}
                                 >

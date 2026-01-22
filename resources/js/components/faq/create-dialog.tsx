@@ -87,6 +87,8 @@ export const CreateDialog = ({ isOpen, close, onOpenChange }: DialogComponentPro
                                 <Button
                                     type="button"
                                     variant="outline"
+                                    size="lg"
+                                    className="rounded-full"
                                     onClick={close}
                                     disabled={processing}
                                 >
