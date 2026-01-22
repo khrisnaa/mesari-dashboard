@@ -17,7 +17,7 @@ class Banner extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_published' => 'boolean',
     ];
 
     public function product()

@@ -30,7 +30,6 @@ class ProductDiscountFactory extends Factory
                 : $this->faker->numberBetween(5, 20),
             'start_at' => $start,
             'end_at' => $end,
-            'is_active' => $this->faker->boolean(50)
         ];
     }
 }

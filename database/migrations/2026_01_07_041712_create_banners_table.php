@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('cta_text')->nullable();
             $table->string('cta_link')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_published')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -121,7 +121,6 @@ class ProductService
                         'end_at'    => !empty($data['discount']['end_at'])
                             ? Carbon::parse($data['discount']['end_at'])
                             : null,
-                        'is_active' => filter_var($data['discount']['is_active'] ?? false, FILTER_VALIDATE_BOOLEAN),
                     ];
 
 
@@ -187,6 +186,7 @@ class ProductService
                     'name'        => $data['name'],
                     'description' => $data['description'],
                     'category_id' => $data['category_id'],
+                    'is_published' => $data['is_published']
                 ]);
 
 
@@ -265,7 +265,6 @@ class ProductService
                         'end_at'    => !empty($data['discount']['end_at'])
                             ? Carbon::parse($data['discount']['end_at'])
                             : null,
-                        'is_active' => filter_var($data['discount']['is_active'] ?? false, FILTER_VALIDATE_BOOLEAN),
                     ];
 
                     if (empty($discountInput['type'])) {

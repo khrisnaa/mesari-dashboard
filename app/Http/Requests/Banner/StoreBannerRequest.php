@@ -31,7 +31,7 @@ class StoreBannerRequest extends FormRequest
             'cta_text'       => ['nullable', 'string', 'max:255'],
             'cta_link'       => ['nullable', 'string', 'max:255'],
             'sort_order'     => ['nullable', 'integer', 'min:0'],
-            'is_active'      => ['required', 'boolean'],
+            'is_published'      => ['required', 'boolean'],
         ];
     }
 
@@ -61,8 +61,8 @@ class StoreBannerRequest extends FormRequest
             'sort_order.integer'  => 'Sort order must be an integer.',
             'sort_order.min'      => 'Sort order cannot be negative.',
 
-            'is_active.required'  => 'Active status is required.',
-            'is_active.boolean'   => 'Active status must be a boolean value.',
+            'is_published.required'  => 'Published status is required.',
+            'is_published.boolean'   => 'Published status must be a boolean value.',
         ];
     }
 }

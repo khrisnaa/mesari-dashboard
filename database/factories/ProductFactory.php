@@ -26,7 +26,7 @@ class ProductFactory extends Factory
             'name' => $name,
             'slug' => Str::slug($name),
             'description' => $this->faker->paragraph(),
-            'status' => $this->faker->randomElement(array_column(ProductStatus::cases(), 'value'))
+            'is_published' => false
         ];
     }
 }

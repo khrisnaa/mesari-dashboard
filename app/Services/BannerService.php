@@ -25,8 +25,8 @@ class BannerService
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             })
-            ->when(isset($params['is_active']), function ($q) use ($params) {
-                $q->where('is_active', $params['is_active']);
+            ->when(isset($params['is_published']), function ($q) use ($params) {
+                $q->where('is_published', $params['is_published']);
             })
             ->orderBy($sort, $direction)
             ->paginate($perPage)
@@ -57,7 +57,7 @@ class BannerService
             'cta_text'       => $data['cta_text'] ?? null,
             'cta_link'       => $data['cta_link'] ?? null,
             'sort_order'     => $data['sort_order'] ?? 0,
-            'is_active'      => $data['is_active'],
+            'is_published'      => $data['is_published'],
         ]);
     }
 
@@ -94,7 +94,7 @@ class BannerService
             'cta_text'    => $data['cta_text'] ?? $banner->cta_text,
             'cta_link'    => $data['cta_link'] ?? $banner->cta_link,
             'sort_order'  => $data['sort_order'] ?? $banner->sort_order,
-            'is_active'   => $data['is_active'],
+            'is_published'   => $data['is_published'],
         ]);
 
         $banner->save();

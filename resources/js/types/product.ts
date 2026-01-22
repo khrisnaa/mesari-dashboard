@@ -5,7 +5,7 @@ export interface Product {
     name: string;
     slug: string;
     description?: string;
-    status: 'draft' | 'published' | 'archived';
+    is_published: boolean;
     variants: ProductVariant[];
     category: Category;
     images: ProductImage[];

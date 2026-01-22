@@ -1,3 +1,4 @@
+import { OrderStatus, PaymentStatus } from './enum';
 import { User } from './user';
 
 export interface Order {
@@ -48,9 +49,3 @@ export interface OrderAddress {
     created_at: string;
     updated_at: string;
 }
-
-export type OrderStatus = 'pending' | 'paid' | 'packed' | 'shipped' | 'completed' | 'cancelled';
-
-export type PaymentStatus = 'pending' | 'paid' | 'failed';
-
-export type UserStatus = 'active' | 'inactive' | 'banned';

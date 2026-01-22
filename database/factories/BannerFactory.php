@@ -30,7 +30,7 @@ class BannerFactory extends Factory
             'cta_link'       => $this->faker->optional()->url(),
 
             'sort_order'     => $this->faker->numberBetween(0, 10),
-            'is_active'      => $this->faker->boolean(),
+            'is_published'      => $this->faker->boolean(),
         ];
     }
 }

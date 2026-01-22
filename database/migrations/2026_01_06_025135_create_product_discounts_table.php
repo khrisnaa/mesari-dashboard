@@ -19,7 +19,6 @@ return new class extends Migration
             $table->decimal('value', 10, 2);
             $table->timestamp('start_at')->nullable();
             $table->timestamp('end_at')->nullable();
-            $table->boolean('is_active')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });
