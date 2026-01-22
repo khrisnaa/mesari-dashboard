@@ -59,6 +59,7 @@ it('can store new product', function () {
         'name' => 'Basic T-Shirt',
         'description' => 'Cotton t-shirt',
         'category_id' => $category->id,
+        'is_published' => false,
         'variants' => json_encode([
             [
                 'price' => 100000,
@@ -119,6 +120,7 @@ it('can update product', function () {
         'name' => 'Updated Product Name',
         'description' => 'Updated description',
         'category_id' => $category->id,
+        'is_published' => true,
         'variants' => json_encode([
             [
                 'price' => 150000,

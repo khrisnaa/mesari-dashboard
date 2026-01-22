@@ -20,10 +20,10 @@ Route::get('/', function () {
 
 
 Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function () {
-    // Dashboard
+    // dashboard
     Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
 
-    // Categories
+    // categories
     Route::prefix('categories')->name('categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])
             ->name('index');
@@ -38,7 +38,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('destroy');
     });
 
-    // Products
+    // products
     Route::prefix('products')->name('products.')->group(function () {
 
         Route::get('/', [ProductController::class, 'index'])
@@ -69,7 +69,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('update.status');
     });
 
-    // Testimonials
+    // testimonials
     Route::prefix('testimonials')->name('testimonials.')->group(function () {
 
         Route::get('/', [TestimonialController::class, 'index'])
@@ -91,6 +91,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('destroy');
     });
 
+    // faqs
     Route::prefix('faqs')->name('faqs.')->group(function () {
 
         Route::get('/', [FaqController::class, 'index'])
@@ -106,6 +107,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('destroy');
     });
 
+    // banners
     Route::prefix('banners')->name('banners.')->group(function () {
 
         Route::get('/', [BannerController::class, 'index'])
@@ -127,6 +129,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('destroy');
     });
 
+    // company-profile
     Route::prefix('company-profile')->name('company-profile.')->group(function () {
 
         Route::get('/', [CompanyProfileController::class, 'index'])
@@ -139,6 +142,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('update');
     });
 
+    // users
     Route::prefix('users')->name('users.')->group(function () {
 
         Route::get('/', [UserController::class, 'index'])
@@ -151,6 +155,7 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('update.status');
     });
 
+    // orders
     Route::prefix('orders')->name('orders.')->group(function () {
 
         Route::get('/', [OrderController::class, 'index'])

@@ -32,14 +32,7 @@ it('can access faq index page', function () {
 });
 
 
-// it('can access faq create page', function () {
-//     $this->get(route('faqs.create'))
-//         ->assertStatus(200)
-//         ->assertInertia(
-//             fn($page) => $page
-//                 ->component('faqs/create')
-//         );
-// });
+
 
 
 it('can store a faq', function () {

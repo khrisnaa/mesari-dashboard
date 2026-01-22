@@ -32,14 +32,6 @@ it('can access testimonial index page', function () {
         );
 });
 
-// it('can access testimonial create page', function () {
-//     $this->get(route('testimonials.create'))
-//         ->assertStatus(200)
-//         ->assertInertia(
-//             fn($page) => $page
-//                 ->component('testimonials/create')
-//         );
-// });
 
 it('can store a testimonial', function () {
     $data = [

@@ -58,8 +58,8 @@ it('can update the company profile', function () {
         'tokopedia' => 'tokopedia.com/new',
     ];
 
-    $this->put(route('company-profile.update'), $update)
-        ->assertRedirect(route('company-profile.edit'));
+    $this->put(route('company-profile.update', $profile), $update)
+        ->assertRedirect(route('company-profile.index'));
 
     $this->assertDatabaseHas('company_profiles', [
         'id' => $profile->id,

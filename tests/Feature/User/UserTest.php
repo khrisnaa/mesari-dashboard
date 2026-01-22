@@ -32,30 +32,17 @@ it('can access the users index page', function () {
 });
 
 
-// it('can access user edit page', function () {
-//     $user = User::factory()->create();
-
-//     $this->get(route('users.edit', $user))
-//         ->assertStatus(200)
-//         ->assertInertia(
-//             fn($page) => $page
-//                 ->component('users/edit')
-//                 ->has('user')
-//         );
-// });
-
-
 it('can update a user', function () {
     $user = User::factory()->create([
         'name' => 'Old Name',
         'email' => 'old@example.com',
+        'password' => bcrypt('oldpassword123'),
     ]);
 
     $update = [
         'name' => 'New Name',
         'email' => 'new@example.com',
-        'password' => 'newpassword123',
-        'status' => 'active', // sesuaikan dengan enum UserStatus
+        'is_active' => true,
     ];
 
     $this->put(route('users.update', $user), $update)
@@ -65,10 +52,11 @@ it('can update a user', function () {
         'id' => $user->id,
         'name' => 'New Name',
         'email' => 'new@example.com',
+        'is_active' => true,
     ]);
 
-    // Password must be hashed
+
     $this->assertTrue(
-        Hash::check('newpassword123', User::find($user->id)->password)
+        Hash::check('oldpassword123', User::find($user->id)->password)
     );
 });

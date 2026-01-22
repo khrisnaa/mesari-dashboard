@@ -4,6 +4,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderAddress;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\User;
 use Database\Seeders\OrderSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -66,15 +67,18 @@ it('can access order edit page', function () {
 it('can update order status', function () {
     $order = Order::factory()->create([
         'status' => OrderStatus::PENDING->value,
+        'payment_status' => PaymentStatus::PENDING->value,
     ]);
 
     $this->put(route('orders.update', $order), [
         'status' => OrderStatus::COMPLETED->value,
+        'payment_status' => PaymentStatus::PAID->value,
     ])
         ->assertRedirect(route('orders.index'));
 
     $this->assertDatabaseHas('orders', [
         'id' => $order->id,
         'status' => OrderStatus::COMPLETED->value,
+        'payment_status' => PaymentStatus::PAID->value,
     ]);
 });
