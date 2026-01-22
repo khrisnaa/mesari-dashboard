@@ -25,14 +25,21 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             'name'   => ['required', 'string', 'max:255'],
+
             'email'  => [
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->user->id)->whereNull('deleted_at'),
+                Rule::unique('users', 'email')->ignore($this->user->id)
             ],
-            'password' => ['nullable', 'string', 'min:8'],
-            'status' => ['required', Rule::in(array_column(UserStatus::cases(), 'value'))],
+
+            'phone' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
+            'is_active' => ['required', 'boolean'],
         ];
     }
 
@@ -47,10 +54,10 @@ class UpdateUserRequest extends FormRequest
             'email.email'    => 'Email must be a valid email address.',
             'email.unique'   => 'This email is already registered.',
 
-            'password.min'   => 'Password must be at least 8 characters.',
+            'phone.max'       => 'Phone cannot exceed 255 characters.',
 
-            'status.required' => 'Status is required.',
-            'status.in'       => 'Status value is not valid.',
+            'is_active.required' => 'Active status is required.',
+            'is_active.in'       => 'Active status value is not valid.',
         ];
     }
 }

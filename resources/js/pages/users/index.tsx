@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/data-table/data-table';
 import FlashToast from '@/components/flash-toast';
 import { PageHeader } from '@/components/page-header';
-import { BanDialog } from '@/components/user/ban-dialog';
+import { ActiveDialog } from '@/components/user/active-dialog';
 import { getColumns } from '@/components/user/columns';
 import { EditDialog } from '@/components/user/edit-dialog';
 import { useDialog } from '@/hooks/use-dialog';
@@ -32,16 +32,15 @@ const Index = ({ users }: PageProps) => {
     } = useDialog<User>();
 
     const {
-        isOpen: isBanOpen,
-        open: openBan,
-        close: closeBan,
-        onOpenChange: onBanOpenChange,
-        payload: banData,
+        isOpen: isActiveOpen,
+        open: openActive,
+        close: closeActive,
+        onOpenChange: onActiveOpenChange,
+        payload: activeData,
     } = useDialog<User>();
 
-    const columns = getColumns(openEdit, openBan);
+    const columns = getColumns(openEdit, openActive);
 
-    console.log(users);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
@@ -70,11 +69,11 @@ const Index = ({ users }: PageProps) => {
                 payload={editData}
             />
 
-            <BanDialog
-                isOpen={isBanOpen}
-                close={closeBan}
-                onOpenChange={onBanOpenChange}
-                payload={banData}
+            <ActiveDialog
+                isOpen={isActiveOpen}
+                close={closeActive}
+                onOpenChange={onActiveOpenChange}
+                payload={activeData}
             />
         </AppLayout>
     );

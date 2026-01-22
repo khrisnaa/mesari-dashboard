@@ -38,7 +38,7 @@ class UserController extends Controller
 
     public function updateStatus(UpdateUserStatusRequest $request, User $user)
     {
-        $this->userService->updateStatus($user, $request->validated('status'));
+        $this->userService->updateStatus($user, $request->validated('is_active'));
 
         return back()->with('success', FlashHelper::stamp('User status successfully updated.'));
     }

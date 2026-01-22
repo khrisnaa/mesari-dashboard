@@ -24,15 +24,15 @@ class UpdateUserStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', Rule::in(array_column(UserStatus::cases(), 'value'))],
+            'is_active' => ['required', 'boolean'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'status.required' => 'Status is required.',
-            'status.in'       => 'Status value is not valid.',
+            'is_active.required' => 'Active status is required.',
+            'is_active.in'       => 'Active status value is not valid.',
         ];
     }
 }

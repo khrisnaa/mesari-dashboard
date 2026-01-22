@@ -1,22 +1,17 @@
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
-import { User, UserStatus } from '@/types/user';
+import { User } from '@/types/user';
 import { formatDate } from '@/utils/formatDate';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, BanIcon, MoreHorizontal, PencilIcon } from 'lucide-react';
+import { ArrowUpIcon, BanIcon, CheckIcon, EditIcon } from 'lucide-react';
+import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
+import { TooltipProvider } from '../ui/tooltip';
 
 export const getColumns = (
     onEdit: (users: User) => void,
-    onBan: (users: User) => void,
+    onActive: (users: User) => void,
 ): ColumnDef<User>[] => [
     {
         id: 'rowNumber',
@@ -170,14 +165,9 @@ export const getColumns = (
             </Button>
         ),
         cell: ({ row }) => {
-            const status = row.original.status;
-
-            const statusVariantMap: Record<UserStatus, 'success' | 'default' | 'danger'> = {
-                [UserStatus.ACTIVE]: 'success',
-                [UserStatus.INACTIVE]: 'default',
-                [UserStatus.SUSPENDED]: 'danger',
-            };
-            const variant = statusVariantMap[status] ?? 'default';
+            const isActive = row.original.is_active;
+            const status = isActive ? 'Active' : 'Inactive';
+            const variant = isActive ? 'success' : 'danger';
 
             return (
                 <div className="flex justify-center px-3">
@@ -189,45 +179,40 @@ export const getColumns = (
     },
     {
         id: 'actions',
+
         cell: ({ row }) => {
             const user = row.original;
+            const isActive = user.is_active;
+
             return (
-                <>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                                <Button
-                                    onClick={() => onEdit(user)}
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-between"
-                                >
-                                    Edit <PencilIcon />
-                                </Button>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-between text-red-500 hover:text-red-600"
-                                    onClick={() => onBan(user)}
-                                >
-                                    Suspend User
-                                    <BanIcon className="text-red-500" />
-                                </Button>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </>
+                <TooltipProvider delayDuration={150}>
+                    <div className="flex items-center justify-center gap-2 px-2">
+                        <ActionIconButton
+                            icon={<EditIcon className="h-4 w-4" />}
+                            tooltip="Edit User"
+                            onClick={() => onEdit(user)}
+                        />
+
+                        <ActionIconButton
+                            icon={
+                                isActive ? (
+                                    <BanIcon className="h-4 w-4 text-red-500" />
+                                ) : (
+                                    <CheckIcon className="h-4 w-4 text-green-500" />
+                                )
+                            }
+                            tooltip={isActive ? 'Deactivate User' : 'Activate User'}
+                            onClick={() => onActive(user)}
+                            className={
+                                isActive
+                                    ? 'text-red-500 hover:text-red-600'
+                                    : 'text-green-500 hover:text-green-600'
+                            }
+                        />
+                    </div>
+                </TooltipProvider>
             );
         },
-        meta: { width: { type: 'fixed', px: 64 } },
+        meta: { width: { type: 'fixed', px: 108 } },
     },
 ];

@@ -1,6 +1,6 @@
 import users from '@/routes/users';
 import { DialogComponentProps } from '@/types/dialog';
-import { User, UserStatus } from '@/types/user';
+import { User } from '@/types/user';
 import { Form } from '@inertiajs/react';
 import { SubmitButton } from '../buttons/submit-button';
 import { Button } from '../ui/button';
@@ -13,7 +13,7 @@ import {
     DialogTitle,
 } from '../ui/dialog';
 
-export const BanDialog = ({
+export const ActiveDialog = ({
     isOpen,
     close,
     onOpenChange,
@@ -21,21 +21,28 @@ export const BanDialog = ({
 }: DialogComponentProps<User>) => {
     if (!user) return null;
 
+    const isActive = user.is_active;
+
+    const title = isActive ? 'Deactivate User' : 'Activate User';
+    const description = isActive
+        ? 'This action will deactivate this user. They will not be able to log in. Are you sure you want to continue?'
+        : 'This action will activate this user. They will be able to log in again. Are you sure you want to continue?';
+
+    const newStatus = !isActive;
+
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
-                    <DialogTitle>Suspend User</DialogTitle>
-                    <DialogDescription>
-                        This action will suspend the user. The user will not be able to log in until
-                        their status is restored. Are you sure you want to continue?
-                    </DialogDescription>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
 
                 <Form {...users.update.status.form(user)} disableWhileProcessing onSuccess={close}>
                     {({ processing }) => (
                         <>
-                            <input type="hidden" name="status" value={UserStatus.SUSPENDED} />
+                            <input type="hidden" name="is_active" value={newStatus ? '1' : '0'} />
+
                             <DialogFooter>
                                 <Button
                                     type="button"
@@ -46,8 +53,11 @@ export const BanDialog = ({
                                     Cancel
                                 </Button>
 
-                                <SubmitButton processing={processing} variant="destructive">
-                                    Suspend User
+                                <SubmitButton
+                                    processing={processing}
+                                    variant={isActive ? 'destructive' : 'default'}
+                                >
+                                    {isActive ? 'Deactivate User' : 'Activate User'}
                                 </SubmitButton>
                             </DialogFooter>
                         </>

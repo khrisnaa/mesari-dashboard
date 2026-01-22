@@ -1,6 +1,6 @@
 import users from '@/routes/users';
 import { DialogComponentProps } from '@/types/dialog';
-import { User, UserStatus } from '@/types/user';
+import { User } from '@/types/user';
 import { Form } from '@inertiajs/react';
 import { SubmitButton } from '../buttons/submit-button';
 import InputError from '../input-error';
@@ -15,7 +15,7 @@ import {
 } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Switch } from '../ui/switch';
 
 export const EditDialog = ({
     isOpen,
@@ -29,15 +29,14 @@ export const EditDialog = ({
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
-                    <DialogTitle>Update User Status</DialogTitle>
+                    <DialogTitle>Edit User</DialogTitle>
                     <DialogDescription>
-                        Only user status can be modified by admin.
+                        Admin can modify basic user information and account status.
                     </DialogDescription>
                 </DialogHeader>
 
                 <Form
-                    {...users.update.status.form(user)}
-                    resetOnSuccess={['status']}
+                    {...users.update.form(user)}
                     disableWhileProcessing
                     className="space-y-6"
                     onSuccess={close}
@@ -46,13 +45,39 @@ export const EditDialog = ({
                         <>
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <Label>Name</Label>
-                                    <Input value={user.name} disabled />
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input
+                                        id="name"
+                                        name="name"
+                                        type="text"
+                                        autoComplete="off"
+                                        defaultValue={user.name}
+                                    />
+                                    <InputError message={errors.name} />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Email</Label>
-                                    <Input value={user.email} disabled />
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="off"
+                                        defaultValue={user.email}
+                                    />
+                                    <InputError message={errors.email} />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="phone">Phone</Label>
+                                    <Input
+                                        id="phone"
+                                        name="phone"
+                                        type="text"
+                                        autoComplete="off"
+                                        defaultValue={user.phone ?? ''}
+                                    />
+                                    <InputError message={errors.phone} />
                                 </div>
 
                                 <div className="space-y-2">
@@ -68,25 +93,20 @@ export const EditDialog = ({
                                     <Input value={user.created_at} disabled />
                                 </div>
 
-                                <div className="space-y-2">
+                                <div className="flex items-center justify-between py-2">
                                     <Label>Status</Label>
-                                    <Select name="status" defaultValue={user.status}>
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={UserStatus.ACTIVE}>
-                                                Active
-                                            </SelectItem>
-                                            <SelectItem value={UserStatus.INACTIVE}>
-                                                Inactive
-                                            </SelectItem>
-                                            <SelectItem value={UserStatus.SUSPENDED}>
-                                                Suspended
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.status} />
+                                    <div className="flex items-center gap-2">
+                                        <input type="hidden" name="is_active" value="0" />
+
+                                        <Switch
+                                            id="is_active"
+                                            name="is_active"
+                                            value="1"
+                                            defaultChecked={user.is_active}
+                                        />
+
+                                        <span>{user.is_active ? 'Active' : 'Inactive'}</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -100,7 +120,7 @@ export const EditDialog = ({
                                     Cancel
                                 </Button>
 
-                                <SubmitButton processing={processing}>Update Status</SubmitButton>
+                                <SubmitButton processing={processing}>Update</SubmitButton>
                             </DialogFooter>
                         </>
                     )}
