@@ -30,7 +30,7 @@ export const updateProductSchema = z.object({
         .trim()
         .max(2000, 'Description must not exceed 2000 characters')
         .optional(),
-    is_published: z.boolean().optional(),
+    is_published: z.boolean(),
     base_price: z.number().optional(),
     base_stock: z.number().optional(),
     selected_sizes: z.array(z.string().min(1)).nonempty('Select at least one size'),

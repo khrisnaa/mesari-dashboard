@@ -75,6 +75,7 @@ class ProductService
                     'slug'        => $data['slug'],
                     'description' => $data['description'],
                     'category_id' => $data['category_id'],
+                    'is_published' => $data['is_published']
                 ]);
 
 

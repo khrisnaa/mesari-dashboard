@@ -26,7 +26,7 @@ class UpdateProductRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'uuid', 'exists:categories,id'],
 
-            'is_published' => ['nullable', 'boolean'],
+            'is_published' => ['required', 'boolean'],
 
             'variants' => ['required', 'string'],
 
@@ -55,6 +55,8 @@ class UpdateProductRequest extends FormRequest
             'category_id.required' => 'Category is required.',
             'category_id.uuid' => 'Category ID must be a valid UUID.',
             'category_id.exists' => 'Selected category does not exist.',
+
+            'is_published.required' => 'Published status is required.',
 
             'variants.required' => 'At least one variant is required.',
             'variants.string' => 'Variants must be a valid JSON string.',

@@ -23,6 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useDialog } from '@/hooks/use-dialog';
 import AppLayout from '@/layouts/app-layout';
@@ -80,6 +81,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
             description: '',
             variants: [],
             images: [],
+            is_published: false,
             category_id: '',
             base_price: 0,
             base_stock: 0,
@@ -211,6 +213,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
         formData.append('variants', JSON.stringify(data.variants));
         formData.append('category_id', data.category_id);
         formData.append('description', data.description || '');
+        formData.append('is_published', data.is_published ? '1' : '0');
 
         images.forEach((img, index) => {
             formData.append(`images[${index}][type]`, img.type);
@@ -723,6 +726,40 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                         Add category
                                     </Button>
                                 </div>
+                            </div>
+
+                            <div className="space-y-4 rounded-lg border p-4">
+                                <h4 className="font-semibold">Publish Settings</h4>
+
+                                <FormField
+                                    control={form.control}
+                                    name="is_published"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-3">
+                                            <div className="space-y-1">
+                                                <FormLabel>Publish Product</FormLabel>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Toggle to publish or archived this product.
+                                                </p>
+                                            </div>
+
+                                            <FormControl>
+                                                <div className="flex items-center justify-between rounded-lg border px-3 py-2">
+                                                    <span className="text-sm font-medium">
+                                                        {field.value ? 'Published' : 'Archived'}
+                                                    </span>
+
+                                                    <Switch
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </div>
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
                         </section>
                     </section>

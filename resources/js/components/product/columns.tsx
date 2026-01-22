@@ -146,20 +146,14 @@ export const getColumns = (onArchive: (product: Product) => void): ColumnDef<Pro
             </Button>
         ),
         cell: ({ row }) => {
-            const status = row.original.status;
-            const variantMap: Record<
-                string,
-                'success' | 'warning' | 'default' | 'danger' | 'info'
-            > = {
-                published: 'success',
-                archived: 'default',
-                draft: 'warning',
-            };
-            const variant = variantMap[status] ?? 'default';
+            const isPublished = row.original.is_published;
+
+            const variant = isPublished ? 'success' : 'default';
+            const label = isPublished ? 'Published' : 'Archived';
 
             return (
                 <div className="px-3">
-                    <StatusBadge variant={variant} label={status} />
+                    <StatusBadge variant={variant} label={label} />
                 </div>
             );
         },
@@ -203,6 +197,6 @@ export const getColumns = (onArchive: (product: Product) => void): ColumnDef<Pro
                 </TooltipProvider>
             );
         },
-        meta: { width: { type: 'fixed', px: 110 } },
+        meta: { width: { type: 'fixed', px: 108 } },
     },
 ];

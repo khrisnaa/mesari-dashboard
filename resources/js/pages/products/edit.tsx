@@ -93,6 +93,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
             description: product.description,
             variants: formattedvariants,
             category_id: product.category.id,
+            is_published: product.is_published,
             base_price: 0,
             base_stock: 0,
             selected_sizes: [],
@@ -244,6 +245,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         formData.append('variants', JSON.stringify(data.variants));
         formData.append('category_id', data.category_id);
         formData.append('description', data.description || '');
+        formData.append('is_published', data.is_published ? '1' : '0');
 
         Object.entries(data.discount ?? {}).forEach(([key, val]) => {
             if (key === 'is_active') {
@@ -731,6 +733,44 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                         Add category
                                     </Button>
                                 </div>
+                            </div>
+
+                            <div className="space-y-4 rounded-lg border p-4">
+                                <h4 className="font-semibold">Publish Settings</h4>
+
+                                <FormField
+                                    control={form.control}
+                                    name="is_published"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-3">
+                                            <div className="space-y-1">
+                                                <FormLabel htmlFor="is_published">
+                                                    Publish Product
+                                                </FormLabel>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Control whether this product is visible to
+                                                    customers.
+                                                </p>
+                                            </div>
+
+                                            <FormControl>
+                                                <div className="flex items-center justify-between rounded-lg border px-3 py-2">
+                                                    <span className="text-sm font-medium">
+                                                        {field.value ? 'Published' : 'Archived'}
+                                                    </span>
+
+                                                    <Switch
+                                                        id="is_published"
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </div>
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
                         </section>
                     </section>
