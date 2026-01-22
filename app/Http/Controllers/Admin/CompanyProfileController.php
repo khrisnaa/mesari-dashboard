@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
-use App\Http\Requests\CompanyProfile\UpdateCompanyProfileRequest;
+use App\Http\Requests\CompanyProfile\Admin\UpdateCompanyProfileRequest;
 use App\Models\CompanyProfile;
-use App\Services\CompanyProfileService;
-use Illuminate\Http\Request;
+use App\Services\Admin\CompanyProfileService;
 use Inertia\Inertia;
 
 class CompanyProfileController extends Controller

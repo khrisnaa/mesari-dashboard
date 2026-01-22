@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Services\OrderService;
-use App\Http\Requests\Order\UpdateOrderStatusRequest;
+use App\Services\Admin\OrderService;
+use App\Http\Requests\Order\Admin\UpdateOrderStatusRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

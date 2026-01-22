@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
-use App\Services\BannerService;
-use App\Http\Requests\Banner\StoreBannerRequest;
-use App\Http\Requests\Banner\UpdateBannerRequest;
+use App\Services\Admin\BannerService;
+use App\Http\Requests\Banner\Admin\StoreBannerRequest;
+use App\Http\Requests\Banner\Admin\UpdateBannerRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

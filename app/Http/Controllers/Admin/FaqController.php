@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
-use App\Http\Requests\Faq\StoreFaqRequest;
-use App\Http\Requests\Faq\UpdateFaqRequest;
+use App\Http\Requests\Faq\Admin\StoreFaqRequest;
+use App\Http\Requests\Faq\Admin\UpdateFaqRequest;
 use App\Models\Faq;
-use App\Services\FaqService;
+use App\Services\Admin\FaqService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

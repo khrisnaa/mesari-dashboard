@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
-use App\Http\Requests\Testimonial\StoreTestimonialRequest;
-use App\Http\Requests\Testimonial\UpdateTestimonialRequest;
+use App\Http\Requests\Testimonial\Admin\StoreTestimonialRequest;
+use App\Http\Requests\Testimonial\Admin\UpdateTestimonialRequest;
 use App\Models\Testimonial;
-use App\Services\TestimonialService;
+use App\Services\Admin\TestimonialService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

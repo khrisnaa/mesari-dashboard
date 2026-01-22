@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
 use App\Models\User;
-use App\Services\UserService;
-use App\Http\Requests\User\UpdateUserRequest;
-use App\Http\Requests\User\UpdateUserStatusRequest;
+use App\Services\Admin\UserService;
+use App\Http\Requests\User\Admin\UpdateUserRequest;
+use App\Http\Requests\User\Admin\UpdateUserStatusRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
