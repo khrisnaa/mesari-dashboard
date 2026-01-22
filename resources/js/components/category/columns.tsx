@@ -1,15 +1,10 @@
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { Category } from '@/types/category';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, MoreHorizontal, PencilIcon, TrashIcon } from 'lucide-react';
+import { ArrowUpIcon, EditIcon, Trash2Icon } from 'lucide-react';
+import { ActionIconButton } from '../buttons/action-icon-button';
+import { TooltipProvider } from '../ui/tooltip';
 
 export const getColumns = (
     onEdit: (category: Category) => void,
@@ -66,42 +61,27 @@ export const getColumns = (
         id: 'actions',
         cell: ({ row }) => {
             const category = row.original;
+
             return (
-                <>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                                <Button
-                                    onClick={() => onEdit(category)}
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-between"
-                                >
-                                    Edit <PencilIcon />
-                                </Button>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-between text-red-500 hover:text-red-600"
-                                    onClick={() => onDelete(category)}
-                                >
-                                    Delete <TrashIcon className="text-red-500" />
-                                </Button>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </>
+                <TooltipProvider delayDuration={150}>
+                    <div className="flex items-center justify-center gap-2 px-2">
+                        <ActionIconButton
+                            icon={<EditIcon className="h-4 w-4" />}
+                            tooltip="Edit Category"
+                            onClick={() => onEdit(category)}
+                        />
+
+                        <ActionIconButton
+                            icon={<Trash2Icon className="h-4 w-4 text-red-500" />}
+                            tooltip="Delete Category"
+                            onClick={() => onDelete(category)}
+                            className="text-red-500 hover:text-red-600"
+                        />
+                    </div>
+                </TooltipProvider>
             );
         },
-        meta: { width: { type: 'fixed', px: 64 } },
+
+        meta: { width: { type: 'fixed', px: 108 } },
     },
 ];

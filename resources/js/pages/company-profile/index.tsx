@@ -8,6 +8,7 @@ import { edit } from '@/routes/company-profile';
 import { BreadcrumbItem } from '@/types';
 import { CompanyProfile } from '@/types/company-profile';
 import { Head, Link } from '@inertiajs/react';
+import { PencilIcon } from 'lucide-react';
 
 interface PageProps {
     profile: CompanyProfile;
@@ -31,7 +32,9 @@ const Index = ({ profile }: PageProps) => {
                     description="Detail informasi perusahaan."
                     actions={
                         <Button asChild className="rounded-full" size="lg">
-                            <Link href={edit()}>Edit Profile</Link>
+                            <Link href={edit()}>
+                                <PencilIcon /> Edit Profile
+                            </Link>
                         </Button>
                     }
                 />

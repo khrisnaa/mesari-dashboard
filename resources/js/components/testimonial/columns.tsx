@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Testimonial } from '@/types/testimonial';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { ArrowUpIcon, EditIcon, Trash2Icon } from 'lucide-react';
 import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
 import { TooltipProvider } from '../ui/tooltip';
@@ -49,7 +49,7 @@ export const getColumns = (
         ),
         cell: ({ row }) => {
             const name = row.original.name;
-            return <div className="px-3">{name}</div>;
+            return <div className="px-3 text-wrap">{name}</div>;
         },
         meta: { width: { type: 'flex', fr: 1 } },
     },
@@ -140,13 +140,13 @@ export const getColumns = (
                 <TooltipProvider delayDuration={150}>
                     <div className="flex items-center justify-center gap-2 px-2">
                         <ActionIconButton
-                            icon={<PencilIcon className="h-4 w-4" />}
+                            icon={<EditIcon className="h-4 w-4" />}
                             tooltip="Edit Testimonial"
                             onClick={() => onEdit(testimonial)}
                         />
 
                         <ActionIconButton
-                            icon={<TrashIcon className="h-4 w-4 text-red-500" />}
+                            icon={<Trash2Icon className="h-4 w-4 text-red-500" />}
                             tooltip="Delete Testimonial"
                             onClick={() => onDelete(testimonial)}
                             className="text-red-500 hover:text-red-600"
