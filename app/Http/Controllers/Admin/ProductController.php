@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
-use App\Http\Requests\Product\Admin\StoreProductRequest;
-use App\Http\Requests\Product\Admin\UpdateProductRequest;
+use App\Http\Requests\Admin\Product\StoreProductRequest;
+use App\Http\Requests\Admin\Product\UpdateProductRequest;
 use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;

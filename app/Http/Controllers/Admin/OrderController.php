@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\Admin\OrderService;
-use App\Http\Requests\Order\Admin\UpdateOrderStatusRequest;
+use App\Http\Requests\Admin\Order\UpdateOrderStatusRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

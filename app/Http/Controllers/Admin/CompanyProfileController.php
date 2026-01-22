@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
-use App\Http\Requests\CompanyProfile\Admin\UpdateCompanyProfileRequest;
+use App\Http\Requests\Admin\CompanyProfile\UpdateCompanyProfileRequest;
 use App\Models\CompanyProfile;
 use App\Services\Admin\CompanyProfileService;
 use Inertia\Inertia;

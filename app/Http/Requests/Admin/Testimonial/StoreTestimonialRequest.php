@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Testimonial\Admin;
+namespace App\Http\Requests\Admin\Testimonial;
 
 use Illuminate\Foundation\Http\FormRequest;
 

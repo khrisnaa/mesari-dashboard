@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
 use App\Models\User;
 use App\Services\Admin\UserService;
-use App\Http\Requests\User\Admin\UpdateUserRequest;
-use App\Http\Requests\User\Admin\UpdateUserStatusRequest;
+use App\Http\Requests\Admin\User\UpdateUserRequest;
+use App\Http\Requests\Admin\User\UpdateUserStatusRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

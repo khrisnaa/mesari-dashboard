@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
-use App\Http\Requests\Category\Admin\StoreCategoryRequest;
-use App\Http\Requests\Category\Admin\UpdateCategoryRequest;
+use App\Http\Requests\Admin\Category\StoreCategoryRequest;
+use App\Http\Requests\Admin\Category\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Services\Admin\CategoryService;
 use Illuminate\Http\Request;
