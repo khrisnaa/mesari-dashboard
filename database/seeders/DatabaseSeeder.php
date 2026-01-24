@@ -16,14 +16,14 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             UserAddressSeeder::class,
-            AttributeSeeder::class,
-            ProductSeeder::class,
-            CartSeeder::class,
-            OrderSeeder::class,
-            OrderAddressSeeder::class,
-            TestimonialSeeder::class,
-            FaqSeeder::class,
-            CompanyProfileSeeder::class
+            // AttributeSeeder::class,
+            // ProductSeeder::class,
+            // CartSeeder::class,
+            // OrderSeeder::class,
+            // OrderAddressSeeder::class,
+            // TestimonialSeeder::class,
+            // FaqSeeder::class,
+            // CompanyProfileSeeder::class
         ]);
     }
 }
