@@ -42,6 +42,26 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmailApi());

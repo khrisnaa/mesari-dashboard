@@ -2,13 +2,11 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
-// public
-Route::get('/faqs', [FaqController::class, 'index']);
 
-Route::get('/testimonials', [TestimonialController::class, 'index']);
 
 // authentication
 Route::post('/login', [AuthController::class, 'login']);
@@ -27,7 +25,14 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
+// public
+Route::get('/faqs', [FaqController::class, 'index']);
 
+Route::get('/testimonials', [TestimonialController::class, 'index']);
+
+Route::get('/products', [ProductController::class, 'index']);
+
+Route::get('/products/{id}', [ProductController::class, 'show']);
 
 
 // authenticated

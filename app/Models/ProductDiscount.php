@@ -17,7 +17,9 @@ class ProductDiscount extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'start_at' => 'datetime',
+        'end_at'   => 'datetime',
     ];
 
     public function product()
