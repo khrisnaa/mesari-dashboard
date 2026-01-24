@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\CompanyProfileController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\ProductController;
@@ -36,6 +37,9 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 
 Route::get('/company-detail', [CompanyProfileController::class, 'index']);
+
+Route::get('/banners', [BannerController::class, 'index']);
+
 
 // authenticated
 Route::middleware('auth:sanctum')->group(function () {});
