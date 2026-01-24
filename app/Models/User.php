@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Notifications\VerifyEmailApi; // ← PERBAIKAN PENTING
+use App\Notifications\ResetPasswordApi;
+use App\Notifications\VerifyEmailApi;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -44,5 +45,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmailApi());
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordApi($token));
     }
 }
