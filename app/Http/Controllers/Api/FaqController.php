@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\FaqResource;
 use App\Models\Faq;
@@ -15,6 +16,8 @@ class FaqController extends Controller
             ->limit(5)
             ->get();
 
-        return FaqResource::collection($faqs);
+        return ApiResponse::success("List of FAQs", [
+            'items' => FaqResource::collection($faqs)
+        ]);
     }
 }
