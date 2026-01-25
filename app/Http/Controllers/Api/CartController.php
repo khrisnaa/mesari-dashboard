@@ -18,7 +18,7 @@ class CartController extends Controller
 
     public function index()
     {
-        $cart = $this->cartService->getOrCreateCart(Auth::id());
+        $cart = $this->cartService->getCart(Auth::id());
 
         return ApiResponse::success(
             'Cart fetched successfully',
@@ -35,7 +35,7 @@ class CartController extends Controller
             'quantity' => ['required', 'numeric', 'min:1'],
         ]);
 
-        $cart = $this->cartService->getOrCreateCart(Auth::id());
+        $cart = $this->cartService->getCart(Auth::id());
 
         $item = $this->cartService->addItem($cart, $request->all());
 

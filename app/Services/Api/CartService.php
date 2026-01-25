@@ -7,7 +7,7 @@ use App\Models\CartItem;
 
 class CartService
 {
-    public function getOrCreateCart($userId)
+    public function getCart($userId)
     {
         return Cart::firstOrCreate([
             'user_id' => $userId

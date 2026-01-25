@@ -7,21 +7,17 @@ use App\Http\Controllers\Api\CompanyProfileController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\TestimonialController;
+use App\Http\Controllers\Api\UserAddressController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 
-
-// authentication
+// auth routes
 Route::post('/login', [AuthController::class, 'login']);
-
 Route::post('/register', [AuthController::class, 'register']);
-
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->name('verification.verify');
-
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -29,35 +25,33 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-// public
+// public routes
 Route::get('/faqs', [FaqController::class, 'index']);
-
 Route::get('/testimonials', [TestimonialController::class, 'index']);
-
 Route::get('/products', [ProductController::class, 'index']);
-
 Route::get('/products/{id}', [ProductController::class, 'show']);
-
 Route::get('/company-detail', [CompanyProfileController::class, 'index']);
-
 Route::get('/banners', [BannerController::class, 'index']);
 
 
-// authenticated
+// protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    // user
+
+    // user profile
     Route::get('/me', [UserController::class, 'edit']);
-
     Route::put('/me', [UserController::class, 'update']);
-
     Route::put('/me/password', [UserController::class, 'updatePassword']);
 
-    //cart
+    // cart
     Route::get('/cart', [CartController::class, 'index']);
-
     Route::post('/cart/add', [CartController::class, 'addItem']);
-
     Route::put('/cart/item/{id}', [CartController::class, 'updateItem']);
-
     Route::delete('/cart/item/{id}', [CartController::class, 'deleteItem']);
+
+    // user addresses
+    Route::get('/addresses', [UserAddressController::class, 'index']);
+    Route::post('/addresses', [UserAddressController::class, 'store']);
+    Route::get('/addresses/{id}', [UserAddressController::class, 'show']);
+    Route::put('/addresses/{id}', [UserAddressController::class, 'update']);
+    Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy']);
 });
