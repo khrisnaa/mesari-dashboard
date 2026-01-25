@@ -16,12 +16,14 @@ class OrderService
     public function checkout($user, array $data)
     {
         $cart = Cart::where('user_id', $user->id)
-            ->with(['items.variant.product', 'items.variant.attributes'])
+            ->with(['items.variant.product', 'items.variant.attributes', 'items.variant'])
             ->firstOrFail();
 
         if ($cart->items->isEmpty()) {
             throw new Exception('Cart is empty.');
         }
+
+
 
         return $this->processOrder($user, $data, $cart->items, true);
     }

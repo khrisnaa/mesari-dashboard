@@ -35,7 +35,7 @@ class CategoryController extends Controller
 
         $message = $category->wasRecentlyCreated ? 'Category  successfully created.' : 'Category successfully restored.';
 
-        return redirect()->route('categories.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp($message));
     }
 

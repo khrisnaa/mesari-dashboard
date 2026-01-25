@@ -17,13 +17,13 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             UserAddressSeeder::class,
             AttributeSeeder::class,
-            ProductSeeder::class,
-            CartSeeder::class,
-            OrderSeeder::class,
-            OrderAddressSeeder::class,
-            TestimonialSeeder::class,
-            FaqSeeder::class,
-            CompanyProfileSeeder::class
+            // ProductSeeder::class,
+            // CartSeeder::class,
+            // OrderSeeder::class,
+            // OrderAddressSeeder::class,
+            // TestimonialSeeder::class,
+            // FaqSeeder::class,
+            // CompanyProfileSeeder::class
         ]);
     }
 }
