@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\CheckoutRequest;
-use App\Http\Requests\Api\BuyNowCheckoutRequest;
-use App\Http\Requests\Api\DirectCheckoutRequest;
+use App\Http\Requests\Api\Order\CheckoutRequest;
+use App\Http\Requests\Api\Order\DirectCheckoutRequest;
 use App\Http\Resources\OrderResource;
 use App\Services\Api\OrderService;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +16,6 @@ class OrderController extends Controller
         protected OrderService $orderService
     ) {}
 
-    // checkout from cart
     public function checkout(CheckoutRequest $request)
     {
         $order = $this->orderService->checkout(
@@ -26,12 +24,11 @@ class OrderController extends Controller
         );
 
         return ApiResponse::success(
-            'checkout successful',
+            'Checkout successful',
             new OrderResource($order)
         );
     }
 
-    // buy now checkout
     public function directCheckout(DirectCheckoutRequest $request)
     {
         $order = $this->orderService->directCheckout(
@@ -40,7 +37,7 @@ class OrderController extends Controller
         );
 
         return ApiResponse::success(
-            'checkout successful',
+            'Checkout successful',
             new OrderResource($order)
         );
     }
