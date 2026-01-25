@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CompanyProfileController;
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\TestimonialController;
 use App\Http\Controllers\Api\UserAddressController;
@@ -54,4 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/addresses/{id}', [UserAddressController::class, 'show']);
     Route::put('/addresses/{id}', [UserAddressController::class, 'update']);
     Route::delete('/addresses/{id}', [UserAddressController::class, 'destroy']);
+
+    // checkout
+    Route::post('/checkout', [OrderController::class, 'checkout']);
+    Route::post('/checkout/buy-now', [OrderController::class, 'directCheckout']);
 });
