@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CompanyProfileController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\ProductController;
@@ -44,7 +45,19 @@ Route::get('/banners', [BannerController::class, 'index']);
 
 // authenticated
 Route::middleware('auth:sanctum')->group(function () {
+    // user
     Route::get('/me', [UserController::class, 'edit']);
+
     Route::put('/me', [UserController::class, 'update']);
+
     Route::put('/me/password', [UserController::class, 'updatePassword']);
+
+    //cart
+    Route::get('/cart', [CartController::class, 'index']);
+
+    Route::post('/cart/add', [CartController::class, 'addItem']);
+
+    Route::put('/cart/item/{id}', [CartController::class, 'updateItem']);
+
+    Route::delete('/cart/item/{id}', [CartController::class, 'deleteItem']);
 });
