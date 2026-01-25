@@ -3,6 +3,8 @@
 use App\Helpers\ApiResponse;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -32,16 +34,37 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (ValidationException $e, $request) {
 
+        // 422 — Validation error
+        $exceptions->render(function (ValidationException $e, $request) {
             if ($request->is('api/*')) {
                 return ApiResponse::error(
-                    $e->getMessage(),
+                    'Validation failed',
                     $e->errors(),
                     422
                 );
             }
+        });
 
-            return null;
+        // 401 — Unauthenticated
+        $exceptions->render(function (AuthenticationException $e, $request) {
+            if ($request->is('api/*')) {
+                return ApiResponse::error(
+                    'Unauthenticated.',
+                    null,
+                    401
+                );
+            }
+        });
+
+        // 404 — Model not found
+        $exceptions->render(function (ModelNotFoundException $e, $request) {
+            if ($request->is('api/*')) {
+                return ApiResponse::error(
+                    'Resource not found.',
+                    null,
+                    404
+                );
+            }
         });
     })->create();

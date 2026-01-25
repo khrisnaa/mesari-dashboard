@@ -25,9 +25,6 @@ class BannerResource extends JsonResource
 
             'sort_order'    => $this->sort_order,
             'is_published'  => $this->is_published,
-
-            'created_at'    => $this->created_at?->format('Y-m-d\TH:i:s\Z'),
-            'updated_at'    => $this->updated_at?->format('Y-m-d\TH:i:s\Z'),
         ];
     }
 }

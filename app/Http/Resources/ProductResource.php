@@ -22,9 +22,6 @@ class ProductResource extends JsonResource
             'images'   => ProductImageResource::collection($this->whenLoaded('images')),
             'discount' => new ProductDiscountResource($this->whenLoaded('discount')),
             'variants' => ProductVariantResource::collection($this->whenLoaded('variants')),
-
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

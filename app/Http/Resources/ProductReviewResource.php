@@ -21,8 +21,8 @@ class ProductReviewResource extends JsonResource
                 'name' => $this->user->name ?? null,
             ],
 
-            'created_at' => $this->created_at?->format('Y-m-d\TH:i:s\Z'),
-            'updated_at' => $this->updated_at?->format('Y-m-d\TH:i:s\Z'),
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

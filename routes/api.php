@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CompanyProfileController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\TestimonialController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -42,4 +43,8 @@ Route::get('/banners', [BannerController::class, 'index']);
 
 
 // authenticated
-Route::middleware('auth:sanctum')->group(function () {});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [UserController::class, 'edit']);
+    Route::put('/me', [UserController::class, 'update']);
+    Route::put('/me/password', [UserController::class, 'updatePassword']);
+});
