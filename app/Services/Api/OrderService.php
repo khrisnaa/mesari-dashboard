@@ -136,4 +136,26 @@ class OrderService
             return $order;
         });
     }
+
+    // get order list
+    public function getOrderHistory($user)
+    {
+        return Order::where('user_id', $user->id)
+            ->with(['address'])
+            ->latest()
+            ->paginate(10); // pagination 10
+    }
+
+    // get order detail
+    public function getOrderDetail($user, $orderId)
+    {
+        return Order::where('user_id', $user->id)
+            ->with([
+                'address',
+                'items',
+                'items.product',
+                'items.variant',
+            ])
+            ->findOrFail($orderId);
+    }
 }

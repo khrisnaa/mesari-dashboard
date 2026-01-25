@@ -6,8 +6,11 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Order\CheckoutRequest;
 use App\Http\Requests\Api\Order\DirectCheckoutRequest;
+use App\Http\Resources\OrderDetailResource;
+use App\Http\Resources\OrderListResource;
 use App\Http\Resources\OrderResource;
 use App\Services\Api\OrderService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
@@ -39,6 +42,26 @@ class OrderController extends Controller
         return ApiResponse::success(
             'Checkout successful',
             new OrderResource($order)
+        );
+    }
+
+    public function index(Request $request)
+    {
+        $orders = $this->orderService->getOrderHistory($request->user());
+
+        return ApiResponse::success(
+            'Order history retrieved',
+            OrderListResource::collection($orders)
+        );
+    }
+
+    public function show($id, Request $request)
+    {
+        $order = $this->orderService->getOrderDetail($request->user(), $id);
+
+        return ApiResponse::success(
+            'Order detail retrieved',
+            new OrderDetailResource($order)
         );
     }
 }

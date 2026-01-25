@@ -59,4 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // checkout
     Route::post('/checkout', [OrderController::class, 'checkout']);
     Route::post('/checkout/buy-now', [OrderController::class, 'directCheckout']);
+
+    //orders
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
 });
