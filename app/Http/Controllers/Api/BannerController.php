@@ -12,20 +12,12 @@ class BannerController extends Controller
 {
     public function index()
     {
-        try {
-            $banners = Banner::where('is_published', true)
-                ->orderBy('sort_order', 'asc')
-                ->get();
+        $banners = Banner::where('is_published', true)
+            ->orderBy('sort_order', 'asc')
+            ->get();
 
-            return ApiResponse::success("List of banners", [
-                'items' => BannerResource::collection($banners)
-            ]);
-        } catch (Throwable $e) {
-            return ApiResponse::error(
-                "Failed to load banners.",
-                $e->getMessage(),
-                500
-            );
-        }
+        return ApiResponse::success("List of banners", [
+            'items' => BannerResource::collection($banners)
+        ]);
     }
 }

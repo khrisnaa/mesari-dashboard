@@ -19,6 +19,7 @@ class OrderController extends Controller
         protected OrderService $orderService
     ) {}
 
+    // process checkout from cart
     public function checkout(CheckoutRequest $request)
     {
         $order = $this->orderService->checkout(
@@ -32,6 +33,7 @@ class OrderController extends Controller
         );
     }
 
+    // process checkout directly form product detail
     public function directCheckout(DirectCheckoutRequest $request)
     {
         $order = $this->orderService->directCheckout(

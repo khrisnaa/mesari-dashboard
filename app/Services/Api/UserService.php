@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
+    // update user detail
     public function update(User $user, array $data)
     {
         // fill normal attributes
@@ -27,6 +28,7 @@ class UserService
         return $user;
     }
 
+    // update user password
     public function updatePassword(User $user, string $newPassword): User
     {
         $user->password = Hash::make($newPassword);

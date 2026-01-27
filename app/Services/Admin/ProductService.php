@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 
 class ProductService
 {
+    // paginate products with optional search, filters, and sorting
     public function paginate(array $params): LengthAwarePaginator
     {
         $perPage   = $params['per_page'] ?? 10;
@@ -61,6 +62,7 @@ class ProductService
             ->withQueryString();
     }
 
+    // store a new product
     public function store(array $data): Product
     {
         $basePath = null;
@@ -177,6 +179,7 @@ class ProductService
         }
     }
 
+    // update a prdouct
     public function update(Product $product, array $data): Product
     {
         $basePath = null;
@@ -327,13 +330,21 @@ class ProductService
         }
     }
 
-
+    // delete a product
     public function delete(Product $product): bool
     {
         return $product->delete();
     }
 
+    // update product status only
+    public function updateStatus(Product $product, bool $isPublished): void
+    {
+        $product->update([
+            'is_published' => $isPublished,
+        ]);
+    }
 
+    // process and store images coming from the frontend
     private function syncImages(
         Product $product,
         array $imageState,
@@ -348,7 +359,7 @@ class ProductService
         $existing = ProductImage::where('product_id', $product->id)->get();
         $keepIds  = $state->pluck('id')->filter()->all();
 
-        // Delete removed images
+        // delete removed images
         $existing->whereNotIn('id', $keepIds)->each(function ($image) {
             if (Storage::disk('public')->exists($image->path)) {
                 Storage::disk('public')->delete($image->path);
@@ -356,7 +367,7 @@ class ProductService
             $image->delete();
         });
 
-        // Update existing images
+        // update existing images
         $state->filter(fn($s) => isset($s['id']))->each(function ($s) {
             ProductImage::where('id', $s['id'])->update([
                 'type'       => $s['type'],
@@ -364,7 +375,7 @@ class ProductService
             ]);
         });
 
-        // Create new images from state
+        // create new images from state
         $state->filter(fn($s) => !isset($s['id']))->each(function ($s) use ($uploads, $product, $basePath) {
             $file = $uploads->shift();
             if (! $file) return;
@@ -377,7 +388,7 @@ class ProductService
             ]);
         });
 
-        // Remaining uploads → gallery
+        // remaining uploads → gallery
         $nextSort = ProductImage::where('product_id', $product->id)
             ->where('type', 'gallery')
             ->max('sort_order') ?? 0;

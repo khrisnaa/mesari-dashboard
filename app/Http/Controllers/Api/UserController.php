@@ -39,6 +39,7 @@ class UserController extends Controller
         );
     }
 
+    // update user password directly
     public function updatePassword(UpdatePasswordRequest $request)
     {
         $user = Auth::user();

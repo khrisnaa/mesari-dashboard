@@ -6,14 +6,16 @@ use App\Models\UserAddress;
 
 class UserAddressService
 {
+    // list user addresses
     public function list($userId)
     {
         return UserAddress::where('user_id', $userId)->get();
     }
 
+    // create new user address
     public function store($userId, array $data)
     {
-        // jika default = true → reset other default
+        // if default = true → reset other default
         if (!empty($data['is_default']) && $data['is_default'] == true) {
             UserAddress::where('user_id', $userId)
                 ->update(['is_default' => false]);
@@ -25,6 +27,7 @@ class UserAddressService
         ]);
     }
 
+    // update user address detail
     public function update(UserAddress $address, array $data)
     {
         if (isset($data['is_default']) && $data['is_default'] == true) {
@@ -37,6 +40,7 @@ class UserAddressService
         return $address;
     }
 
+    // delete user addresss
     public function delete(UserAddress $address)
     {
         $address->delete();

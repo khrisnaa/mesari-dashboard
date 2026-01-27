@@ -23,10 +23,8 @@ class OrderController extends Controller
         ]);
     }
 
-    public function show(string $id)
+    public function show(Order $order)
     {
-        $order = $this->orderService->find($id);
-
         return Inertia::render('orders/show', [
             'order' => $order,
         ]);

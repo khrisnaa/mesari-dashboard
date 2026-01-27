@@ -35,6 +35,7 @@ class UserController extends Controller
     }
 
 
+    // update user status only
     public function updateStatus(UpdateUserStatusRequest $request, User $user)
     {
         $this->userService->updateStatus($user, $request->validated('is_active'));

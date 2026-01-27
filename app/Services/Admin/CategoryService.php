@@ -8,7 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class CategoryService
 {
-    // get paginated data of category
+    // paginate categories with optional search, filters, and sorting
     public function paginate(array $params): LengthAwarePaginator
     {
         $perPage = $params['per_page'] ?? 10;
@@ -27,7 +27,7 @@ class CategoryService
             ->withQueryString();
     }
 
-    // create or update a category
+    // store a category
     public function store(array $data): Category
     {
         $data['slug'] = Str::slug($data['name']);
@@ -46,6 +46,7 @@ class CategoryService
         return Category::create($data);
     }
 
+    // update a category
     public function update(Category $category, array $data): bool
     {
         return $category->update($data);

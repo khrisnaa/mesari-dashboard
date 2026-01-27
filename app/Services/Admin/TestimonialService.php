@@ -7,7 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class TestimonialService
 {
-
+    // paginate testimonial with optional search, filters, and sorting
     public function paginate(array $params): LengthAwarePaginator
     {
         $perPage = $params['per_page'] ?? 10;
@@ -34,16 +34,19 @@ class TestimonialService
             ->withQueryString();
     }
 
+    // create a testimonial
     public function store(array $data): Testimonial
     {
         return Testimonial::create($data);
     }
 
+    // update a testimonial
     public function update(Testimonial $testimonial, array $data): bool
     {
         return $testimonial->update($data);
     }
 
+    // delete a testimonial
     public function delete(Testimonial $testimonial): bool|null
     {
         return $testimonial->delete();

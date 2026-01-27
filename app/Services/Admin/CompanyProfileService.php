@@ -6,16 +6,19 @@ use App\Models\CompanyProfile;
 
 class CompanyProfileService
 {
+    // get compnay profile detail
     public function get(): CompanyProfile
     {
         return CompanyProfile::first();
     }
 
+    // update company profile detail
     public function update(CompanyProfile $profile, array $data): bool
     {
         return $profile->update($data);
     }
 
+    // initialize default company profile if none exists
     public function initialize(): CompanyProfile
     {
         return CompanyProfile::firstOrCreate([], [

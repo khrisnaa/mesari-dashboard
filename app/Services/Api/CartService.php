@@ -7,6 +7,7 @@ use App\Models\CartItem;
 
 class CartService
 {
+    // find or create cart
     public function getCart($userId)
     {
         return Cart::firstOrCreate([
@@ -14,6 +15,7 @@ class CartService
         ]);
     }
 
+    // add item to cart
     public function addItem(Cart $cart, array $data)
     {
         $existing = CartItem::where('cart_id', $cart->id)
@@ -39,6 +41,7 @@ class CartService
         ]);
     }
 
+    // update cart item
     public function updateItem(CartItem $item, int $quantity)
     {
         $item->quantity = $quantity;
@@ -48,6 +51,7 @@ class CartService
         return $item;
     }
 
+    // delete cart item
     public function deleteItem(CartItem $item)
     {
         return $item->delete();

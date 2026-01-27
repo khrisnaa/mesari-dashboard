@@ -26,6 +26,7 @@ class CartController extends Controller
         );
     }
 
+    // create cart item
     public function addItem(Request $request)
     {
         $request->validate([
@@ -45,6 +46,7 @@ class CartController extends Controller
         );
     }
 
+    // update amount of quantity in cart item
     public function updateItem(Request $request, string $itemId)
     {
         $request->validate([
@@ -58,6 +60,7 @@ class CartController extends Controller
         return ApiResponse::success('Cart item updated');
     }
 
+    // remove cart item
     public function deleteItem(string $itemId)
     {
         $item = CartItem::findOrFail($itemId);

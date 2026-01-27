@@ -29,7 +29,7 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        // send email verification
+        // send notification
         $user->sendEmailVerificationNotification();
 
         return ApiResponse::success(
@@ -77,10 +77,12 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
+        // check email if has verified or not
         if ($user->hasVerifiedEmail()) {
             return ApiResponse::error('Email already verified.', 400);
         }
 
+        // send notification
         $user->sendEmailVerificationNotification();
 
         return ApiResponse::success('Verification email sent.');
@@ -90,6 +92,7 @@ class AuthController extends Controller
     {
         $user = User::findOrFail($request->route('id'));
 
+        // verify the hash to ensure link integrity (prevents tampering)
         if (! hash_equals(
             (string) $request->route('hash'),
             sha1($user->email)
@@ -97,6 +100,7 @@ class AuthController extends Controller
             return redirect(env('FRONTEND_URL') . '/verify/error');
         }
 
+        // mark email as verified if not already verified
         if (! $user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
         }

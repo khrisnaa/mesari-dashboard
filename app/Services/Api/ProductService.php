@@ -9,6 +9,7 @@ use App\Http\Resources\ProductReviewResource;
 
 class ProductService
 {
+    // list products
     public function paginate(Request $request)
     {
         $perPage = $request->get('per_page', 12);
@@ -61,6 +62,7 @@ class ProductService
         ];
     }
 
+    // get product detail
     public function show(string $id)
     {
         $product = Product::with([
@@ -68,7 +70,7 @@ class ProductService
             'variants.attributes',
             'images',
             'discount',
-            'reviews.user', // include user
+            'reviews.user',
         ])->findOrFail($id);
 
         return [

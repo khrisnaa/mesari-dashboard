@@ -17,7 +17,6 @@ class FaqController extends Controller
         protected FaqService $faqService
     ) {}
 
-    // fetch faqs
     public function index(Request $request)
     {
         $faqs = $this->faqService->paginate($request->all());
@@ -28,7 +27,6 @@ class FaqController extends Controller
         ]);
     }
 
-    // store faq
     public function store(StoreFaqRequest $request)
     {
         $this->faqService->store($request->validated());
@@ -37,7 +35,6 @@ class FaqController extends Controller
             ->with('success', FlashHelper::stamp('FAQ successfully created.'));
     }
 
-    // update faq
     public function update(UpdateFaqRequest $request, Faq $faq)
     {
         $this->faqService->update($faq, $request->validated());
@@ -46,7 +43,6 @@ class FaqController extends Controller
             ->with('success', FlashHelper::stamp('FAQ successfully updated.'));
     }
 
-    // delete faq
     public function destroy(Faq $faq)
     {
         $this->faqService->delete($faq);

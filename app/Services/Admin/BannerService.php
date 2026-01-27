@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class BannerService
 {
+    // paginate banners with optional search, filters, and sorting
     public function paginate(array $params): LengthAwarePaginator
     {
         $perPage = $params['per_page'] ?? 10;
@@ -33,13 +34,13 @@ class BannerService
             ->withQueryString();
     }
 
+    // store a new banner
     public function store(array $data): Banner
     {
         $basePath = 'banners/' . now()->format('Y/m/d');
 
         $backdropPath = $data['backdrop']->store($basePath, 'public');
         $backdropUrl  = $backdropPath;
-
 
         $imagePath = $data['image']->store($basePath, 'public');
         $imageUrl  = $imagePath;
@@ -61,11 +62,12 @@ class BannerService
         ]);
     }
 
-
+    // update existing banner
     public function update(Banner $banner, array $data): Banner
     {
         $basePath = 'banners/' . now()->format('Y/m/d');
 
+        // handle backdrop image upload (delete old file if exists)
         if (!empty($data['backdrop'])) {
             if ($banner->backdrop_path) {
                 Storage::disk('public')->delete($banner->backdrop_path);
@@ -77,6 +79,7 @@ class BannerService
             $banner->backdrop_url  = $path;
         }
 
+        // handle main image upload (delete old file if exists)
         if (!empty($data['image'])) {
             if ($banner->image_path) {
                 Storage::disk('public')->delete($banner->image_path);
@@ -102,6 +105,7 @@ class BannerService
         return $banner;
     }
 
+    // delete banner
     public function delete(Banner $banner): bool|null
     {
         return $banner->delete();

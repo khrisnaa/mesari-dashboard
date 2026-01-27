@@ -12,8 +12,6 @@ class CompanyProfileController extends Controller
 
     public function index()
     {
-
-        $company = CompanyProfile::first();
         $company = CompanyProfile::first();
 
         return ApiResponse::success("Company profile", [

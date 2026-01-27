@@ -7,6 +7,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class FaqService
 {
+    // paginate faqs with optional search, filters, and sorting
     public function paginate(array $params): LengthAwarePaginator
     {
         $perPage = $params['per_page'] ?? 10;
@@ -33,21 +34,19 @@ class FaqService
             ->withQueryString();
     }
 
-    public function find(string $id): Faq
-    {
-        return Faq::findOrFail($id);
-    }
-
+    // store a new faq
     public function store(array $data): Faq
     {
         return Faq::create($data);
     }
 
+    // update a faq
     public function update(Faq $faq, array $data): bool
     {
         return $faq->update($data);
     }
 
+    // delete a faq
     public function delete(Faq $faq): bool|null
     {
         return $faq->delete();

@@ -12,7 +12,7 @@ use Exception;
 
 class OrderService
 {
-    // checkout from cart
+    // process checkout from cart
     public function checkout($user, array $data)
     {
         $cart = Cart::where('user_id', $user->id)
@@ -28,7 +28,7 @@ class OrderService
         return $this->processOrder($user, $data, $cart->items, true);
     }
 
-    // direct buy now checkout
+    // process checkout from direct buy now (without adding into cart)
     public function directCheckout($user, array $data)
     {
         $variant = ProductVariant::with(['product', 'attributes'])

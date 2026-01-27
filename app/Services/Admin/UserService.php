@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
+    // paginate users with optional search, filters, and sorting
     public function paginate(array $params): LengthAwarePaginator
     {
         $perPage = $params['per_page'] ?? 10;
@@ -33,19 +34,15 @@ class UserService
             ->withQueryString();
     }
 
-    public function find(string $id): User
-    {
-        return User::findOrFail($id);
-    }
-
+    // update user detail
     public function update(User $user, array $data): bool
     {
         return $user->update($data);
     }
 
+    // update user status only
     public function updateStatus(User $user, bool $status): bool
     {
-
         return $user->update([
             'is_active' => $status,
         ]);

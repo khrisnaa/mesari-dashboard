@@ -17,7 +17,6 @@ class CategoryController extends Controller
         protected CategoryService $categoryService
     ) {}
 
-    // fetch categories
     public function index(Request $request)
     {
         $categories = $this->categoryService->paginate($request->all());
@@ -28,7 +27,6 @@ class CategoryController extends Controller
         ]);
     }
 
-    // store category
     public function store(StoreCategoryRequest $request)
     {
         $category = $this->categoryService->store($request->validated());
@@ -39,8 +37,6 @@ class CategoryController extends Controller
             ->with('success', FlashHelper::stamp($message));
     }
 
-
-    // update category
     public function update(UpdateCategoryRequest $request, Category $category)
     {
         $this->categoryService->update($category, $request->validated());
@@ -49,7 +45,6 @@ class CategoryController extends Controller
             ->with('success', FlashHelper::stamp('Category successfully updated.'));
     }
 
-    // delete category
     public function destroy(Category $category)
     {
         $deleted = $this->categoryService->delete($category);

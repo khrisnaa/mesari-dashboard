@@ -21,7 +21,6 @@ class ProductController extends Controller
         protected ProductService $productService
     ) {}
 
-    // display a paginated list of product
     public function index(Request $request)
     {
         $products = $this->productService->paginate($request->all());
@@ -32,7 +31,6 @@ class ProductController extends Controller
         ]);
     }
 
-    // show form to create a new product
     public function create()
     {
         $categories = Category::all();
@@ -143,7 +141,6 @@ class ProductController extends Controller
         try {
             $validated = $request->validated();
 
-            // Log variants
             Log::info('REQUEST VARIANTS:', [
                 'variants_raw' => $validated['variants'] ?? null,
                 'variants_decoded' => json_decode($validated['variants'] ?? '[]', true),
@@ -173,15 +170,16 @@ class ProductController extends Controller
             ->with('success', FlashHelper::stamp('Product successfully deleted.'));
     }
 
+    // update product status only (published/archived)
     public function updateStatus(Request $request, Product $product)
     {
         $validated = $request->validate([
             'is_published' => 'required|boolean',
+        ], [
+            'is_published.required' => 'Please select the product status.',
         ]);
 
-        $product->update([
-            'is_published' => $validated['is_published'],
-        ]);
+        $this->productService->updateStatus($product, $validated['is_published']);
 
         return redirect()
             ->back()
