@@ -19,7 +19,6 @@ beforeEach(function () {
 });
 
 
-
 it('can access the company profile edit page', function () {
     CompanyProfile::factory()->create();
 

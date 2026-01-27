@@ -32,9 +32,6 @@ it('can access faq index page', function () {
 });
 
 
-
-
-
 it('can store a faq', function () {
     $data = [
         'question' => 'What is Laravel?',
@@ -51,19 +48,6 @@ it('can store a faq', function () {
         'answer' => 'Laravel is a PHP framework.',
     ]);
 });
-
-
-// it('can access faq edit page', function () {
-//     $faq = Faq::factory()->create();
-
-//     $this->get(route('faqs.edit', $faq))
-//         ->assertStatus(200)
-//         ->assertInertia(
-//             fn($page) => $page
-//                 ->component('faqs/edit')
-//                 ->has('faq')
-//         );
-// });
 
 
 it('can update a faq', function () {

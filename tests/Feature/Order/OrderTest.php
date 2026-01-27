@@ -38,7 +38,10 @@ it('can access orders index page', function () {
 
 
 it('can view order detail page', function () {
-    $order = Order::factory()->create();
+    $user = User::factory()->create();
+    $order = Order::factory()->create([
+        'user_id' => $user->id
+    ]);
 
     $this->get(route('orders.show', $order))
         ->assertStatus(200)
@@ -51,21 +54,10 @@ it('can view order detail page', function () {
 });
 
 
-it('can access order edit page', function () {
-    $order = Order::factory()->create();
-
-    $this->get(route('orders.edit', $order))
-        ->assertStatus(200)
-        ->assertInertia(
-            fn($page) => $page
-                ->component('orders/edit')
-                ->has('order')
-        );
-});
-
-
 it('can update order status', function () {
+    $user = User::factory()->create();
     $order = Order::factory()->create([
+        'user_id' => $user->id,
         'status' => OrderStatus::PENDING->value,
         'payment_status' => PaymentStatus::PENDING->value,
     ]);

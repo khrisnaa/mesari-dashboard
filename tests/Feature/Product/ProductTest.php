@@ -22,6 +22,7 @@ beforeEach(function () {
     $this->actingAs($user);
 });
 
+
 it('can access product index page', function () {
     $this->seed(AttributeSeeder::class);
     $this->seed(ProductSeeder::class);
@@ -50,6 +51,7 @@ it('can access create product page', function () {
                 ->has('colors')
         );
 });
+
 
 it('can store new product', function () {
     $this->seed(AttributeSeeder::class);
@@ -90,6 +92,7 @@ it('can store new product', function () {
     ]);
 });
 
+
 it('can access edit product page', function () {
     $this->seed(AttributeSeeder::class);
     $category = Category::factory()->create();
@@ -108,6 +111,7 @@ it('can access edit product page', function () {
                 ->has('colors')
         );
 });
+
 
 it('can update product', function () {
     $category = Category::factory()->create();
@@ -140,6 +144,7 @@ it('can update product', function () {
         'name' => 'Updated Product Name',
     ]);
 });
+
 
 it('can soft delete product', function () {
     $category = Category::factory()->create();

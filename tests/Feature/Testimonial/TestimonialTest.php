@@ -51,17 +51,6 @@ it('can store a testimonial', function () {
     ]);
 });
 
-// it('can access edit page', function () {
-//     $testimonial = Testimonial::factory()->create();
-
-//     $this->get(route('testimonials.edit', $testimonial))
-//         ->assertStatus(200)
-//         ->assertInertia(
-//             fn($page) => $page
-//                 ->component('testimonials/edit')
-//                 ->has('testimonial')
-//         );
-// });
 
 it('can update a testimonial', function () {
     $testimonial = Testimonial::factory()->create([

@@ -60,3 +60,22 @@ it('can update a user', function () {
         Hash::check('oldpassword123', User::find($user->id)->password)
     );
 });
+
+
+
+it('can update user status', function () {
+    $user = User::factory()->create([
+        'is_active' => false
+    ]);
+
+    $update = [
+        'is_active' => true
+    ];
+
+    $this->put(route('users.update.status', $user), $update)
+        ->assertRedirect(route('users.index'));
+
+    $this->assertDatabaseHas('users', [
+        'is_active' => true
+    ]);
+});

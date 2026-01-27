@@ -40,6 +40,7 @@ class UserController extends Controller
     {
         $this->userService->updateStatus($user, $request->validated('is_active'));
 
-        return back()->with('success', FlashHelper::stamp('User status successfully updated.'));
+        return redirect()->route('users.index')
+            ->with('success', FlashHelper::stamp('User status successfully updated.'));
     }
 }

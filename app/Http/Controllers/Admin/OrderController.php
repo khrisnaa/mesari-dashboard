@@ -30,12 +30,6 @@ class OrderController extends Controller
         ]);
     }
 
-    public function edit(Order $order)
-    {
-        return Inertia::render('orders/edit', [
-            'order' => $order,
-        ]);
-    }
 
     public function update(UpdateOrderStatusRequest $request, Order $order)
     {

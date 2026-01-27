@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->actingAs($user);
 });
 
-// display a paginated category test
+
 it('can access category index page', function () {
     Category::factory()->count(3)->create();
 
@@ -31,11 +31,12 @@ it('can access category index page', function () {
         );
 });
 
-// store a new category test
+
 it('can store new category', function () {
     $payload = ['name' => 'T-Shirt'];
 
-    $this->post(route('categories.store'), $payload)
+    $this->from(route('categories.index'))
+        ->post(route('categories.store'), $payload)
         ->assertRedirect(route('categories.index'));
 
     $this->assertDatabaseHas('categories', [
@@ -45,7 +46,7 @@ it('can store new category', function () {
 });
 
 
-// update a category test
+
 it('can update category', function () {
     $category = Category::factory()->create(['name' => 'Old Name']);
 
@@ -59,7 +60,7 @@ it('can update category', function () {
     ]);
 });
 
-// soft-delete a category test
+
 it('can soft delete category', function () {
     $category = Category::factory()->create();
 
