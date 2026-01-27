@@ -21,7 +21,7 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
+            'user_id' => null,
             'status' => $this->faker->randomElement(array_column(OrderStatus::cases(), 'value')),
             'subtotal' => 0,
             'total' => 0,

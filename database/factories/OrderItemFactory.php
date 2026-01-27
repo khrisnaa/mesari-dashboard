@@ -18,9 +18,9 @@ class OrderItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'order_id' => Str::uuid(),
-            'product_id' => Str::uuid(),
-            'product_variant_id' => Str::uuid(),
+            'order_id' => null,
+            'product_id' => null,
+            'product_variant_id' => null,
             'product_name' => null,
             'variant_name' => null,
             'price' => 0,
