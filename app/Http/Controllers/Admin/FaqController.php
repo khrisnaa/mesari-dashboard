@@ -31,7 +31,7 @@ class FaqController extends Controller
     {
         $this->faqService->store($request->validated());
 
-        return redirect()->route('faqs.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp('FAQ successfully created.'));
     }
 
@@ -39,7 +39,7 @@ class FaqController extends Controller
     {
         $this->faqService->update($faq, $request->validated());
 
-        return redirect()->route('faqs.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp('FAQ successfully updated.'));
     }
 
@@ -47,7 +47,7 @@ class FaqController extends Controller
     {
         $this->faqService->delete($faq);
 
-        return redirect()->route('faqs.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp('FAQ successfully deleted.'));
     }
 }

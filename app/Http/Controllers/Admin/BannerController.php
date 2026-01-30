@@ -66,7 +66,7 @@ class BannerController extends Controller
     {
         $this->bannerService->delete($banner);
 
-        return redirect()->route('banners.index')
+        return redirect()->back()
             ->with('success', 'Banner successfully deleted.');
     }
 }

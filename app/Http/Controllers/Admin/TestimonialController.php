@@ -31,7 +31,7 @@ class TestimonialController extends Controller
     {
         $this->testimonialService->store($request->validated());
 
-        return redirect()->route('testimonials.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp('Testimonial successfully created.'));
     }
 
@@ -39,7 +39,7 @@ class TestimonialController extends Controller
     {
         $this->testimonialService->update($testimonial, $request->validated());
 
-        return redirect()->route('testimonials.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp('Testimonial successfully updated.'));
     }
 
@@ -47,7 +47,7 @@ class TestimonialController extends Controller
     {
         $this->testimonialService->delete($testimonial);
 
-        return redirect()->route('testimonials.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp('Testimonial successfully deleted.'));
     }
 }

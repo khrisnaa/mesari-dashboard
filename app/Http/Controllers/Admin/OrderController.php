@@ -35,7 +35,7 @@ class OrderController extends Controller
     {
         $this->orderService->updateStatus($order, $request->validated());
 
-        return redirect()->route('orders.index')
+        return redirect()->back()
             ->with('success', 'Order status successfully updated.');
     }
 }

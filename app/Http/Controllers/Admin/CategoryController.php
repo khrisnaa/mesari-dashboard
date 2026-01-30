@@ -41,7 +41,7 @@ class CategoryController extends Controller
     {
         $this->categoryService->update($category, $request->validated());
 
-        return redirect()->route('categories.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp('Category successfully updated.'));
     }
 
@@ -54,7 +54,7 @@ class CategoryController extends Controller
                 ->with('error', FlashHelper::stamp('Cannot delete category that has products.'));
         }
 
-        return redirect()->route('categories.index')
+        return redirect()->back()
             ->with('success', FlashHelper::stamp('Category successfully deleted.'));
     }
 }
