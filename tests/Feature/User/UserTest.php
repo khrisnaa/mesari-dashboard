@@ -45,7 +45,8 @@ it('can update a user', function () {
         'is_active' => true,
     ];
 
-    $this->put(route('users.update', $user), $update)
+    $this->from(route('users.index'))
+        ->put(route('users.update', $user), $update)
         ->assertRedirect(route('users.index'));
 
     $this->assertDatabaseHas('users', [
@@ -62,7 +63,6 @@ it('can update a user', function () {
 });
 
 
-
 it('can update user status', function () {
     $user = User::factory()->create([
         'is_active' => false
@@ -72,7 +72,8 @@ it('can update user status', function () {
         'is_active' => true
     ];
 
-    $this->put(route('users.update.status', $user), $update)
+    $this->from(route('users.index'))
+        ->put(route('users.update.status', $user), $update)
         ->assertRedirect(route('users.index'));
 
     $this->assertDatabaseHas('users', [

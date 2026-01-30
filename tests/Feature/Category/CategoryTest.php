@@ -50,9 +50,10 @@ it('can store new category', function () {
 it('can update category', function () {
     $category = Category::factory()->create(['name' => 'Old Name']);
 
-    $this->put(route('categories.update', $category), [
-        'name' => 'Updated Name'
-    ])->assertRedirect(route('categories.index'));
+    $this->from(route('categories.index'))
+        ->put(route('categories.update', $category), [
+            'name' => 'Updated Name'
+        ])->assertRedirect(route('categories.index'));
 
     $this->assertDatabaseHas('categories', [
         'id' => $category->id,
@@ -64,7 +65,8 @@ it('can update category', function () {
 it('can soft delete category', function () {
     $category = Category::factory()->create();
 
-    $this->delete(route('categories.destroy', $category))
+    $this->from(route('categories.index'))
+        ->delete(route('categories.destroy', $category))
         ->assertRedirect(route('categories.index'));
 
     $this->assertSoftDeleted('categories', [

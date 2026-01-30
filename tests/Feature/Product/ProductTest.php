@@ -159,3 +159,24 @@ it('can soft delete product', function () {
         'id' => $product->id,
     ]);
 });
+
+it('can update product status', function () {
+    $category = Category::factory()->create();
+    $product = Product::factory()->create([
+        'category_id' => $category->id,
+        'is_published' => true
+    ]);
+
+    $update = [
+        'is_published' => false
+    ];
+
+    $this->from(route('products.index'))
+        ->put(route('products.update.status', $product), $update)
+        ->assertRedirect(route('products.index'));
+
+    $this->assertDatabaseHas('products', [
+        'id' => $product->id,
+        'is_published' => false
+    ]);
+});

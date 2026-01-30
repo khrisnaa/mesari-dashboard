@@ -40,7 +40,8 @@ it('can store a faq', function () {
         'is_published' => true,
     ];
 
-    $this->post(route('faqs.store'), $data)
+    $this->from(route('faqs.index'))
+        ->post(route('faqs.store'), $data)
         ->assertRedirect(route('faqs.index'));
 
     $this->assertDatabaseHas('faqs', [
@@ -62,7 +63,8 @@ it('can update a faq', function () {
         'is_published' => false,
     ];
 
-    $this->put(route('faqs.update', $faq), $update)
+    $this->from(route('faqs.index'))
+        ->put(route('faqs.update', $faq), $update)
         ->assertRedirect(route('faqs.index'));
 
     $this->assertDatabaseHas('faqs', [
@@ -75,7 +77,8 @@ it('can update a faq', function () {
 it('can delete a faq', function () {
     $faq = Faq::factory()->create();
 
-    $this->delete(route('faqs.destroy', $faq))
+    $this->from(route('faqs.index'))
+        ->delete(route('faqs.destroy', $faq))
         ->assertRedirect(route('faqs.index'));
 
     $this->assertSoftDeleted('faqs', [

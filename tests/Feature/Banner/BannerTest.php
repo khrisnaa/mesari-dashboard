@@ -94,7 +94,8 @@ it('can update a banner', function () {
         'is_published' => false,
     ];
 
-    $this->put(route('banners.update', $banner), $update)
+    $this->from(route('banners.index'))
+        ->put(route('banners.update', $banner), $update)
         ->assertRedirect(route('banners.index'));
 
     $this->assertDatabaseHas('banners', [

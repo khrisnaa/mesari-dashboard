@@ -62,10 +62,11 @@ it('can update order status', function () {
         'payment_status' => PaymentStatus::PENDING->value,
     ]);
 
-    $this->put(route('orders.update', $order), [
-        'status' => OrderStatus::COMPLETED->value,
-        'payment_status' => PaymentStatus::PAID->value,
-    ])
+    $this->from(route('orders.index'))
+        ->put(route('orders.update', $order), [
+            'status' => OrderStatus::COMPLETED->value,
+            'payment_status' => PaymentStatus::PAID->value,
+        ])
         ->assertRedirect(route('orders.index'));
 
     $this->assertDatabaseHas('orders', [

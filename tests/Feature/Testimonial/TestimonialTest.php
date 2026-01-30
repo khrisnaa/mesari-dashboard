@@ -42,7 +42,8 @@ it('can store a testimonial', function () {
         'is_published' => true,
     ];
 
-    $this->post(route('testimonials.store'), $data)
+    $this->from(route('testimonials.index'))
+        ->post(route('testimonials.store'), $data)
         ->assertRedirect(route('testimonials.index'));
 
     $this->assertDatabaseHas('testimonials', [
@@ -65,7 +66,8 @@ it('can update a testimonial', function () {
         'is_published' => false,
     ];
 
-    $this->put(route('testimonials.update', $testimonial), $update)
+    $this->from(route('testimonials.index'))
+        ->put(route('testimonials.update', $testimonial), $update)
         ->assertRedirect(route('testimonials.index'));
 
     $this->assertDatabaseHas('testimonials', [
@@ -77,7 +79,8 @@ it('can update a testimonial', function () {
 it('can delete a testimonial', function () {
     $testimonial = Testimonial::factory()->create();
 
-    $this->delete(route('testimonials.destroy', $testimonial))
+    $this->from(route('testimonials.index'))
+        ->delete(route('testimonials.destroy', $testimonial))
         ->assertRedirect(route('testimonials.index'));
 
     $this->assertSoftDeleted('testimonials', [
