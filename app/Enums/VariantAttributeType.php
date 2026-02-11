@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum AttributeType: string
+enum VariantAttributeType: string
 {
     case COLOR = 'color';
     case SIZE = 'size';

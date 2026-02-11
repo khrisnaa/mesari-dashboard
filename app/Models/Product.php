@@ -17,7 +17,10 @@ class Product extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'is_published' => 'boolean'
+        'is_published' => 'boolean',
+        'is_customizable' => 'boolean',
+        'discount_start_at' => 'datetime',
+        'discount_end_at'   => 'datetime',
     ];
 
     public function category()
@@ -35,28 +38,13 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
-    public function discount()
-    {
-        return $this->hasOne(ProductDiscount::class);
-    }
-
-    public function cartItems()
-    {
-        return $this->hasMany(CartItem::class);
-    }
-
-    public function orderItems()
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
     public function reviews()
     {
         return $this->hasMany(ProductReview::class);
     }
 
-    public function banners()
+    public function customizations()
     {
-        return $this->hasMany(Banner::class);
+        return $this->hasMany(Customization::class);
     }
 }

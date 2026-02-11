@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Enums\AttributeType;
-use App\Models\Attribute;
+use App\Enums\VariantAttributeType;
+use App\Models\VariantAttribute;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductDiscount;
@@ -31,8 +31,8 @@ class ProductSeeder extends Seeder
             $variant->save();
         });
 
-        $sizes = Attribute::where('type', AttributeType::SIZE->value)->get();
-        $colors = Attribute::where('type', AttributeType::COLOR->value)->get();
+        $sizes = VariantAttribute::where('type', VariantAttributeType::SIZE->value)->get();
+        $colors = VariantAttribute::where('type', VariantAttributeType::COLOR->value)->get();
 
         $variants->each(function ($variant) use ($sizes, $colors) {
             $size = $sizes->random(1)->pluck('id')->toArray();

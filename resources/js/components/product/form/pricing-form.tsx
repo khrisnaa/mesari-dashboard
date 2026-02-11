@@ -12,15 +12,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { Attribute } from '@/types/product';
+import { VariantAttribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export interface Variant {
-    size?: Attribute;
-    color?: Attribute;
+    size?: VariantAttribute;
+    color?: VariantAttribute;
     price: number;
     stock: number;
     isPriceAuto?: boolean;
@@ -30,8 +30,8 @@ export interface Variant {
 interface PricingFormProps {
     open: boolean;
     onOpenChange: (value: boolean) => void;
-    sizes: Attribute[];
-    colors: Attribute[];
+    sizes: VariantAttribute[];
+    colors: VariantAttribute[];
     differentPricing?: boolean;
     onDifferentPricing?: (value: boolean) => void;
 }

@@ -3,7 +3,7 @@
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
-use Database\Seeders\AttributeSeeder;
+use Database\Seeders\VariantAttributeSeeder;
 use Database\Seeders\ProductSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,7 +24,7 @@ beforeEach(function () {
 
 
 it('can access product index page', function () {
-    $this->seed(AttributeSeeder::class);
+    $this->seed(VariantAttributeSeeder::class);
     $this->seed(ProductSeeder::class);
 
     $this->get(route('products.index'))
@@ -38,7 +38,7 @@ it('can access product index page', function () {
 
 
 it('can access create product page', function () {
-    $this->seed(AttributeSeeder::class);
+    $this->seed(VariantAttributeSeeder::class);
     Category::factory()->count(10)->create();
 
     $this->get(route('products.create'))
@@ -54,7 +54,7 @@ it('can access create product page', function () {
 
 
 it('can store new product', function () {
-    $this->seed(AttributeSeeder::class);
+    $this->seed(VariantAttributeSeeder::class);
     $category = Category::factory()->create();
 
     $payload = [
@@ -94,7 +94,7 @@ it('can store new product', function () {
 
 
 it('can access edit product page', function () {
-    $this->seed(AttributeSeeder::class);
+    $this->seed(VariantAttributeSeeder::class);
     $category = Category::factory()->create();
     $product = Product::factory()->create([
         'category_id' => $category->id

@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Enums\AttributeType;
-use App\Models\Attribute;
+use App\Enums\VariantAttributeType;
+use App\Models\VariantAttribute;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class AttributeSeeder extends Seeder
+class VariantAttributeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,9 +17,9 @@ class AttributeSeeder extends Seeder
         $sizes = config('product.sizes');
 
         foreach ($sizes as $size) {
-            Attribute::create([
+            VariantAttribute::create([
                 'name' => $size['name'],
-                'type' => AttributeType::SIZE->value,
+                'type' => VariantAttributeType::SIZE->value,
                 'hex' => null
             ]);
         }
@@ -27,9 +27,9 @@ class AttributeSeeder extends Seeder
         $colors = config('product.colors');
 
         foreach ($colors as $color) {
-            Attribute::create([
+            VariantAttribute::create([
                 'name' => $color['name'],
-                'type' => AttributeType::COLOR->value,
+                'type' => VariantAttributeType::COLOR->value,
                 'hex' => $color['hex']
             ]);
         }

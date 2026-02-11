@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
 use App\Http\Requests\Admin\Product\StoreProductRequest;
 use App\Http\Requests\Admin\Product\UpdateProductRequest;
-use App\Models\Attribute;
+use App\Models\VariantAttribute;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\Admin\ProductService;
@@ -35,7 +35,7 @@ class ProductController extends Controller
     {
         $categories = Category::all();
 
-        $sizes = Attribute::where('type', 'size')
+        $sizes = VariantAttribute::where('type', 'size')
             ->when(
                 DB::getDriverName() === 'mysql',
                 fn($q) =>
@@ -45,7 +45,7 @@ class ProductController extends Controller
             )
             ->get();
 
-        $colors = Attribute::where('type', 'color')
+        $colors = VariantAttribute::where('type', 'color')
             ->where(function ($q) {
                 foreach (config('product.colors') as $color) {
                     $q->orWhere(function ($q2) use ($color) {
@@ -94,7 +94,7 @@ class ProductController extends Controller
     {
         $categories = Category::all();
 
-        $sizes = Attribute::where('type', 'size')
+        $sizes = VariantAttribute::where('type', 'size')
             ->when(
                 DB::getDriverName() === 'mysql',
                 fn($q) =>
@@ -104,7 +104,7 @@ class ProductController extends Controller
             )
             ->get();
 
-        $colors = Attribute::where('type', 'color')
+        $colors = VariantAttribute::where('type', 'color')
             ->where(function ($q) {
                 foreach (config('product.colors') as $color) {
                     $q->orWhere(function ($q2) use ($color) {

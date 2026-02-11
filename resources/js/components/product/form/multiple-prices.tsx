@@ -12,19 +12,19 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 // import { Color } from '@/pages/products/create';
-import { Attribute } from '@/types/product';
+import { VariantAttribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { useEffect, useMemo, useState } from 'react';
 
 type Variant = {
     id: string;
-    size: Attribute;
-    color?: Attribute;
+    size: VariantAttribute;
+    color?: VariantAttribute;
 };
 
 interface VariantResult {
-    size: Attribute;
-    color?: Attribute;
+    size: VariantAttribute;
+    color?: VariantAttribute;
     price: number;
     stock: number;
 }
@@ -33,8 +33,8 @@ interface PricesDialogProps {
     open: boolean;
     onOpenChange: (value: boolean) => void;
     onSubmit: (data: VariantResult[]) => void;
-    sizes: Attribute[];
-    colors: Attribute[];
+    sizes: VariantAttribute[];
+    colors: VariantAttribute[];
     basePriceProp?: string;
     baseStockProp?: string;
     setBasePriceProp: (data: string) => void;

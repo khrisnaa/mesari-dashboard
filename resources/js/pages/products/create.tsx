@@ -32,7 +32,7 @@ import products from '@/routes/products';
 import { CreateProductInput, createProductSchema } from '@/schemas/product/createProductSchema';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
-import { Attribute } from '@/types/product';
+import { VariantAttribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
@@ -59,8 +59,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface PageProps {
     categories: Category[];
-    sizes: Attribute[];
-    colors: Attribute[];
+    sizes: VariantAttribute[];
+    colors: VariantAttribute[];
 }
 
 export interface ImageState {
@@ -101,9 +101,9 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
     const colorPickerDialog = useDialog();
 
     // select sizes handler
-    const [selectedSizes, setSelectedSizes] = useState<Attribute[] | []>([]);
+    const [selectedSizes, setSelectedSizes] = useState<VariantAttribute[] | []>([]);
 
-    const toggleSize = (size: Attribute) => {
+    const toggleSize = (size: VariantAttribute) => {
         setSelectedSizes((prev) => {
             const exists = prev.some((s) => s.id === size.id);
             const next = exists ? prev.filter((s) => s.id !== size.id) : [...prev, size];
@@ -116,9 +116,9 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
     };
 
     // select colors handler
-    const [selectedColors, setSelectedColors] = useState<Attribute[] | []>([]);
+    const [selectedColors, setSelectedColors] = useState<VariantAttribute[] | []>([]);
 
-    const toggleColor = (color: Attribute) => {
+    const toggleColor = (color: VariantAttribute) => {
         setSelectedColors((prev) => {
             const exists = prev.some((c) => c.hex === color.hex && c.name === color.name);
 
@@ -131,9 +131,9 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
     };
 
     // custom colors
-    const [customColors, setCustomColors] = useState<Attribute[]>([]);
+    const [customColors, setCustomColors] = useState<VariantAttribute[]>([]);
 
-    const handleAddColor = (color: Attribute) => {
+    const handleAddColor = (color: VariantAttribute) => {
         setSelectedColors((prev) => [...prev, color]);
         setCustomColors((prev) => [...prev, color]);
     };

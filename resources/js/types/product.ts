@@ -21,7 +21,7 @@ export interface ProductVariant {
     price: number;
     stock: number;
     product_id: string;
-    attributes?: Attribute[];
+    attributes?: VariantAttribute[];
     created_at: string;
     updated_at: string;
     deleted_at?: string | null;
@@ -32,7 +32,7 @@ export interface ProductVariantAttributePivot {
     attribute_id: string;
 }
 
-export interface Attribute {
+export interface VariantAttribute {
     id?: string;
     name: string;
     hex?: string | null;

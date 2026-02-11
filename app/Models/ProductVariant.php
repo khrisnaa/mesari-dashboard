@@ -29,7 +29,7 @@ class ProductVariant extends Model
 
     public function attributes()
     {
-        return $this->belongsToMany(Attribute::class, 'product_variant_attributes');
+        return $this->belongsToMany(VariantAttribute::class, 'product_variant_attributes');
     }
 
     public function cartItems()

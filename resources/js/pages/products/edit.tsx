@@ -33,7 +33,7 @@ import { useDialog } from '@/hooks/use-dialog';
 import { UpdateProductInput, updateProductSchema } from '@/schemas/product/updateProductSchema';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
-import { Attribute, Product } from '@/types/product';
+import { Product, VariantAttribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
@@ -56,8 +56,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface PageProps {
     categories: Category[];
-    sizes: Attribute[];
-    colors: Attribute[];
+    sizes: VariantAttribute[];
+    colors: VariantAttribute[];
     product: Product;
 }
 
@@ -117,9 +117,9 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         .flatMap((v) => v.attributes?.filter((a) => a.type === 'size') || [])
         .filter((attr, index, self) => index === self.findIndex((a) => a.name === attr.name));
 
-    const [selectedSizes, setSelectedSizes] = useState<Attribute[] | []>(productSizes);
+    const [selectedSizes, setSelectedSizes] = useState<VariantAttribute[] | []>(productSizes);
 
-    const toggleSize = (size: Attribute) => {
+    const toggleSize = (size: VariantAttribute) => {
         setSelectedSizes((prev) => {
             const exists = prev.some((s) => s.id === size.id);
             const next = exists ? prev.filter((s) => s.id !== size.id) : [...prev, size];
@@ -142,9 +142,9 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         .flatMap((v) => v.attributes?.filter((a) => a.type === 'color') || [])
         .filter((attr, index, self) => index === self.findIndex((a) => a.name === attr.name));
 
-    const [selectedColors, setSelectedColors] = useState<Attribute[] | []>(productColors);
+    const [selectedColors, setSelectedColors] = useState<VariantAttribute[] | []>(productColors);
 
-    const toggleColor = (color: Attribute) => {
+    const toggleColor = (color: VariantAttribute) => {
         setSelectedColors((prev) => {
             const exists = prev.some((c) => c.hex === color.hex && c.name === color.name);
 
@@ -157,9 +157,9 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
     };
 
     // custom colors
-    const [customColors, setCustomColors] = useState<Attribute[]>([]);
+    const [customColors, setCustomColors] = useState<VariantAttribute[]>([]);
 
-    const handleAddColor = (color: Attribute) => {
+    const handleAddColor = (color: VariantAttribute) => {
         setSelectedColors((prev) => [...prev, color]);
         setCustomColors((prev) => [...prev, color]);
     };

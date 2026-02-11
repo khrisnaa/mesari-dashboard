@@ -1,4 +1,4 @@
-export enum AttributeType {
+export enum VariantAttributeType {
     COLOR = 'color',
     SIZE = 'size',
 }

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const AttributeSchema = z.object({
+const VariantAttributeSchema = z.object({
     id: z.string().optional(),
     name: z.string().min(1),
     hex: z
@@ -13,8 +13,8 @@ const AttributeSchema = z.object({
 });
 
 const VariantSchema = z.object({
-    size: AttributeSchema,
-    color: AttributeSchema.optional(),
+    size: VariantAttributeSchema,
+    color: VariantAttributeSchema.optional(),
     price: z.number().min(0, 'Price must be 0 or greater'),
     stock: z.number().int('Stock must be an integer').min(0, 'Stock cannot be negative'),
 });

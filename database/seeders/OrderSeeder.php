@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\AttributeType;
+use App\Enums\VariantAttributeType;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
@@ -35,8 +35,8 @@ class OrderSeeder extends Seeder
                         $variantName = $variant->attributes
                             ->sortBy(function ($attr) {
                                 return match ($attr->type) {
-                                    AttributeType::SIZE->value => 1,
-                                    AttributeType::COLOR->value => 2,
+                                    VariantAttributeType::SIZE->value => 1,
+                                    VariantAttributeType::COLOR->value => 2,
                                     default => 99,
                                 };
                             })

@@ -2,7 +2,7 @@
 
 namespace App\Services\Admin;
 
-use App\Models\Attribute;
+use App\Models\VariantAttribute;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
@@ -89,7 +89,7 @@ class ProductService
                     $colorId = null;
 
                     if (!empty($variant['color']['name'])) {
-                        $color = Attribute::firstOrCreate([
+                        $color = VariantAttribute::firstOrCreate([
                             'name' => $variant['color']['name'],
                             'hex'  => $variant['color']['hex'],
                             'type' => 'color',
@@ -201,7 +201,7 @@ class ProductService
                 // normalize color id 
                 foreach ($variants as $idx => $variant) {
                     if (!empty($variant['color']['name'])) {
-                        $color = Attribute::firstOrCreate(
+                        $color = VariantAttribute::firstOrCreate(
                             ['type' => 'color', 'name' => $variant['color']['name']],
                             ['hex' => $variant['color']['hex']]
                         );
