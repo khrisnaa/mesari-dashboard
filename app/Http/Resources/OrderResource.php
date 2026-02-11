@@ -20,7 +20,6 @@ class OrderResource extends JsonResource
             'shipping_cost'   => $this->shipping_cost,
             'shipping_weight' => $this->shipping_weight,
             'shipping_etd'    => $this->shipping_etd,
-            'address'         => new OrderAddressResource($this->address),
             'items'           => OrderItemResource::collection($this->items),
         ];
     }

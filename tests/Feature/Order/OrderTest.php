@@ -2,7 +2,6 @@
 
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\OrderAddress;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\User;
@@ -58,20 +57,20 @@ it('can update order status', function () {
     $user = User::factory()->create();
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => OrderStatus::PENDING->value,
+        'order_status' => OrderStatus::PENDING->value,
         'payment_status' => PaymentStatus::PENDING->value,
     ]);
 
     $this->from(route('orders.index'))
         ->put(route('orders.update', $order), [
-            'status' => OrderStatus::COMPLETED->value,
+            'order_status' => OrderStatus::COMPLETED->value,
             'payment_status' => PaymentStatus::PAID->value,
         ])
         ->assertRedirect(route('orders.index'));
 
     $this->assertDatabaseHas('orders', [
         'id' => $order->id,
-        'status' => OrderStatus::COMPLETED->value,
+        'order_status' => OrderStatus::COMPLETED->value,
         'payment_status' => PaymentStatus::PAID->value,
     ]);
 });

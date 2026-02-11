@@ -78,7 +78,7 @@ class ProductService
                     'description' => $data['description'],
                     'category_id' => $data['category_id'],
                     'is_published' => $data['is_published'],
-                    'is_customizable'    => $data['is_customizable'],
+                    'is_customizable'    => $data['is_customizable'] ?? false,
                     'additional_price'   => $data['additional_price'] ?? null,
                     'discount_type'      => $data['discount_type'] ?? null,
                     'discount_value'     => $data['discount_value'] ?? null,
@@ -118,25 +118,25 @@ class ProductService
                 }
 
 
-                if (!empty($data['discount']) && is_array($data['discount'])) {
+                // if (!empty($data['discount']) && is_array($data['discount'])) {
 
 
-                    $discount = [
-                        'type'      => $data['discount']['type'] ?? null,
-                        'value'     => $data['discount']['value'] ?? 0,
-                        'start_at'  => !empty($data['discount']['start_at'])
-                            ? Carbon::parse($data['discount']['start_at'])
-                            : null,
-                        'end_at'    => !empty($data['discount']['end_at'])
-                            ? Carbon::parse($data['discount']['end_at'])
-                            : null,
-                    ];
+                //     $discount = [
+                //         'type'      => $data['discount']['type'] ?? null,
+                //         'value'     => $data['discount']['value'] ?? 0,
+                //         'start_at'  => !empty($data['discount']['start_at'])
+                //             ? Carbon::parse($data['discount']['start_at'])
+                //             : null,
+                //         'end_at'    => !empty($data['discount']['end_at'])
+                //             ? Carbon::parse($data['discount']['end_at'])
+                //             : null,
+                //     ];
 
 
-                    if (!empty($discount['type'])) {
-                        $product->discount()->create($discount);
-                    }
-                }
+                //     if (!empty($discount['type'])) {
+                //         $product->discount()->create($discount);
+                //     }
+                // }
 
 
                 if (!empty($data['images'])) {
@@ -198,7 +198,7 @@ class ProductService
                     'description' => $data['description'],
                     'category_id' => $data['category_id'],
                     'is_published' => $data['is_published'],
-                    'is_customizable'    => $data['is_customizable'],
+                    'is_customizable'    => $data['is_customizable'] ?? false,
                     'additional_price'   => $data['additional_price'] ?? null,
                     'discount_type'      => $data['discount_type'] ?? null,
                     'discount_value'     => $data['discount_value'] ?? null,
@@ -294,32 +294,32 @@ class ProductService
                     ->each(fn($v) => $v->delete());
 
                 // discount handling
-                if (!empty($data['discount']) && is_array($data['discount'])) {
-                    $discountInput = [
-                        'type'      => $data['discount']['type'] ?? null,
-                        'value'     => $data['discount']['value'] ?? 0,
-                        'start_at'  => !empty($data['discount']['start_at'])
-                            ? Carbon::parse($data['discount']['start_at'])
-                            : null,
-                        'end_at'    => !empty($data['discount']['end_at'])
-                            ? Carbon::parse($data['discount']['end_at'])
-                            : null,
-                    ];
+                // if (!empty($data['discount']) && is_array($data['discount'])) {
+                //     $discountInput = [
+                //         'type'      => $data['discount']['type'] ?? null,
+                //         'value'     => $data['discount']['value'] ?? 0,
+                //         'start_at'  => !empty($data['discount']['start_at'])
+                //             ? Carbon::parse($data['discount']['start_at'])
+                //             : null,
+                //         'end_at'    => !empty($data['discount']['end_at'])
+                //             ? Carbon::parse($data['discount']['end_at'])
+                //             : null,
+                //     ];
 
-                    if (empty($discountInput['type'])) {
+                //     if (empty($discountInput['type'])) {
 
-                        $product->discount()->delete();
-                    } else {
+                //         $product->discount()->delete();
+                //     } else {
 
-                        $existingDiscount = $product->discount()->latest()->first();
+                //         $existingDiscount = $product->discount()->latest()->first();
 
-                        if ($existingDiscount) {
-                            $existingDiscount->update($discountInput);
-                        } else {
-                            $product->discount()->create($discountInput);
-                        }
-                    }
-                }
+                //         if ($existingDiscount) {
+                //             $existingDiscount->update($discountInput);
+                //         } else {
+                //             $product->discount()->create($discountInput);
+                //         }
+                //     }
+                // }
 
                 // images sync
                 $this->syncImages(

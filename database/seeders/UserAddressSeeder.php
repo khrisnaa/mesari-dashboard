@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\City;
 use App\Models\User;
 use App\Models\UserAddress;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -17,9 +18,17 @@ class UserAddressSeeder extends Seeder
         $users = User::whereIn('email', ['member@example.com', 'guest@example.com'])->get();
 
         foreach ($users as $user) {
-            UserAddress::factory(3)->create([
-                'user_id' => $user->id
-            ]);
+            for ($i = 0; $i < 3; $i++) {
+
+                $city = City::factory()->create();
+
+                UserAddress::factory()->create([
+                    'user_id' => $user->id,
+                    'city_id' => $city->id,
+                    'province_name' => $city->province_name,
+                    'city_name' => $city->city_name,
+                ]);
+            }
         }
     }
 }

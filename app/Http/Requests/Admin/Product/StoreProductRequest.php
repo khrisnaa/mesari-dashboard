@@ -27,7 +27,7 @@ class StoreProductRequest extends FormRequest
             'category_id' => ['required', 'uuid', 'exists:categories,id'],
 
             'is_published' => ['required', 'boolean'],
-            'is_customizable' => ['required', 'boolean'],
+            'is_customizable' => ['nullable', 'boolean'],
 
             'additional_price' => ['nullable', 'numeric', 'min:0'],
 
@@ -72,11 +72,14 @@ class StoreProductRequest extends FormRequest
             'images.*.file.mimes' => 'Each image must be in JPG, JPEG, PNG, or WEBP format.',
             'images.*.file.max' => 'Each image may not exceed 10MB.',
 
-            'discount.type.in' => 'Discount type must be "percentage" or "fixed".',
-            'discount.value.numeric' => 'Discount value must be a number.',
-            'discount.start_at.date' => 'Start date must be a valid date.',
-            'discount.end_at.date' => 'End date must be a valid date.',
-            'discount.end_at.after_or_equal' => 'End date must be on or after the start date.',
+            'discount_type.in' => 'Discount type must be "percentage" or "fixed".',
+            'discount_value.numeric' => 'Discount value must be a number.',
+            'discount_start_at.date' => 'Start date must be a valid date.',
+            'discount_end_at.date' => 'End date must be a valid date.',
+            'discount_end_at.after_or_equal' => 'End date must be on or after the start date.',
+
+            'additional_price.numeric' => 'Additional price must be a valid number.',
+            'additional_price.min'     => 'Additional price cannot be less than 0.',
         ];
     }
 }

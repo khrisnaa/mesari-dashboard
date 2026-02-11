@@ -19,7 +19,6 @@ export interface Order {
 
     user?: User;
     items?: OrderItem[];
-    address?: OrderAddress;
 }
 
 export interface OrderItem {
@@ -32,20 +31,6 @@ export interface OrderItem {
     price: number;
     quantity: number;
     subtotal: number;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface OrderAddress {
-    id: string;
-    order_id: string;
-    recipient_name: string;
-    phone: string;
-    address_line: string;
-    province_name: string;
-    city_name: string;
-    subdistrict_name: string;
-    postal_code: string;
     created_at: string;
     updated_at: string;
 }

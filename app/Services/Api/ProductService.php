@@ -18,7 +18,6 @@ class ProductService
             'category',
             'variants.attributes',
             'images',
-            'discount',
         ]);
 
         // search
@@ -69,7 +68,6 @@ class ProductService
             'category',
             'variants.attributes',
             'images',
-            'discount',
             'reviews.user',
         ])->findOrFail($id);
 

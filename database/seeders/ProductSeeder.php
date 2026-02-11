@@ -6,10 +6,7 @@ use App\Enums\VariantAttributeType;
 use App\Models\VariantAttribute;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductDiscount;
 use App\Models\ProductVariant;
-use Database\Factories\ProductDiscountFactory;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -40,12 +37,6 @@ class ProductSeeder extends Seeder
             $selectedColors = $colorCount > 0 ? $colors->random($colorCount)->pluck('id')->toArray() : [];
             $selectedAttributes = array_merge($size, $selectedColors);
             $variant->attributes()->sync($selectedAttributes);
-        });
-
-
-        ProductDiscount::factory()->count(5)->make()->each(function ($discount) use ($products) {
-            $discount->product_id = $products->random()->id;
-            $discount->save();
         });
     }
 }

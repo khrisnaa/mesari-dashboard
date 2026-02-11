@@ -19,7 +19,6 @@ class OrderItemFactory extends Factory
     {
         return [
             'order_id' => null,
-            'product_id' => null,
             'product_variant_id' => null,
             'product_name' => null,
             'variant_name' => null,

@@ -3,9 +3,7 @@ export interface Banner {
     title: string | null;
     description: string | null;
     backdrop_path: string;
-    backdrop_url: string | null;
     image_path: string;
-    image_url: string | null;
     cta_text: string | null;
     cta_link: string | null;
     sort_order: number;

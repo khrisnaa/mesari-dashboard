@@ -86,7 +86,7 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
     },
 
     {
-        accessorKey: 'status',
+        accessorKey: 'order_status',
         header: 'Order Status',
         cell: ({ row }) => {
             const order = row.original;

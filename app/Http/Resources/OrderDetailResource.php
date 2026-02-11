@@ -10,7 +10,7 @@ class OrderDetailResource extends JsonResource
     {
         return [
             'id'              => $this->id,
-            'status'          => $this->status,
+            'order_status'          => $this->status,
             'subtotal'        => $this->subtotal,
             'total'           => $this->total,
             'payment_method'  => $this->payment_method,

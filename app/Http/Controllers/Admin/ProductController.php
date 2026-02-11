@@ -122,7 +122,7 @@ class ProductController extends Controller
             )
             ->get();
 
-        $product = Product::with(['category', 'variants.attributes', 'images', 'discount'])
+        $product = Product::with(['category', 'variants.attributes', 'images'])
             ->where('id', $product->id)
             ->first();
 

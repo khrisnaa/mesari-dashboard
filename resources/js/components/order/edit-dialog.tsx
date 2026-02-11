@@ -34,7 +34,7 @@ export const EditDialog = ({
 
                 <Form
                     {...orders.update.form(order)}
-                    resetOnSuccess={['status', 'payment_status']}
+                    resetOnSuccess={['order_status', 'payment_status']}
                     disableWhileProcessing
                     className="space-y-6"
                     onSuccess={close}

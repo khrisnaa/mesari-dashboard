@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\BannerType;
 use App\Models\Banner;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
@@ -48,13 +49,12 @@ it('can store a banner', function () {
         'title' => 'Homepage Banner',
         'description' => 'Main banner description',
         'backdrop' => UploadedFile::fake()->image('backdrop.jpg'),
-        'backdrop_url' => 'https://example.com/backdrop.jpg',
         'image' => UploadedFile::fake()->image('banner.jpg'),
-        'image_url' => 'https://example.com/image.jpg',
         'cta_text' => 'Learn More',
         'cta_link' => 'https://example.com',
         'sort_order' => 1,
         'is_published' => true,
+        'type' => BannerType::BANNER->value,
     ];
 
     $this->post(route('banners.store'), $data)
@@ -92,6 +92,8 @@ it('can update a banner', function () {
         'image_path' => 'images/new.jpg',
         'sort_order' => 2,
         'is_published' => false,
+        'type' => BannerType::POPUP->value,
+
     ];
 
     $this->from(route('banners.index'))
@@ -108,7 +110,8 @@ it('can update a banner', function () {
 it('can delete a banner', function () {
     $banner = Banner::factory()->create();
 
-    $this->delete(route('banners.destroy', $banner))
+    $this->from(route('banners.index'))
+        ->delete(route('banners.destroy', $banner))
         ->assertRedirect(route('banners.index'));
 
     $this->assertSoftDeleted('banners', [

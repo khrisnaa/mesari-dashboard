@@ -38,8 +38,6 @@ class CompanyProfileFactory extends Factory
             'instagram' => $this->faker->optional()->url(),
             'tiktok' => $this->faker->optional()->url(),
             'facebook' => $this->faker->optional()->url(),
-            'shopee' => $this->faker->optional()->url(),
-            'tokopedia' => $this->faker->optional()->url(),
         ];;
     }
 }

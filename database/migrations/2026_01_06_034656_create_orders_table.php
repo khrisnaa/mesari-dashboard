@@ -34,7 +34,6 @@ return new class extends Migration
             $table->decimal('shipping_weight', 8, 2);
             $table->string('shipping_estimation', 50)->nullable();
             $table->timestamps();
-            $table->timestamps();
         });
     }
 

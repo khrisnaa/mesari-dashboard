@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\BannerType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,20 +18,19 @@ class BannerFactory extends Factory
     public function definition(): array
     {
         return [
-            'title'          => $this->faker->sentence(3),
-            'description'    => $this->faker->sentence(6),
+            'title' => $this->faker->sentence(3),
+            'description' => $this->faker->sentence(6),
 
-            'backdrop_path'  => 'backdrops/' . $this->faker->uuid . '.jpg',
-            'backdrop_url'   => $this->faker->imageUrl(1920, 1080, 'nature', true),
+            'backdrop_path' => 'backdrops/' . $this->faker->uuid . '.jpg',
 
-            'image_path'     => 'images/' . $this->faker->uuid . '.jpg',
-            'image_url'      => $this->faker->imageUrl(1280, 720, 'business', true),
+            'image_path' => 'images/' . $this->faker->uuid . '.jpg',
 
-            'cta_text'       => $this->faker->optional()->words(2, true),
-            'cta_link'       => $this->faker->optional()->url(),
+            'cta_text' => $this->faker->optional()->words(2, true),
+            'cta_link' => $this->faker->optional()->url(),
 
-            'sort_order'     => $this->faker->numberBetween(0, 10),
-            'is_published'      => $this->faker->boolean(),
+            'sort_order' => $this->faker->numberBetween(0, 10),
+            'is_published' => $this->faker->boolean(),
+            'type' => $this->faker->randomElement(array_column(BannerType::cases(), 'value')),
         ];
     }
 }

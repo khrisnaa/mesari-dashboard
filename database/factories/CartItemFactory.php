@@ -18,7 +18,6 @@ class CartItemFactory extends Factory
     {
         return [
             'cart_id' => null,
-            'product_id' => null,
             'product_variant_id' => null,
             'price' => 0,
             'quantity' => $this->faker->numberBetween(1, 5),

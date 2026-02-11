@@ -37,7 +37,6 @@ class CartSeeder extends Seeder
                 $quantity = rand(1, 5);
                 CartItem::factory()->create([
                     'cart_id' => $cart->id,
-                    'product_id' => $variant->product_id,
                     'product_variant_id' => $variant->id,
                     'price' => $variant->price,
                     'quantity' => $quantity,

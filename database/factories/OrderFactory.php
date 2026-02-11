@@ -21,17 +21,26 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => null,
-            'status' => $this->faker->randomElement(array_column(OrderStatus::cases(), 'value')),
-            'subtotal' => 0,
-            'total' => 0,
-            'payment_method' => $this->faker->word(),
-            'payment_status' => PaymentStatus::PENDING->value,
-            'shipping_courier' => $this->faker->word(),
-            'shipping_service' => $this->faker->word(),
-            'shipping_cost' => $this->faker->numberBetween(15000, 30000),
-            'shipping_weight' => $this->faker->randomFloat(2, 0, 2),
-            'shipping_etd' => $this->faker->date('Y-m-d', '+1 week')
+            'user_id'            => null,
+            'order_status'       => $this->faker->randomElement(array_column(OrderStatus::cases(), 'value')),
+            'payment_status'     => $this->faker->randomElement(array_column(PaymentStatus::cases(), 'value')),
+            'payment_method'     => $this->faker->randomElement(['bank_transfer', 'credit_card', 'ewallet']),
+
+            'subtotal'           => $this->faker->randomFloat(2, 10000, 500000),
+            'total'              => $this->faker->randomFloat(2, 10000, 500000),
+
+            'recipient_name'     => $this->faker->name(),
+            'recipient_phone'    => $this->faker->phoneNumber(),
+            'recipient_address'  => $this->faker->streetAddress(),
+            'province_name'      => $this->faker->state(),
+            'city_name'          => $this->faker->city(),
+            'postal_code'        => $this->faker->postcode(),
+
+            'shipping_courier'   => $this->faker->randomElement(['jne', 'tiki', 'pos']),
+            'shipping_service'   => $this->faker->randomElement(['REG', 'ECO', 'YES']),
+            'shipping_cost'      => $this->faker->numberBetween(10000, 40000),
+            'shipping_weight'    => $this->faker->randomFloat(2, 0.1, 5),
+            'shipping_estimation' => $this->faker->randomElement(['2-3 days', '3-5 days', 'Next Day']),
         ];
     }
 }

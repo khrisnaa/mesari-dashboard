@@ -35,26 +35,18 @@ class BannerService
         $basePath = 'banners/' . now()->format('Y/m/d');
 
         $backdropPath = $data['backdrop']->store($basePath, 'public');
-        $backdropUrl = $backdropPath;
 
         $imagePath = $data['image']->store($basePath, 'public');
-        $imageUrl = $imagePath;
 
         return Banner::create([
             'title' => $data['title'] ?? null,
             'description' => $data['description'] ?? null,
-
             'backdrop_path' => $backdropPath,
-            'backdrop_url' => $backdropUrl,
-
             'image_path' => $imagePath,
-            'image_url' => $imageUrl,
-
             'cta_text' => $data['cta_text'] ?? null,
             'cta_link' => $data['cta_link'] ?? null,
             'sort_order' => $data['sort_order'] ?? 0,
             'is_published' => $data['is_published'],
-
             'type' => $data['type'],
         ]);
     }
@@ -85,7 +77,6 @@ class BannerService
             $path = $data['image']->store($basePath, 'public');
 
             $banner->image_path = $path;
-            $banner->image_url = $path;
         }
 
         $banner->fill([

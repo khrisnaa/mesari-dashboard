@@ -46,7 +46,6 @@ class OrderSeeder extends Seeder
 
                         OrderItem::factory()->create([
                             'order_id' => $order->id,
-                            'product_id' => $variant->product_id,
                             'product_variant_id' => $variant->id,
                             'product_name' => $variant->product->name,
                             'variant_name' => $variantName,
