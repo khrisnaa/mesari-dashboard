@@ -29,6 +29,7 @@ import {
     MessageSquareIcon,
     PackageIcon,
     ReceiptIcon,
+    ScissorsIcon,
     TagIcon,
     UserCogIcon,
 } from 'lucide-react';
@@ -60,11 +61,15 @@ const mainNavItems: NavItemGroup[] = [
     },
 
     {
-        heading: 'User Management',
+        heading: 'Order',
         items: [
-            { title: 'Users', href: users.index(), icon: UserCogIcon },
             { title: 'Orders', href: orders.index(), icon: ReceiptIcon },
+            { title: 'Customizations', href: orders.index(), icon: ScissorsIcon },
         ],
+    },
+    {
+        heading: 'User Management',
+        items: [{ title: 'Users', href: users.index(), icon: UserCogIcon }],
     },
 ];
 
