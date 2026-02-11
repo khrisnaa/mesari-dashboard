@@ -41,8 +41,6 @@ class UpdateCompanyProfileRequest extends FormRequest
             'instagram'     => ['nullable', 'string', 'max:255'],
             'tiktok'        => ['nullable', 'string', 'max:255'],
             'facebook'      => ['nullable', 'string', 'max:255'],
-            'shopee'        => ['nullable', 'string', 'max:255'],
-            'tokopedia'     => ['nullable', 'string', 'max:255'],
         ];
     }
 

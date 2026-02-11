@@ -25,7 +25,7 @@ class UpdateOrderStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => [
+            'order_status' => [
                 'required',
                 Rule::in(array_column(OrderStatus::cases(), 'value')),
             ],
@@ -40,8 +40,8 @@ class UpdateOrderStatusRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'status.required' => 'Order status is required.',
-            'status.in' => 'Invalid order status value.',
+            'order_status.required' => 'Order status is required.',
+            'order_status.in' => 'Invalid order status value.',
 
             'payment_status.required' => 'Order payment status is required.',
             'payment_status.in' => 'Invalid order payment status value.',

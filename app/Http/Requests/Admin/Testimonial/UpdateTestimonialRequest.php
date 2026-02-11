@@ -23,8 +23,8 @@ class UpdateTestimonialRequest extends FormRequest
     {
         return [
             'name'         => ['required', 'string', 'max:255'],
-            'role'         => ['required', 'string', 'max:255'],
-            'content'      => ['nullable', 'string'],
+            'role'         => ['nullable', 'string', 'max:255'],
+            'content'      => ['required', 'string'],
             'sort_order'   => ['nullable', 'integer', 'min:0'],
             'is_published' => ['required', 'boolean'],
         ];
@@ -37,10 +37,9 @@ class UpdateTestimonialRequest extends FormRequest
             'name.string'           => 'Name must be a valid string.',
             'name.max'              => 'Name cannot exceed 255 characters.',
 
-            'role.required'         => 'Role is required.',
             'role.string'           => 'Role must be a valid string.',
-            'role.max'              => 'Role cannot exceed 255 characters.',
 
+            'content.required'      => 'Content is required.',
             'content.string'        => 'Content must be a valid string.',
 
             'sort_order.integer'    => 'Sort order must be an integer value.',

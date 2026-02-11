@@ -27,6 +27,7 @@ class StoreProductRequest extends FormRequest
             'category_id' => ['required', 'uuid', 'exists:categories,id'],
 
             'is_published' => ['required', 'boolean'],
+            'is_customizable' => ['required', 'boolean'],
 
             'variants' => ['required', 'string'],
 
@@ -34,12 +35,10 @@ class StoreProductRequest extends FormRequest
             'images.*.type' => ['required', 'in:thumbnail,gallery'],
             'images.*.file' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
 
-            'discount' => ['nullable', 'array'],
-
-            'discount.type' => ['nullable', 'in:percentage,fixed'],
-            'discount.value' => ['nullable', 'numeric', 'min:0'],
-            'discount.start_at' => ['nullable', 'date'],
-            'discount.end_at' => ['nullable', 'date', 'after_or_equal:discount.start_at'],
+            'discount_type' => ['nullable', 'in:percentage,fixed'],
+            'discount_value' => ['nullable', 'numeric', 'min:0'],
+            'discount_start_at' => ['nullable', 'date'],
+            'discount_end_at' => ['nullable', 'date', 'after_or_equal:discount_start_at'],
         ];
     }
 
