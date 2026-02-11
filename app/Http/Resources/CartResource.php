@@ -11,9 +11,7 @@ class CartResource extends JsonResource
         return [
             'id'      => $this->id,
             'user_id' => $this->user_id,
-
             'items' => CartItemResource::collection($this->items),
-
             'total' => $this->items->sum('subtotal'),
         ];
     }

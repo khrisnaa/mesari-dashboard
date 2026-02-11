@@ -14,7 +14,6 @@ class OrderAddressResource extends JsonResource
             'address_line'     => $this->address_line,
             'province_name'    => $this->province_name,
             'city_name'        => $this->city_name,
-            'subdistrict_name' => $this->subdistrict_name,
             'postal_code'      => $this->postal_code,
         ];
     }

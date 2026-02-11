@@ -29,6 +29,8 @@ class UpdateProductRequest extends FormRequest
             'is_published' => ['required', 'boolean'],
             'is_customizable' => ['required', 'boolean'],
 
+            'additional_price' => ['nullable', 'numeric', 'min:0'],
+
             'variants' => ['required', 'string'],
 
             'image_state' => ['sometimes', 'string'],
@@ -76,6 +78,9 @@ class UpdateProductRequest extends FormRequest
             'discount_start_at.date' => 'Start date must be a valid date.',
             'discount_end_at.date' => 'End date must be a valid date.',
             'discount_end_at.after_or_equal' => 'End date must be on or after the start date.',
+
+            'additional_price.numeric' => 'Additional price must be a valid number.',
+            'additional_price.min'     => 'Additional price cannot be less than 0.',
         ];
     }
 }

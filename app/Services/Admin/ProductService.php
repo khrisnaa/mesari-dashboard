@@ -70,7 +70,6 @@ class ProductService
         try {
             return DB::transaction(function () use ($data, &$basePath) {
 
-
                 $data['slug'] = Str::slug($data['name']);
 
                 $product = Product::create([
@@ -78,7 +77,13 @@ class ProductService
                     'slug'        => $data['slug'],
                     'description' => $data['description'],
                     'category_id' => $data['category_id'],
-                    'is_published' => $data['is_published']
+                    'is_published' => $data['is_published'],
+                    'is_customizable'    => $data['is_customizable'],
+                    'additional_price'   => $data['additional_price'] ?? null,
+                    'discount_type'      => $data['discount_type'] ?? null,
+                    'discount_value'     => $data['discount_value'] ?? null,
+                    'discount_start_at'  => $data['discount_start_at'] ?? null,
+                    'discount_end_at'    => $data['discount_end_at'] ?? null,
                 ]);
 
 
@@ -192,7 +197,13 @@ class ProductService
                     'name'        => $data['name'],
                     'description' => $data['description'],
                     'category_id' => $data['category_id'],
-                    'is_published' => $data['is_published']
+                    'is_published' => $data['is_published'],
+                    'is_customizable'    => $data['is_customizable'],
+                    'additional_price'   => $data['additional_price'] ?? null,
+                    'discount_type'      => $data['discount_type'] ?? null,
+                    'discount_value'     => $data['discount_value'] ?? null,
+                    'discount_start_at'  => $data['discount_start_at'] ?? null,
+                    'discount_end_at'    => $data['discount_end_at'] ?? null,
                 ]);
 
                 // decode variants from request

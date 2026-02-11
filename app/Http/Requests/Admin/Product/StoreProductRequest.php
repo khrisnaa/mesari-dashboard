@@ -29,6 +29,8 @@ class StoreProductRequest extends FormRequest
             'is_published' => ['required', 'boolean'],
             'is_customizable' => ['required', 'boolean'],
 
+            'additional_price' => ['nullable', 'numeric', 'min:0'],
+
             'variants' => ['required', 'string'],
 
             'images' => ['sometimes', 'array'],

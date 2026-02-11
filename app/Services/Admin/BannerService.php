@@ -13,18 +13,13 @@ class BannerService
     {
         $perPage = $params['per_page'] ?? 10;
 
-        $sort = in_array($params['sort'] ?? '', [
-            'title',
-            'created_at',
-            'sort_order',
-        ]) ? $params['sort'] : 'sort_order';
+        $sort = in_array($params['sort'] ?? '', ['title', 'created_at', 'sort_order']) ? $params['sort'] : 'sort_order';
 
         $direction = ($params['direction'] ?? '') === 'asc' ? 'asc' : 'desc';
 
         return Banner::query()
             ->when($params['search'] ?? null, function ($q, $search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                $q->where('title', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
             })
             ->when(isset($params['is_published']), function ($q) use ($params) {
                 $q->where('is_published', $params['is_published']);
@@ -40,25 +35,27 @@ class BannerService
         $basePath = 'banners/' . now()->format('Y/m/d');
 
         $backdropPath = $data['backdrop']->store($basePath, 'public');
-        $backdropUrl  = $backdropPath;
+        $backdropUrl = $backdropPath;
 
         $imagePath = $data['image']->store($basePath, 'public');
-        $imageUrl  = $imagePath;
+        $imageUrl = $imagePath;
 
         return Banner::create([
-            'title'          => $data['title'] ?? null,
-            'description'    => $data['description'] ?? null,
+            'title' => $data['title'] ?? null,
+            'description' => $data['description'] ?? null,
 
-            'backdrop_path'  => $backdropPath,
-            'backdrop_url'   => $backdropUrl,
+            'backdrop_path' => $backdropPath,
+            'backdrop_url' => $backdropUrl,
 
-            'image_path'     => $imagePath,
-            'image_url'      => $imageUrl,
+            'image_path' => $imagePath,
+            'image_url' => $imageUrl,
 
-            'cta_text'       => $data['cta_text'] ?? null,
-            'cta_link'       => $data['cta_link'] ?? null,
-            'sort_order'     => $data['sort_order'] ?? 0,
-            'is_published'      => $data['is_published'],
+            'cta_text' => $data['cta_text'] ?? null,
+            'cta_link' => $data['cta_link'] ?? null,
+            'sort_order' => $data['sort_order'] ?? 0,
+            'is_published' => $data['is_published'],
+
+            'type' => $data['type'],
         ]);
     }
 
@@ -76,7 +73,7 @@ class BannerService
             $path = $data['backdrop']->store($basePath, 'public');
 
             $banner->backdrop_path = $path;
-            $banner->backdrop_url  = $path;
+            $banner->backdrop_url = $path;
         }
 
         // handle main image upload (delete old file if exists)
@@ -88,16 +85,17 @@ class BannerService
             $path = $data['image']->store($basePath, 'public');
 
             $banner->image_path = $path;
-            $banner->image_url  = $path;
+            $banner->image_url = $path;
         }
 
         $banner->fill([
-            'title'       => $data['title'] ?? $banner->title,
+            'title' => $data['title'] ?? $banner->title,
             'description' => $data['description'] ?? $banner->description,
-            'cta_text'    => $data['cta_text'] ?? $banner->cta_text,
-            'cta_link'    => $data['cta_link'] ?? $banner->cta_link,
-            'sort_order'  => $data['sort_order'] ?? $banner->sort_order,
-            'is_published'   => $data['is_published'],
+            'cta_text' => $data['cta_text'] ?? $banner->cta_text,
+            'cta_link' => $data['cta_link'] ?? $banner->cta_link,
+            'sort_order' => $data['sort_order'] ?? $banner->sort_order,
+            'is_published' => $data['is_published'],
+            'type' => $data['type'],
         ]);
 
         $banner->save();

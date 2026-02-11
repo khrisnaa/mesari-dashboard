@@ -14,7 +14,7 @@ class OrderService
 
         $sort = in_array($params['sort'] ?? '', [
             'created_at',
-            'status',
+            'order_status',
             'payment_status',
             'user_name',
         ])
@@ -48,7 +48,7 @@ class OrderService
     public function updateStatus(Order $order, array $data): bool
     {
         return $order->update([
-            'status' => $data['status'],
+            'order_status' => $data['order_status'],
             'payment_status' => $data['payment_status']
         ]);
     }
