@@ -1,3 +1,4 @@
+import { router, usePage } from '@inertiajs/react';
 import {
     ColumnDef,
     OnChangeFn,
@@ -8,6 +9,7 @@ import {
     getPaginationRowModel,
     useReactTable,
 } from '@tanstack/react-table';
+import { FileQuestion } from 'lucide-react'; // Icon for empty state
 import { useState } from 'react';
 
 import {
@@ -21,7 +23,6 @@ import {
 
 import { generateGridTemplate } from '@/lib/table-grid';
 import { PaginationDetails } from '@/types/pagination';
-import { router, usePage } from '@inertiajs/react';
 import { DataTableFilter } from './data-table-filter';
 import { DataTablePagination } from './data-table-pagination';
 
@@ -57,7 +58,6 @@ export function DataTable<TData extends { id: string }, TValue>({
 
     const [sorting, setSorting] = useState<SortingState>(() => {
         const sort = params?.sort;
-
         const direction = params?.direction;
 
         if (sort) {
@@ -120,23 +120,28 @@ export function DataTable<TData extends { id: string }, TValue>({
     const gridTemplate = generateGridTemplate(columns);
 
     return (
-        <div>
-            <div className="flex items-center py-4">
+        <div className="space-y-4">
+            {/* Filter Section */}
+            <div className="flex items-center justify-between">
                 <DataTableFilter placeholder={name} />
             </div>
 
-            <div className="overflow-hidden rounded-md border">
+            {/* Table Section */}
+            <div className="overflow-hidden rounded-md border bg-background">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow
                                 key={headerGroup.id}
-                                className="grid"
+                                className="grid border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                                 style={{ gridTemplateColumns: gridTemplate }}
                             >
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id} className="flex items-center">
+                                        <TableHead
+                                            key={header.id}
+                                            className="flex items-center text-xs font-semibold text-muted-foreground uppercase"
+                                        >
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -155,11 +160,14 @@ export function DataTable<TData extends { id: string }, TValue>({
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && 'selected'}
-                                    className="grid"
+                                    className="grid items-center border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                                     style={{ gridTemplateColumns: gridTemplate }}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="flex items-center">
+                                        <TableCell
+                                            key={cell.id}
+                                            className="flex items-center overflow-hidden py-3 text-sm"
+                                        >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext(),
@@ -170,14 +178,30 @@ export function DataTable<TData extends { id: string }, TValue>({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="flex h-64 flex-col items-center justify-center gap-3 text-center"
+                                >
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                                        <FileQuestion className="h-6 w-6 text-muted-foreground" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-sm font-medium text-foreground">
+                                            No results found
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            Try adjusting your search or filters to find what you're
+                                            looking for.
+                                        </p>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
             </div>
+
+            {/* Pagination Section */}
             <DataTablePagination
                 pagination={pagination}
                 selected={{

@@ -12,15 +12,14 @@ import { TooltipProvider } from '../ui/tooltip';
 export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner>[] => [
     {
         id: 'rowNumber',
-        header: '#',
+        header: () => <div className="px-2 text-center">#</div>,
         cell: ({ row, table }) => {
             const pageIndex = table.getState().pagination.pageIndex;
             const pageSize = table.getState().pagination.pageSize;
 
-            // index on current page → add offset for real number
             const rowNumber = pageIndex * pageSize + row.index + 1;
 
-            return <span>{rowNumber}</span>;
+            return <div className="px-2 text-center">{rowNumber}</div>;
         },
         enableSorting: false,
         enableHiding: false,
@@ -32,41 +31,59 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
             <Button
                 variant="ghost"
                 size="sm"
-                className="flex cursor-pointer items-center justify-center"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Title
+                <span>Title</span>
                 <ArrowUpIcon
                     className={cn(
-                        'size-3 transition-all duration-300',
+                        'ml-2 h-3 w-3 transition-all',
                         column.getIsSorted() === 'asc'
                             ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
                     )}
                 />
             </Button>
         ),
         cell: ({ row }) => {
             const title = row.original.title;
-            return <div className="px-3">{title}</div>;
+            return <div className="truncate font-medium">{title}</div>;
         },
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {
-        accessorKey: 'description',
-        header: 'Description',
+        accessorKey: 'type',
+        header: () => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 cursor-default data-[state=open]:bg-accent"
+            >
+                <span>Type</span>
+            </Button>
+        ),
         cell: ({ row }) => {
-            const description = row.original.description;
-            return <div className="line-clamp-3 text-wrap">{description}</div>;
+            const type = row.original.type;
+            return <div className="truncate font-medium capitalize">{type}</div>;
         },
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         accessorKey: 'cta_text',
-        header: 'CTA Text',
+        header: () => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 cursor-default data-[state=open]:bg-accent"
+            >
+                <span>CTA</span>
+            </Button>
+        ),
         cell: ({ row }) => {
             const cta_text = row.original.cta_text;
-            return <div className="text-wrap">{cta_text}</div>;
+            return <div className="truncate font-medium capitalize">{cta_text}</div>;
         },
         meta: { width: { type: 'flex', fr: 1 } },
     },
@@ -76,25 +93,27 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
             <Button
                 variant="ghost"
                 size="sm"
-                className="flex cursor-pointer items-center justify-center"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Order
+                <span>Sort Order</span>
                 <ArrowUpIcon
                     className={cn(
-                        'size-3 transition-all duration-300',
+                        'ml-2 h-3 w-3 transition-all',
                         column.getIsSorted() === 'asc'
                             ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
                     )}
                 />
             </Button>
         ),
         cell: ({ row }) => {
-            const order = row.original.sort_order;
-            return <div className="px-3 text-center">{order}</div>;
+            const sort_order = row.original.sort_order;
+            return <div className="truncate font-medium">{sort_order}</div>;
         },
-        meta: { width: { type: 'fixed', px: 100 } },
+        meta: { width: { type: 'fixed', px: 160 } },
     },
     {
         accessorKey: 'is_published',
@@ -102,33 +121,33 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
             <Button
                 variant="ghost"
                 size="sm"
-                className="flex cursor-pointer items-center justify-center"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Status
+                <span>Status</span>
                 <ArrowUpIcon
                     className={cn(
-                        'size-3 transition-all duration-300',
+                        'ml-2 h-3 w-3 transition-all',
                         column.getIsSorted() === 'asc'
                             ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
                     )}
                 />
             </Button>
         ),
         cell: ({ row }) => {
-            const active = row.original.is_published;
+            const published = row.original.is_published;
 
             return (
-                <div className="flex justify-center px-3">
-                    <StatusBadge
-                        variant={active ? 'success' : 'default'}
-                        label={active ? 'Published' : 'Archived'}
-                    />
-                </div>
+                <StatusBadge
+                    variant={published ? 'success' : 'default'}
+                    label={published ? 'Published' : 'Archived'}
+                />
             );
         },
-        meta: { width: { type: 'fixed', px: 120 } },
+        meta: { width: { type: 'fixed', px: 160 } },
     },
     {
         id: 'actions',
@@ -137,18 +156,21 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
 
             return (
                 <TooltipProvider delayDuration={150}>
-                    <div className="flex items-center justify-center gap-2 px-2">
+                    <div className="flex items-center justify-end gap-2 pr-2">
                         <ActionIconButton
                             icon={<EditIcon className="h-4 w-4" />}
                             tooltip="Edit Banner"
                             onClick={() => router.get(banners.edit(banner))}
+                            variant="ghost"
+                            className="h-8 w-8 hover:bg-muted"
                         />
 
                         <ActionIconButton
-                            icon={<Trash2Icon className="h-4 w-4 text-red-500" />}
+                            icon={<Trash2Icon className="h-4 w-4" />}
                             tooltip="Delete Banner"
                             onClick={() => onDelete(banner)}
-                            className="text-red-500 hover:text-red-600"
+                            variant="ghost"
+                            className="h-8 w-8 text-red-500 hover:bg-muted hover:text-red-600"
                         />
                     </div>
                 </TooltipProvider>

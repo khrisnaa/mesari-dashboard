@@ -10,22 +10,32 @@ import { TooltipProvider } from '../ui/tooltip';
 export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] => [
     {
         id: 'rowNumber',
-        header: '#',
+        header: () => <div className="px-2 text-center">#</div>,
         cell: ({ row, table }) => {
             const pageIndex = table.getState().pagination.pageIndex;
             const pageSize = table.getState().pagination.pageSize;
-            return <span>{pageIndex * pageSize + row.index + 1}</span>;
+
+            const rowNumber = pageIndex * pageSize + row.index + 1;
+
+            return <div className="px-2 text-center">{rowNumber}</div>;
         },
         enableSorting: false,
         enableHiding: false,
         meta: { width: { type: 'fixed', px: 56 } },
     },
-
     {
         accessorKey: 'id',
-        header: 'Order ID',
+        header: () => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 cursor-default data-[state=open]:bg-accent"
+            >
+                <span>Order ID</span>
+            </Button>
+        ),
         cell: ({ row }) => (
-            <span className="font-mono text-xs">{row.original.id.slice(0, 8)}…</span>
+            <span className="truncate font-mono font-medium">{row.original.id.slice(0, 8)}…</span>
         ),
         meta: {
             width: { type: 'fixed', px: 140 },
@@ -40,21 +50,26 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
             <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center justify-center"
+                className="-ml-3 h-8 cursor-default data-[state=open]:bg-accent"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Customer
+                <span>Customer</span>
                 <ArrowUpIcon
                     className={cn(
-                        'ml-1 size-3 transition-all',
+                        'ml-2 h-3 w-3 transition-all',
                         column.getIsSorted() === 'asc'
                             ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
                     )}
                 />
             </Button>
         ),
-        cell: ({ row }) => <div className="px-3">{row.original.user?.name ?? '-'}</div>,
+        cell: ({ row }) => {
+            const name = row.original.user?.name;
+            return <div className="truncate font-medium">{name}</div>;
+        },
         meta: { width: { type: 'flex', fr: 1 } },
     },
 
@@ -64,32 +79,56 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
             <Button
                 variant="ghost"
                 size="sm"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Total
+                <span>Total</span>
                 <ArrowUpIcon
                     className={cn(
-                        'ml-1 size-3 transition-all',
+                        'ml-2 h-3 w-3 transition-all',
                         column.getIsSorted() === 'asc'
                             ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
                     )}
                 />
             </Button>
         ),
-        cell: ({ row }) => (
-            <div className="px-3 font-medium">
-                Rp {Number(row.original.total).toLocaleString('id-ID')}
-            </div>
-        ),
+        cell: ({ row }) => {
+            const total = row.original.total;
+            return (
+                <div className="truncate font-medium">
+                    Rp {Number(total).toLocaleString('id-ID')}
+                </div>
+            );
+        },
         meta: { width: { type: 'fixed', px: 140 } },
     },
 
     {
         accessorKey: 'order_status',
-        header: 'Order Status',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                <span>Order Status</span>
+                <ArrowUpIcon
+                    className={cn(
+                        'ml-2 h-3 w-3 transition-all',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
+                    )}
+                />
+            </Button>
+        ),
         cell: ({ row }) => {
-            const order = row.original;
             const status: string = row.original.status;
 
             const statusVariantMap: Record<
@@ -112,17 +151,31 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
 
     {
         accessorKey: 'payment_status',
-        header: 'Payment',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                <span>Payment Status</span>
+                <ArrowUpIcon
+                    className={cn(
+                        'ml-2 h-3 w-3 transition-all',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
+                    )}
+                />
+            </Button>
+        ),
         cell: ({ row }) => {
             const status = row.original.payment_status;
 
             return (
-                <div>
-                    <StatusBadge
-                        variant={status === 'paid' ? 'success' : 'warning'}
-                        label={status}
-                    />
-                </div>
+                <StatusBadge variant={status === 'paid' ? 'success' : 'warning'} label={status} />
             );
         },
         meta: { width: { type: 'fixed', px: 200 } },
@@ -134,11 +187,13 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
 
             return (
                 <TooltipProvider delayDuration={150}>
-                    <div className="flex items-center justify-center px-2">
+                    <div className="flex items-center justify-end gap-2 pr-2">
                         <ActionIconButton
                             icon={<EditIcon className="h-4 w-4" />}
                             tooltip="Edit Status"
                             onClick={() => onEdit(order)}
+                            variant="ghost"
+                            className="h-8 w-8 hover:bg-muted"
                         />
                     </div>
                 </TooltipProvider>

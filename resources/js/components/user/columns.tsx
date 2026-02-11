@@ -2,9 +2,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 import { User } from '@/types/user';
-import { formatDate } from '@/utils/formatDate';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, BanIcon, CheckCircleIcon, EditIcon } from 'lucide-react';
+import { ArrowUpIcon, BanIcon, CheckCircleIcon, EditIcon, ImageIcon } from 'lucide-react';
 import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
 import { TooltipProvider } from '../ui/tooltip';
@@ -15,19 +14,51 @@ export const getColumns = (
 ): ColumnDef<User>[] => [
     {
         id: 'rowNumber',
-        header: '#',
+        header: () => <div className="px-2 text-center">#</div>,
         cell: ({ row, table }) => {
             const pageIndex = table.getState().pagination.pageIndex;
             const pageSize = table.getState().pagination.pageSize;
 
-            // index on current page → add offset for real number
             const rowNumber = pageIndex * pageSize + row.index + 1;
 
-            return <span>{rowNumber}</span>;
+            return <div className="px-2 text-center">{rowNumber}</div>;
         },
         enableSorting: false,
         enableHiding: false,
         meta: { width: { type: 'fixed', px: 56 } },
+    },
+    {
+        id: 'avatar',
+        header: () => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 cursor-default data-[state=open]:bg-accent"
+            >
+                <span>Name</span>
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const avatar = row.original.avatar;
+            return (
+                <div className="py-2 pr-2">
+                    <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border bg-muted/50">
+                        {avatar ? (
+                            <img
+                                src={avatar}
+                                alt={row.original.name}
+                                className="h-full w-full object-cover transition-transform hover:scale-105"
+                                loading="lazy"
+                            />
+                        ) : (
+                            <ImageIcon className="h-5 w-5 text-muted-foreground/50" />
+                        )}
+                    </div>
+                </div>
+            );
+        },
+        enableSorting: false,
+        meta: { width: { type: 'fixed', px: 80 } },
     },
     {
         accessorKey: 'name',
@@ -35,25 +66,27 @@ export const getColumns = (
             <Button
                 variant="ghost"
                 size="sm"
-                className="flex cursor-pointer items-center justify-center"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Name
+                <span>Name</span>
                 <ArrowUpIcon
                     className={cn(
-                        'size-3 transition-all duration-300',
+                        'ml-2 h-3 w-3 transition-all',
                         column.getIsSorted() === 'asc'
                             ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
                     )}
                 />
             </Button>
         ),
         cell: ({ row }) => {
             const name = row.original.name;
-            return <div className="px-3">{name}</div>;
+            return <div className="max-w-[200px] truncate font-medium">{name}</div>;
         },
-        meta: { width: { type: 'flex', fr: 2 } },
+        meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         accessorKey: 'email',
@@ -61,53 +94,27 @@ export const getColumns = (
             <Button
                 variant="ghost"
                 size="sm"
-                className="flex cursor-pointer items-center justify-center"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Email
+                <span>Email</span>
                 <ArrowUpIcon
                     className={cn(
-                        'size-3 transition-all duration-300',
+                        'ml-2 h-3 w-3 transition-all',
                         column.getIsSorted() === 'asc'
                             ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
                     )}
                 />
             </Button>
         ),
         cell: ({ row }) => {
             const email = row.original.email;
-            return <div className="px-3">{email}</div>;
+            return <div className="truncate font-medium">{email}</div>;
         },
         meta: { width: { type: 'flex', fr: 1 } },
-    },
-
-    {
-        accessorKey: 'created_at',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                size="sm"
-                className="flex cursor-pointer items-center justify-center"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            >
-                Created At
-                <ArrowUpIcon
-                    className={cn(
-                        'size-3 transition-all duration-300',
-                        column.getIsSorted() === 'asc'
-                            ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
-                    )}
-                />
-            </Button>
-        ),
-        cell: ({ row }) => {
-            const createdAt = row.original.created_at;
-
-            return <div className="px-3 whitespace-nowrap">{formatDate(createdAt)}</div>;
-        },
-        meta: { width: { type: 'fixed', px: 160 } },
     },
 
     {
@@ -116,16 +123,18 @@ export const getColumns = (
             <Button
                 variant="ghost"
                 size="sm"
-                className="flex cursor-pointer items-center justify-center"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Verified
+                <span>Verified</span>
                 <ArrowUpIcon
                     className={cn(
-                        'size-3 transition-all duration-300',
+                        'ml-2 h-3 w-3 transition-all',
                         column.getIsSorted() === 'asc'
                             ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
                     )}
                 />
             </Button>
@@ -134,32 +143,32 @@ export const getColumns = (
             const verifiedAt = row.original.email_verified_at;
 
             return (
-                <div className="flex justify-center px-3">
-                    <StatusBadge
-                        variant={verifiedAt ? 'success' : 'default'}
-                        label={verifiedAt ? 'Verified' : 'Not Verified'}
-                    />
-                </div>
+                <StatusBadge
+                    variant={verifiedAt ? 'success' : 'default'}
+                    label={verifiedAt ? 'Verified' : 'Not Verified'}
+                />
             );
         },
         meta: { width: { type: 'fixed', px: 200 } },
     },
     {
-        accessorKey: 'status',
+        accessorKey: 'is_active',
         header: ({ column }) => (
             <Button
                 variant="ghost"
                 size="sm"
-                className="flex cursor-pointer items-center justify-center"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-                Status
+                <span>Status</span>
                 <ArrowUpIcon
                     className={cn(
-                        'size-3 transition-all duration-300',
+                        'ml-2 h-3 w-3 transition-all',
                         column.getIsSorted() === 'asc'
                             ? 'rotate-0 opacity-100'
-                            : '-rotate-180 opacity-40',
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
                     )}
                 />
             </Button>
@@ -169,11 +178,7 @@ export const getColumns = (
             const status = isActive ? 'Active' : 'Inactive';
             const variant = isActive ? 'success' : 'danger';
 
-            return (
-                <div className="flex justify-center px-3">
-                    <StatusBadge variant={variant} label={status} />
-                </div>
-            );
+            return <StatusBadge variant={variant} label={status} />;
         },
         meta: { width: { type: 'fixed', px: 200 } },
     },
@@ -186,11 +191,13 @@ export const getColumns = (
 
             return (
                 <TooltipProvider delayDuration={150}>
-                    <div className="flex items-center justify-center gap-2 px-2">
+                    <div className="flex items-center justify-end gap-2 pr-2">
                         <ActionIconButton
                             icon={<EditIcon className="h-4 w-4" />}
                             tooltip="Edit User"
                             onClick={() => onEdit(user)}
+                            variant="ghost"
+                            className="h-8 w-8 hover:bg-muted"
                         />
 
                         <ActionIconButton
@@ -203,11 +210,13 @@ export const getColumns = (
                             }
                             tooltip={isActive ? 'Deactivate User' : 'Activate User'}
                             onClick={() => onActive(user)}
-                            className={
+                            variant="ghost"
+                            className={cn(
+                                'h-8 w-8 hover:bg-muted',
                                 isActive
                                     ? 'text-red-500 hover:text-red-600'
-                                    : 'text-green-600 hover:text-green-700'
-                            }
+                                    : 'text-green-600 hover:text-green-700',
+                            )}
                         />
                     </div>
                 </TooltipProvider>
