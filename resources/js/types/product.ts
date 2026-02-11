@@ -6,6 +6,12 @@ export interface Product {
     slug: string;
     description?: string;
     is_published: boolean;
+    is_customizable: boolean;
+    additional_price: number;
+    discount_type: string;
+    discount_value: number;
+    discount_start_at: string;
+    discount_end_at: string;
     variants: ProductVariant[];
     category: Category;
     images: ProductImage[];

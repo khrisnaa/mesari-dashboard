@@ -58,15 +58,12 @@ export const updateProductSchema = z.object({
 
     category_id: z.string().min(1, 'Product category is required'),
 
-    discount: z
-        .object({
-            type: z.string().optional(),
-            value: z.number().optional(),
-            start_at: z.string().optional(),
-            end_at: z.string().optional(),
-            is_active: z.boolean().optional(),
-        })
-        .optional(),
+    is_customizable: z.boolean(),
+    additional_price: z.number().optional(),
+    discount_type: z.string().optional(),
+    discount_value: z.number().optional(),
+    discount_start_at: z.string().optional(),
+    discount_end_at: z.string().optional(),
 });
 
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;

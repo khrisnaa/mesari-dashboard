@@ -25,6 +25,7 @@ export interface Variant {
     stock: number;
     isPriceAuto?: boolean;
     isStockAuto?: boolean;
+    isBaseParentAuto?: boolean;
 }
 
 interface PricingFormProps {
@@ -89,10 +90,27 @@ const PricingForm = ({
 
     // load snapshot
     useEffect(() => {
+        // if (open) {
+        //     const snapshot = form.getValues('variants') ?? [];
+
+        //     const unique = dedupe(snapshot);
+        //     setInitialVariants(unique);
+        //     setVariants(unique);
+        //     setSelectedVariants([]);
+        // }
+
         if (open) {
             const snapshot = form.getValues('variants') ?? [];
 
-            const unique = dedupe(snapshot);
+            // Reset variant price & stock ke 0
+            const reset = snapshot.map((v: Variant) => ({
+                ...v,
+                price: v.isBaseParentAuto ? 0 : v.price,
+                stock: v.isBaseParentAuto ? 0 : v.stock,
+                isBaseParentAuto: false,
+            }));
+
+            const unique = dedupe(reset);
             setInitialVariants(unique);
             setVariants(unique);
             setSelectedVariants([]);
@@ -223,6 +241,9 @@ const PricingForm = ({
             color: v.color ? { ...v.color } : undefined,
             price: baseParentPrice ?? 0,
             stock: baseParentStock ?? 0,
+            isPriceAuto: true,
+            isStockAuto: true,
+            isBaseParentAuto: true,
         }));
 
         form.setValue('variants', finalData, { shouldDirty: true });

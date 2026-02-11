@@ -41,7 +41,7 @@ import { useState } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
 
-export const DISCOUNT_EVENT_TYPES = [
+export const DISCOUNT_TYPES = [
     { value: 'percentage', label: 'Percentage' },
     { value: 'fixed', label: 'Fixed' },
 ];
@@ -86,12 +86,12 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
             base_price: 0,
             base_stock: 0,
             selected_sizes: [],
-            discount: {
-                type: '',
-                value: 0,
-                start_at: '',
-                end_at: '',
-            },
+            is_customizable: false,
+            additional_price: 0,
+            discount_type: '',
+            discount_value: 0,
+            discount_start_at: '',
+            discount_end_at: '',
         },
     });
 
@@ -198,9 +198,9 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
     };
 
     // handle discount type, start and end date
-    const startValue = form.watch('discount.start_at');
-    const endValue = form.watch('discount.end_at');
-    const discountType = form.watch('discount.type');
+    const startValue = form.watch('discount_start_at');
+    const endValue = form.watch('discount_end_at');
+    const discountType = form.watch('discount_type');
 
     // handle variant pricing
     const [isDifferentPricing, setIsDifferentPricing] = useState(false);
@@ -214,19 +214,20 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
         formData.append('category_id', data.category_id);
         formData.append('description', data.description || '');
         formData.append('is_published', data.is_published ? '1' : '0');
+        formData.append('is_customizable', data.is_published ? '1' : '0');
+        formData.append('discount_type', data.discount_type || '');
+        formData.append('discount_value', data.discount_value ? String(data.discount_value) : '');
+        formData.append('discount_start_at', data.discount_start_at || '');
+        formData.append('discount_end_at', data.discount_end_at || '');
+        formData.append(
+            'additional_price',
+            data.additional_price ? String(data.additional_price) : '',
+        );
 
         images.forEach((img, index) => {
             formData.append(`images[${index}][type]`, img.type);
             if (img.file) {
                 formData.append(`images[${index}][file]`, img.file);
-            }
-        });
-
-        Object.entries(data.discount ?? {}).forEach(([key, val]) => {
-            if (key === 'is_active') {
-                formData.append(`discount[${key}]`, val ? '1' : '0');
-            } else {
-                formData.append(`discount[${key}]`, val != null ? String(val) : '');
             }
         });
 
@@ -475,7 +476,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
-                                            name="discount.value"
+                                            name="discount_value"
                                             render={({ field }) => {
                                                 const isPercentage = discountType === 'percentage';
 
@@ -515,7 +516,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
 
                                                                             if (numeric > 100) {
                                                                                 form.setError(
-                                                                                    'discount.value',
+                                                                                    'discount_value',
                                                                                     {
                                                                                         type: 'manual',
                                                                                         message:
@@ -525,7 +526,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                                                                 numeric = 100;
                                                                             } else {
                                                                                 form.clearErrors(
-                                                                                    'discount.value',
+                                                                                    'discount_value',
                                                                                 );
                                                                             }
 
@@ -566,7 +567,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
 
                                         <FormField
                                             control={form.control}
-                                            name="discount.type"
+                                            name="discount_type"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Discount Type</FormLabel>
@@ -575,7 +576,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                                             onValueChange={(value) => {
                                                                 const current =
                                                                     form.getValues(
-                                                                        'discount.value',
+                                                                        'discount_value',
                                                                     ) ?? 0;
 
                                                                 if (
@@ -583,7 +584,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                                                     current > 100
                                                                 ) {
                                                                     form.setValue(
-                                                                        'discount.value',
+                                                                        'discount_value',
                                                                         100,
                                                                         {
                                                                             shouldValidate: true,
@@ -592,7 +593,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                                                     );
                                                                 }
 
-                                                                form.clearErrors('discount.value');
+                                                                form.clearErrors('discount_value');
                                                                 field.onChange(value);
                                                             }}
                                                             defaultValue={field.value ?? undefined}
@@ -601,7 +602,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                                                 <SelectValue placeholder="Select discount type" />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                {DISCOUNT_EVENT_TYPES.map(
+                                                                {DISCOUNT_TYPES.map(
                                                                     (discount, i) => (
                                                                         <SelectItem
                                                                             key={i}
@@ -623,7 +624,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
-                                            name="discount.start_at"
+                                            name="discount_start_at"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Start Date</FormLabel>
@@ -643,7 +644,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
 
                                         <FormField
                                             control={form.control}
-                                            name="discount.end_at"
+                                            name="discount_end_at"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>End Date</FormLabel>
@@ -664,6 +665,75 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                         />
                                     </div>
                                 </div>
+                            </div>
+
+                            <div className="space-y-4 rounded-lg border p-4">
+                                <h4 className="font-semibold">Customization Settings</h4>
+
+                                {/* Toggle is_customizable */}
+                                <FormField
+                                    control={form.control}
+                                    name="is_customizable"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-3">
+                                            <div className="space-y-1">
+                                                <FormLabel>Enable Customization</FormLabel>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Allow customers to customize this product.
+                                                </p>
+                                            </div>
+
+                                            <FormControl>
+                                                <div className="flex items-center justify-between rounded-lg border px-3 py-2">
+                                                    <span className="text-sm font-medium">
+                                                        {field.value
+                                                            ? 'Customizable'
+                                                            : 'Not Customizable'}
+                                                    </span>
+
+                                                    <Switch
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </div>
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* Additional price only if customizable */}
+                                {form.watch('is_customizable') && (
+                                    <div className="pt-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="additional_price"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Additional Customization Price
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="0"
+                                                            inputMode="numeric"
+                                                            {...field}
+                                                            value={formatNumber(field.value)}
+                                                            onChange={(e) => {
+                                                                const numericValue = parseNumber(
+                                                                    e.target.value,
+                                                                );
+                                                                field.onChange(numericValue);
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </section>
 
