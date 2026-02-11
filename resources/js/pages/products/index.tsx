@@ -40,7 +40,7 @@ const Index = ({ products }: PageProps) => {
             <Head title="Products" />
             <FlashToast />
 
-            <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
+            <div className="container mx-auto flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Products"
                     description="Track your products seamlessly, ensuring smooth organization and effortless control."
@@ -52,13 +52,12 @@ const Index = ({ products }: PageProps) => {
                         </Button>
                     }
                 />
-                <div className="container mx-auto">
-                    <DataTable
-                        columns={columns}
-                        data={products.data}
-                        pagination={(({ data, ...rest }) => rest)(products)}
-                    />
-                </div>
+
+                <DataTable
+                    columns={columns}
+                    data={products.data}
+                    pagination={(({ data, ...rest }) => rest)(products)}
+                />
             </div>
 
             <ArchiveDialog

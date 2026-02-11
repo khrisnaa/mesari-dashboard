@@ -63,7 +63,7 @@ const Create = () => {
 
             <form
                 onSubmit={submit}
-                className="container mx-auto flex max-w-7xl flex-1 flex-col gap-8 p-4 md:p-8"
+                className="container mx-auto flex flex-1 flex-col gap-8 p-4 md:p-8"
             >
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <PageHeader

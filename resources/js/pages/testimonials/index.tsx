@@ -56,7 +56,7 @@ const Index = ({ testimonials }: PageProps) => {
             <Head title="Testimonials" />
             <FlashToast />
 
-            <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
+            <div className="container mx-auto flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Testimonials"
                     description="Manage customer testimonials to build trust and improve credibility."
@@ -67,14 +67,12 @@ const Index = ({ testimonials }: PageProps) => {
                     }
                 />
 
-                <div className="container mx-auto">
-                    <DataTable
-                        name="faq"
-                        columns={columns}
-                        data={testimonials.data}
-                        pagination={(({ data, ...rest }) => rest)(testimonials)}
-                    />
-                </div>
+                <DataTable
+                    name="faq"
+                    columns={columns}
+                    data={testimonials.data}
+                    pagination={(({ data, ...rest }) => rest)(testimonials)}
+                />
             </div>
 
             <CreateDialog

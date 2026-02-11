@@ -40,7 +40,7 @@ const Index = ({ banners }: PageProps) => {
             <Head title="Banners" />
             <FlashToast />
 
-            <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
+            <div className="container mx-auto flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Banners"
                     description="Manage homepage banners and promotional content."
@@ -53,14 +53,12 @@ const Index = ({ banners }: PageProps) => {
                     }
                 />
 
-                <div className="container mx-auto">
-                    <DataTable
-                        name="banner"
-                        columns={columns}
-                        data={banners.data}
-                        pagination={(({ data, ...rest }) => rest)(banners)}
-                    />
-                </div>
+                <DataTable
+                    name="banner"
+                    columns={columns}
+                    data={banners.data}
+                    pagination={(({ data, ...rest }) => rest)(banners)}
+                />
             </div>
 
             <DeleteDialog

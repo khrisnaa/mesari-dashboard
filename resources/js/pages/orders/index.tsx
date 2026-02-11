@@ -38,20 +38,18 @@ const Index = ({ orders }: PageProps) => {
             <Head title="Orders" />
             <FlashToast />
 
-            <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
+            <div className="container mx-auto flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Orders"
                     description="Manage and track all customer orders in one place."
                 />
 
-                <div className="container mx-auto">
-                    <DataTable
-                        name="orders"
-                        columns={columns}
-                        data={orders.data}
-                        pagination={(({ data, ...rest }) => rest)(orders)}
-                    />
-                </div>
+                <DataTable
+                    name="orders"
+                    columns={columns}
+                    data={orders.data}
+                    pagination={(({ data, ...rest }) => rest)(orders)}
+                />
             </div>
 
             <EditDialog

@@ -46,20 +46,18 @@ const Index = ({ users }: PageProps) => {
             <Head title="Users" />
             <FlashToast />
 
-            <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
+            <div className="container mx-auto flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Users"
                     description="Manage application users and their access status."
                 />
 
-                <div className="container mx-auto">
-                    <DataTable
-                        name="users"
-                        columns={columns}
-                        data={users.data}
-                        pagination={(({ data, ...rest }) => rest)(users)}
-                    />
-                </div>
+                <DataTable
+                    name="users"
+                    columns={columns}
+                    data={users.data}
+                    pagination={(({ data, ...rest }) => rest)(users)}
+                />
             </div>
 
             <EditDialog

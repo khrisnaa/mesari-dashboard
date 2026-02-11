@@ -294,7 +294,10 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
             <Head title="Edit Product" />
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="container mx-auto space-y-6 p-4"
+                >
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <PageHeader
                             title="Edit Product"

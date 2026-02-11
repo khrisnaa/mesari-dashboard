@@ -37,7 +37,7 @@ const Edit = ({ profile }: PageProps) => {
                 {...companyProfile.update.form(profile)}
                 resetOnSuccess={false}
                 disableWhileProcessing
-                className="container mx-auto flex max-w-7xl flex-1 flex-col gap-8 p-4 md:p-8"
+                className="container mx-auto flex flex-1 flex-col gap-8 p-4 md:p-8"
             >
                 {({ processing, errors }) => (
                     <>

@@ -56,7 +56,7 @@ const Index = ({ categories }: PageProps) => {
             <Head title="Categories" />
             <FlashToast />
 
-            <div className="flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
+            <div className="container mx-auto flex h-full flex-1 flex-col gap-8 rounded-xl p-4">
                 <PageHeader
                     title="Categories"
                     description="Manage your categories efficiently and keep your products organized."
@@ -67,14 +67,12 @@ const Index = ({ categories }: PageProps) => {
                     }
                 />
 
-                <div className="container mx-auto">
-                    <DataTable
-                        name="category"
-                        columns={columns}
-                        data={categories.data}
-                        pagination={(({ data, ...rest }) => rest)(categories)}
-                    />
-                </div>
+                <DataTable
+                    name="category"
+                    columns={columns}
+                    data={categories.data}
+                    pagination={(({ data, ...rest }) => rest)(categories)}
+                />
             </div>
 
             <CreateDialog

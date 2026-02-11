@@ -37,7 +37,7 @@ const Index = ({ profile }: PageProps) => {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Company Profile" />
 
-            <div className="container mx-auto max-w-7xl space-y-8 p-4 md:p-8">
+            <div className="container mx-auto space-y-8 p-4 md:p-8">
                 {/* Header Section */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
