@@ -6,6 +6,7 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/password/confirm';
 import { Form, Head } from '@inertiajs/react';
+import { Lock } from 'lucide-react';
 
 export default function ConfirmPassword() {
     return (
@@ -20,28 +21,31 @@ export default function ConfirmPassword() {
                     <div className="space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                autoComplete="current-password"
-                                autoFocus
-                            />
+                            <div className="relative">
+                                <Lock className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    placeholder="••••••••"
+                                    autoComplete="current-password"
+                                    autoFocus
+                                    className="pl-9"
+                                />
+                            </div>
 
                             <InputError message={errors.password} />
                         </div>
 
-                        <div className="flex items-center">
-                            <Button
-                                className="w-full"
-                                disabled={processing}
-                                data-test="confirm-password-button"
-                            >
-                                {processing && <Spinner />}
-                                Confirm password
-                            </Button>
-                        </div>
+                        <Button
+                            size="lg"
+                            className="w-full rounded-full"
+                            disabled={processing}
+                            data-test="confirm-password-button"
+                        >
+                            {processing && <Spinner className="mr-2" />}
+                            Confirm password
+                        </Button>
                     </div>
                 )}
             </Form>
