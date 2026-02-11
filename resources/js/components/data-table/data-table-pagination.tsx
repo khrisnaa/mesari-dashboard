@@ -1,9 +1,16 @@
+import { Button } from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { PaginationDetails } from '@/types/pagination';
 import { router, usePage } from '@inertiajs/react';
 import { Table } from '@tanstack/react-table';
-import { Button } from '../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface DataTablePaginationProps<TData> {
     selected: {
@@ -64,36 +71,21 @@ export const DataTablePagination = <TData,>({
 
     const pages = generatePages();
 
-    const renderPage = (p: number | 'ellipsis', i: number) => {
-        if (p === 'ellipsis') {
-            return (
-                <span key={i} className="flex w-10 items-center justify-center px-2">
-                    ...
-                </span>
-            );
-        }
-
-        return (
-            <Button
-                key={i}
-                size="sm"
-                variant={current === p ? 'default' : 'outline'}
-                onClick={() => goTo(p)}
-                className={cn(last <= 7 ? '' : 'w-10')}
-            >
-                {p}
-            </Button>
-        );
-    };
-
     return (
-        <div className="flex items-center justify-end">
-            {/* <div className="text-sm text-muted-foreground">
-                {selected.count} of {selected.total} row(s) selected.
-            </div> */}
+        <div className="flex items-center justify-between px-2">
+            {/* Optional: Selected Row Count */}
+            <div className="hidden flex-1 text-sm text-muted-foreground sm:block">
+                {pagination.total > 0 && (
+                    <>
+                        Showing {pagination.from ?? 0} to {pagination.to ?? 0} of {pagination.total}{' '}
+                        {pagination.total === 1 ? 'item' : 'items'}.
+                    </>
+                )}
+            </div>
 
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="mr-4 flex items-center justify-center space-x-2">
+            <div className="flex items-center space-x-6 lg:space-x-8">
+                {/* Rows Per Page Selector */}
+                <div className="flex items-center space-x-2">
                     <p className="text-sm font-medium">Rows per page</p>
                     <Select
                         value={`${params?.per_page ?? 10}`}
@@ -105,6 +97,7 @@ export const DataTablePagination = <TData,>({
                                 {
                                     ...params,
                                     per_page: size,
+                                    page: 1, // Reset to first page when changing page size
                                 },
                                 {
                                     preserveState: true,
@@ -114,7 +107,7 @@ export const DataTablePagination = <TData,>({
                             );
                         }}
                     >
-                        <SelectTrigger className="h-8 w-[70px]">
+                        <SelectTrigger className="h-8 w-[70px] rounded-full">
                             <SelectValue placeholder={table.getState().pagination.pageSize} />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -126,34 +119,72 @@ export const DataTablePagination = <TData,>({
                         </SelectContent>
                     </Select>
                 </div>
-                {/* Prev */}
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!pagination.prev_page_url}
-                    onClick={() => {
-                        if (!pagination.prev_page_url) return;
-                        goTo(pagination.current_page - 1);
-                    }}
-                >
-                    Previous
-                </Button>
 
-                {/* Pages */}
-                {pages.map(renderPage)}
+                {/* Navigation Buttons */}
+                <div className="flex items-center space-x-2">
+                    {/* Previous Button */}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={!pagination.prev_page_url}
+                        onClick={() => {
+                            if (!pagination.prev_page_url) return;
+                            goTo(pagination.current_page - 1);
+                        }}
+                        className="h-8 rounded-full px-3"
+                    >
+                        <ChevronLeft className="mr-1 h-4 w-4" />
+                        Previous
+                    </Button>
 
-                {/* Next */}
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!pagination.next_page_url}
-                    onClick={() => {
-                        if (!pagination.next_page_url) return;
-                        goTo(pagination.current_page + 1);
-                    }}
-                >
-                    Next
-                </Button>
+                    {/* Page Numbers */}
+                    <div className="hidden items-center gap-1 sm:flex">
+                        {pages.map((p, i) => {
+                            if (p === 'ellipsis') {
+                                return (
+                                    <span
+                                        key={i}
+                                        className="flex h-8 w-8 items-center justify-center text-sm text-muted-foreground"
+                                    >
+                                        ...
+                                    </span>
+                                );
+                            }
+
+                            return (
+                                <Button
+                                    key={i}
+                                    variant={current === p ? 'default' : 'ghost'}
+                                    size="sm"
+                                    onClick={() => goTo(p)}
+                                    className={cn(
+                                        'h-8 w-8 rounded-full p-0 font-medium',
+                                        current === p
+                                            ? ''
+                                            : 'text-muted-foreground hover:text-foreground',
+                                    )}
+                                >
+                                    {p}
+                                </Button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Next Button */}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={!pagination.next_page_url}
+                        onClick={() => {
+                            if (!pagination.next_page_url) return;
+                            goTo(pagination.current_page + 1);
+                        }}
+                        className="h-8 rounded-full px-3"
+                    >
+                        Next
+                        <ChevronRight className="ml-1 h-4 w-4" />
+                    </Button>
+                </div>
             </div>
         </div>
     );
