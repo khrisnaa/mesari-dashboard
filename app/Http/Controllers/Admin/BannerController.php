@@ -41,6 +41,7 @@ class BannerController extends Controller
 
     public function edit(Banner $banner)
     {
+
         $banner->backdrop_path = $banner->backdrop_path
             ? '/storage/' . $banner->backdrop_path
             : null;

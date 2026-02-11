@@ -1,6 +1,7 @@
 import categories from '@/routes/categories';
 import { DialogComponentProps } from '@/types/dialog';
 import { Form } from '@inertiajs/react';
+import { Plus, X } from 'lucide-react';
 import { SubmitButton } from '../buttons/submit-button';
 import InputError from '../input-error';
 import { Button } from '../ui/button';
@@ -18,7 +19,7 @@ import { Label } from '../ui/label';
 export const CreateDialog = ({ isOpen, close, onOpenChange }: DialogComponentProps) => {
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle>Create Category</DialogTitle>
                     <DialogDescription>Add a new category to your collection.</DialogDescription>
@@ -33,16 +34,17 @@ export const CreateDialog = ({ isOpen, close, onOpenChange }: DialogComponentPro
                 >
                     {({ processing, errors }) => (
                         <>
-                            <div className="space-y-6">
+                            <div className="grid gap-4 py-2">
+                                {/* Name */}
                                 <div className="space-y-2">
                                     <Label htmlFor="name">Name</Label>
                                     <Input
                                         id="name"
+                                        name="name"
                                         type="text"
+                                        placeholder="Category name"
                                         autoFocus
                                         autoComplete="off"
-                                        name="name"
-                                        placeholder="Category name"
                                     />
                                     <InputError message={errors.name} />
                                 </div>
@@ -52,15 +54,21 @@ export const CreateDialog = ({ isOpen, close, onOpenChange }: DialogComponentPro
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    size="lg"
-                                    className="rounded-full"
                                     onClick={close}
                                     disabled={processing}
+                                    size="lg"
+                                    className="gap-2 rounded-full"
                                 >
+                                    <X className="h-4 w-4" />
                                     Cancel
                                 </Button>
 
-                                <SubmitButton processing={processing}>Create</SubmitButton>
+                                <SubmitButton processing={processing}>
+                                    <span className="flex items-center gap-2">
+                                        <Plus className="h-4 w-4" />
+                                        Create Category
+                                    </span>
+                                </SubmitButton>
                             </DialogFooter>
                         </>
                     )}

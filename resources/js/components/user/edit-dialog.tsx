@@ -2,6 +2,7 @@ import users from '@/routes/users';
 import { DialogComponentProps } from '@/types/dialog';
 import { User } from '@/types/user';
 import { Form } from '@inertiajs/react';
+import { Save, X } from 'lucide-react';
 import { SubmitButton } from '../buttons/submit-button';
 import InputError from '../input-error';
 import { Button } from '../ui/button';
@@ -27,11 +28,11 @@ export const EditDialog = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+            <DialogContent className="sm:max-w-[600px]" onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>Edit User</DialogTitle>
                     <DialogDescription>
-                        Admin can modify basic user information and account status.
+                        Update user details and manage account status.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -43,29 +44,30 @@ export const EditDialog = ({
                 >
                     {({ processing, errors }) => (
                         <>
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input
-                                        id="name"
-                                        name="name"
-                                        type="text"
-                                        autoComplete="off"
-                                        defaultValue={user.name}
-                                    />
-                                    <InputError message={errors.name} />
-                                </div>
+                            <div className="grid gap-4 py-2">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name">Name</Label>
+                                        <Input
+                                            id="name"
+                                            name="name"
+                                            defaultValue={user.name}
+                                            autoComplete="off"
+                                        />
+                                        <InputError message={errors.name} />
+                                    </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="email">Email</Label>
-                                    <Input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        autoComplete="off"
-                                        defaultValue={user.email}
-                                    />
-                                    <InputError message={errors.email} />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">Email</Label>
+                                        <Input
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            defaultValue={user.email}
+                                            autoComplete="off"
+                                        />
+                                        <InputError message={errors.email} />
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
@@ -73,39 +75,49 @@ export const EditDialog = ({
                                     <Input
                                         id="phone"
                                         name="phone"
-                                        type="text"
-                                        autoComplete="off"
                                         defaultValue={user.phone ?? ''}
+                                        autoComplete="off"
+                                        placeholder="e.g. +62..."
                                     />
                                     <InputError message={errors.phone} />
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label>Email Verified</Label>
-                                    <Input
-                                        value={user.email_verified_at ?? 'Not Verified'}
-                                        disabled
-                                    />
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label className="text-muted-foreground">Verified At</Label>
+                                        <Input
+                                            value={user.email_verified_at ?? 'Not Verified'}
+                                            disabled
+                                            className="bg-muted text-muted-foreground"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-muted-foreground">Created At</Label>
+                                        <Input
+                                            value={user.created_at}
+                                            disabled
+                                            className="bg-muted text-muted-foreground"
+                                        />
+                                    </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label>Created At</Label>
-                                    <Input value={user.created_at} disabled />
-                                </div>
-
-                                <div className="flex items-center justify-between py-2">
-                                    <Label>Status</Label>
-                                    <div className="flex items-center gap-2">
+                                <div className="flex flex-col justify-start space-y-2">
+                                    <div className="flex items-center justify-between rounded-lg border p-3">
+                                        <div className="space-y-0.5">
+                                            <Label htmlFor="is_active" className="cursor-pointer">
+                                                Active Status
+                                            </Label>
+                                            <p className="text-xs text-muted-foreground">
+                                                Enable or disable this user account.
+                                            </p>
+                                        </div>
                                         <input type="hidden" name="is_active" value="0" />
-
                                         <Switch
                                             id="is_active"
                                             name="is_active"
                                             value="1"
                                             defaultChecked={user.is_active}
                                         />
-
-                                        <span>{user.is_active ? 'Active' : 'Inactive'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -114,15 +126,21 @@ export const EditDialog = ({
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    size="lg"
-                                    className="rounded-full"
                                     onClick={close}
                                     disabled={processing}
+                                    size="lg"
+                                    className="gap-2 rounded-full"
                                 >
+                                    <X className="h-4 w-4" />
                                     Cancel
                                 </Button>
 
-                                <SubmitButton processing={processing}>Update</SubmitButton>
+                                <SubmitButton processing={processing}>
+                                    <span className="flex items-center gap-2">
+                                        <Save className="h-4 w-4" />
+                                        Update User
+                                    </span>
+                                </SubmitButton>
                             </DialogFooter>
                         </>
                     )}

@@ -1,3 +1,4 @@
+import { SubmitButton } from '@/components/buttons/submit-button';
 import { ColorPickerDialog } from '@/components/color-picker';
 import { DateTimePicker } from '@/components/date-time-picker';
 import { PageHeader } from '@/components/page-header';
@@ -6,6 +7,7 @@ import { NewCategoryDialog } from '@/components/product/form/new-category';
 import PricingForm, { Variant } from '@/components/product/form/pricing-form';
 import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import {
     Form,
     FormControl,
@@ -36,7 +38,7 @@ import { VariantAttribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -206,7 +208,9 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
     const [isDifferentPricing, setIsDifferentPricing] = useState(false);
 
     // form submit handler
+    const [loading, setLoading] = useState(false);
     const onSubmit = (data: CreateProductInput) => {
+        setLoading(true);
         const formData = new FormData();
 
         formData.append('name', data.name);
@@ -237,6 +241,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                 const errorMessage = Object.values(errors)[0];
                 toast.error(errorMessage);
             },
+            onFinish: () => setLoading(false),
         });
     };
 
@@ -246,28 +251,43 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
-                    <PageHeader
-                        title="Create Product"
-                        description="Add a new product to your catalogue."
-                        actions={
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <PageHeader
+                            title="Create Product"
+                            description="Add a new product to your catalogue."
+                        />
+
+                        <div className="flex items-center gap-3">
                             <Button
+                                type="button"
+                                variant="outline"
+                                disabled={loading}
+                                onClick={() => history.back()}
+                                size="lg"
+                                className="gap-2 rounded-full"
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                                Cancel
+                            </Button>
+
+                            <SubmitButton
+                                processing={loading}
                                 onClick={() => {
                                     form.handleSubmit(onSubmit)();
                                 }}
-                                type="button"
-                                size="lg"
-                                className="rounded-full"
                             >
-                                <Plus />
-                                Save Product
-                            </Button>
-                        }
-                    />
+                                <span className="flex items-center gap-2">
+                                    <Plus className="h-4 w-4" />
+                                    Create Product
+                                </span>
+                            </SubmitButton>
+                        </div>
+                    </div>
 
                     <section className="flex gap-6">
                         {/* Left section */}
                         <section className="w-full space-y-6">
-                            <div className="space-y-4 rounded-lg border p-4">
+                            <Card className="space-y-4 p-4">
                                 <h4 className="font-semibold">General Information</h4>
                                 <div className="grid gap-4">
                                     <FormField
@@ -388,9 +408,9 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                         <FormMessage />
                                     </FormItem>
                                 </div>
-                            </div>
+                            </Card>
 
-                            <div className="space-y-4 rounded-lg border p-4">
+                            <Card className="space-y-4 p-4">
                                 <h4 className="font-semibold">Pricing and Stock</h4>
                                 <div className="grid gap-4">
                                     {isDifferentPricing ? (
@@ -665,9 +685,9 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                         />
                                     </div>
                                 </div>
-                            </div>
+                            </Card>
 
-                            <div className="space-y-4 rounded-lg border p-4">
+                            <Card className="space-y-4 p-4">
                                 <h4 className="font-semibold">Customization Settings</h4>
 
                                 {/* Toggle is_customizable */}
@@ -684,7 +704,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                             </div>
 
                                             <FormControl>
-                                                <div className="flex items-center justify-between rounded-lg border px-3 py-2">
+                                                <div className="flex items-center justify-between px-3 py-2">
                                                     <span className="text-sm font-medium">
                                                         {field.value
                                                             ? 'Customizable'
@@ -734,12 +754,12 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                         />
                                     </div>
                                 )}
-                            </div>
+                            </Card>
                         </section>
 
                         {/* Right Section */}
                         <section className="w-full max-w-sm space-y-6">
-                            <div className="space-y-4 rounded-lg border p-4">
+                            <Card className="space-y-4 p-4">
                                 <h4 className="font-semibold">Product Images</h4>
                                 <div className="flex flex-col gap-4">
                                     <div className="flex justify-center bg-gray-100">
@@ -754,9 +774,9 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                         onSortOrder={handleSortOrder}
                                     />
                                 </div>
-                            </div>
+                            </Card>
 
-                            <div className="space-y-4 rounded-lg border p-4">
+                            <Card className="space-y-4 p-4">
                                 <h4 className="font-semibold">Category</h4>
                                 <FormField
                                     control={form.control}
@@ -796,9 +816,9 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                         Add category
                                     </Button>
                                 </div>
-                            </div>
+                            </Card>
 
-                            <div className="space-y-4 rounded-lg border p-4">
+                            <Card className="space-y-4 p-4">
                                 <h4 className="font-semibold">Publish Settings</h4>
 
                                 <FormField
@@ -814,7 +834,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                             </div>
 
                                             <FormControl>
-                                                <div className="flex items-center justify-between rounded-lg border px-3 py-2">
+                                                <div className="flex items-center justify-between px-3 py-2">
                                                     <span className="text-sm font-medium">
                                                         {field.value ? 'Published' : 'Archived'}
                                                     </span>
@@ -830,7 +850,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                         </FormItem>
                                     )}
                                 />
-                            </div>
+                            </Card>
                         </section>
                     </section>
                 </form>
@@ -873,7 +893,7 @@ const VariantSummaryList = () => {
             {visible.map((variant, i) => (
                 <div
                     key={`${variant.size?.id}-${variant.color?.id}`}
-                    className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2"
+                    className="flex items-center justify-between bg-muted/30 px-3 py-2"
                 >
                     <div className="flex items-center gap-2">
                         {variant.color && (

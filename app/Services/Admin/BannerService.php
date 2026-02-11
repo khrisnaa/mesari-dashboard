@@ -69,7 +69,6 @@ class BannerService
             $path = $data['backdrop']->store($basePath, 'public');
 
             $banner->backdrop_path = $path;
-            $banner->backdrop_url = $path;
         }
 
         // handle main image upload (delete old file if exists)

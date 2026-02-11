@@ -25,6 +25,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import products from '@/routes/products';
 
+import { SubmitButton } from '@/components/buttons/submit-button';
 import { DateTimePicker } from '@/components/date-time-picker';
 import { PageHeader } from '@/components/page-header';
 import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
@@ -37,7 +38,7 @@ import { Product, VariantAttribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { ArrowLeft, Plus, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -236,7 +237,9 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
     const discountType = form.watch('discount_type');
 
     // form submit handler
+    const [loading, setLoading] = useState(false);
     const onSubmit = (data: UpdateProductInput) => {
+        setLoading(true);
         const formData = new FormData();
 
         formData.append('_method', 'PUT');
@@ -278,6 +281,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                 const errorMessage = Object.values(errors)[0];
                 toast.error(errorMessage);
             },
+            onFinish: () => setLoading(false),
         });
     };
 
@@ -291,24 +295,38 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
-                    <PageHeader
-                        title="Edit Product"
-                        description="Update product information and manage details."
-                        actions={
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <PageHeader
+                            title="Edit Product"
+                            description="Update product information and manage details."
+                        />
+
+                        <div className="flex items-center gap-3">
                             <Button
+                                type="button"
+                                variant="outline"
+                                disabled={loading}
+                                onClick={() => history.back()}
+                                size="lg"
+                                className="gap-2 rounded-full"
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                                Cancel
+                            </Button>
+
+                            <SubmitButton
+                                processing={loading}
                                 onClick={() => {
                                     form.handleSubmit(onSubmit)();
                                 }}
-                                type="button"
-                                size="lg"
-                                className="rounded-full"
                             >
-                                <Plus />
-                                Save Product
-                            </Button>
-                        }
-                    />
-
+                                <span className="flex items-center gap-2">
+                                    <Save className="h-4 w-4" />
+                                    Update Product
+                                </span>
+                            </SubmitButton>
+                        </div>
+                    </div>
                     <section className="flex gap-6">
                         {/* Left section */}
                         <section className="w-full space-y-6">

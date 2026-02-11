@@ -2,6 +2,7 @@ import products from '@/routes/products';
 import { DialogComponentProps } from '@/types/dialog';
 import { Product } from '@/types/product';
 import { Form } from '@inertiajs/react';
+import { Archive, Upload, X } from 'lucide-react';
 import { SubmitButton } from '../buttons/submit-button';
 import { Button } from '../ui/button';
 import {
@@ -31,11 +32,17 @@ export const ArchiveDialog = ({
     const submitLabel = isPublished ? 'Archive' : 'Publish';
     const submitVariant = isPublished ? 'destructive' : 'default';
 
+    const submitIcon = isPublished ? (
+        <Archive className="h-4 w-4" />
+    ) : (
+        <Upload className="h-4 w-4" />
+    );
+
     const nextValue = isPublished ? '0' : '1';
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-sm">
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>{description}</DialogDescription>
@@ -50,20 +57,26 @@ export const ArchiveDialog = ({
                         <div>
                             <input type="hidden" name="is_published" value={nextValue} />
 
-                            <DialogFooter>
+                            <DialogFooter className="gap-2 sm:justify-end">
+                                {/* Cancel Button */}
                                 <Button
                                     type="button"
                                     variant="outline"
                                     size="lg"
-                                    className="rounded-full"
+                                    className="gap-2 rounded-full"
                                     onClick={close}
                                     disabled={processing}
                                 >
+                                    <X className="h-4 w-4" />
                                     Cancel
                                 </Button>
 
+                                {/* Submit Button */}
                                 <SubmitButton processing={processing} variant={submitVariant}>
-                                    {submitLabel}
+                                    <span className="flex items-center gap-2">
+                                        {submitIcon}
+                                        {submitLabel}
+                                    </span>
                                 </SubmitButton>
                             </DialogFooter>
                         </div>

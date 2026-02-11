@@ -2,6 +2,7 @@ import categories from '@/routes/categories';
 import { Category } from '@/types/category';
 import { DialogComponentProps } from '@/types/dialog';
 import { Form } from '@inertiajs/react';
+import { Save, X } from 'lucide-react';
 import { SubmitButton } from '../buttons/submit-button';
 import InputError from '../input-error';
 import { Button } from '../ui/button';
@@ -26,10 +27,10 @@ export const EditDialog = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+            <DialogContent className="sm:max-w-[600px]" onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>Edit Category</DialogTitle>
-                    <DialogDescription>Update the selected category information.</DialogDescription>
+                    <DialogDescription>Update the category information.</DialogDescription>
                 </DialogHeader>
 
                 <Form
@@ -41,16 +42,17 @@ export const EditDialog = ({
                 >
                     {({ processing, errors }) => (
                         <>
-                            <div className="space-y-6">
+                            <div className="grid gap-4 py-2">
+                                {/* Name */}
                                 <div className="space-y-2">
                                     <Label htmlFor="name">Name</Label>
                                     <Input
                                         id="name"
+                                        name="name"
                                         type="text"
+                                        placeholder="Category name"
                                         autoFocus
                                         autoComplete="off"
-                                        name="name"
-                                        placeholder="Category name"
                                         defaultValue={category?.name}
                                     />
                                     <InputError message={errors.name} />
@@ -61,15 +63,21 @@ export const EditDialog = ({
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    size="lg"
-                                    className="rounded-full"
                                     onClick={close}
                                     disabled={processing}
+                                    size="lg"
+                                    className="gap-2 rounded-full"
                                 >
+                                    <X className="h-4 w-4" />
                                     Cancel
                                 </Button>
 
-                                <SubmitButton processing={processing}>Update</SubmitButton>
+                                <SubmitButton processing={processing}>
+                                    <span className="flex items-center gap-2">
+                                        <Save className="h-4 w-4" />
+                                        Update Category
+                                    </span>
+                                </SubmitButton>
                             </DialogFooter>
                         </>
                     )}
