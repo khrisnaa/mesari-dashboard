@@ -1,3 +1,5 @@
+import { BannerType } from './enum';
+
 export interface Banner {
     id: string;
     title: string | null;
@@ -8,6 +10,7 @@ export interface Banner {
     cta_link: string | null;
     sort_order: number;
     is_published: boolean;
+    type: BannerType;
     created_at: string;
     updated_at: string;
     deleted_at: string | null;

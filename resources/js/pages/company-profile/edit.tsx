@@ -55,8 +55,6 @@ const Edit = ({ profile }: PageProps) => {
                         'instagram',
                         'tiktok',
                         'facebook',
-                        'shopee',
-                        'tokopedia',
                     ]}
                     disableWhileProcessing
                     className="space-y-6"
@@ -172,21 +170,6 @@ const Edit = ({ profile }: PageProps) => {
                                     <Label>Facebook</Label>
                                     <Input name="facebook" defaultValue={profile.facebook ?? ''} />
                                     <InputError message={errors.facebook} />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label>Shopee</Label>
-                                    <Input name="shopee" defaultValue={profile.shopee ?? ''} />
-                                    <InputError message={errors.shopee} />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label>Tokopedia</Label>
-                                    <Input
-                                        name="tokopedia"
-                                        defaultValue={profile.tokopedia ?? ''}
-                                    />
-                                    <InputError message={errors.tokopedia} />
                                 </div>
                             </div>
 

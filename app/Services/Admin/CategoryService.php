@@ -49,6 +49,16 @@ class CategoryService
     // update a category
     public function update(Category $category, array $data): bool
     {
+        $data['slug'] = Str::slug($data['name']);
+
+        $exists = Category::where('slug', $data['slug'])
+            ->where('id', '!=', $category->id)
+            ->exists();
+
+        if ($exists) {
+            $data['slug'] .= '-' . uniqid();
+        }
+
         return $category->update($data);
     }
 

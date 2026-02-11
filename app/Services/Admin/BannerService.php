@@ -34,9 +34,13 @@ class BannerService
     {
         $basePath = 'banners/' . now()->format('Y/m/d');
 
-        $backdropPath = $data['backdrop']->store($basePath, 'public');
+        $backdropPath = isset($data['backdrop']) && $data['backdrop']
+            ? $data['backdrop']->store($basePath, 'public')
+            : null;
 
-        $imagePath = $data['image']->store($basePath, 'public');
+        $imagePath = isset($data['image']) && $data['image']
+            ? $data['image']->store($basePath, 'public')
+            : null;
 
         return Banner::create([
             'title' => $data['title'] ?? null,

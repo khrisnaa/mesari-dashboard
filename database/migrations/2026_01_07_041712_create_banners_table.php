@@ -16,13 +16,13 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('title')->nullable();
             $table->string('description')->nullable();
-            $table->string('backdrop_path');
-            $table->string('image_path');
+            $table->string('backdrop_path')->nullable();
+            $table->string('image_path')->nullable();
             $table->string('cta_text')->nullable();
             $table->string('cta_link')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_published')->default(false);
-            $table->enum('type', array_column(BannerType::cases(), 'value'));
+            $table->enum('type', array_column(BannerType::cases(), 'value'))->default(BannerType::BANNER->value);
             $table->timestamps();
             $table->softDeletes();
         });

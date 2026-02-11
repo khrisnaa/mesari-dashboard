@@ -27,3 +27,9 @@ export enum PaymentStatus {
     PAID = 'paid',
     FAILED = 'failed',
 }
+
+export enum BannerType {
+    MARQUEE = 'marquee',
+    POPUP = 'popup',
+    BANNER = 'banner',
+}

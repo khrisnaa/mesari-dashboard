@@ -5,11 +5,19 @@ import { ImageValue, SingleImageUpload } from '@/components/single-image-upload'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import banners from '@/routes/banners';
 import { BreadcrumbItem } from '@/types';
+import { BannerType } from '@/types/enum';
 import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -37,6 +45,7 @@ const Create = () => {
         cta_link: '',
         sort_order: 0,
         is_published: true,
+        type: 'banner',
     });
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -147,7 +156,28 @@ const Create = () => {
                             <InputError message={errors.cta_link} />
                         </div>
 
-                        <div className="flex items-center justify-between md:col-span-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="type">Banner Type</Label>
+
+                            <Select
+                                value={data.type}
+                                onValueChange={(value) => setData('type', value)}
+                            >
+                                <SelectTrigger id="type">
+                                    <SelectValue placeholder="Select banner type" />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    <SelectItem value={BannerType.MARQUEE}>Marquee</SelectItem>
+                                    <SelectItem value={BannerType.POPUP}>Popup</SelectItem>
+                                    <SelectItem value={BannerType.BANNER}>Banner</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <InputError message={errors.type} />
+                        </div>
+
+                        <div className="flex items-center justify-between">
                             <Label htmlFor="is_published">Published</Label>
                             <Switch
                                 id="is_published"

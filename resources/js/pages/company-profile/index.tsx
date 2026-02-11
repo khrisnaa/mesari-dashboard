@@ -82,8 +82,6 @@ const Index = ({ profile }: PageProps) => {
                         <SocialBadge label="Instagram" value={profile.instagram} />
                         <SocialBadge label="TikTok" value={profile.tiktok} />
                         <SocialBadge label="Facebook" value={profile.facebook} />
-                        <SocialBadge label="Shopee" value={profile.shopee} />
-                        <SocialBadge label="Tokopedia" value={profile.tokopedia} />
                     </div>
                 </div>
             </div>

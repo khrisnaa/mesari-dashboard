@@ -26,8 +26,8 @@ class StoreBannerRequest extends FormRequest
             'title'          => ['nullable', 'string', 'max:255'],
             'description'    => ['nullable', 'string', 'max:255'],
 
-            'backdrop'  => ['required', 'file', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'image'     => ['required', 'file', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'backdrop'  => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'image'     => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
 
             'cta_text'       => ['nullable', 'string', 'max:255'],
             'cta_link'       => ['nullable', 'string', 'max:255'],
