@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\BannerType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,13 +17,12 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->string('description')->nullable();
             $table->string('backdrop_path');
-            $table->string('backdrop_url')->nullable();
             $table->string('image_path');
-            $table->string('image_url')->nullable();
             $table->string('cta_text')->nullable();
             $table->string('cta_link')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_published')->default(false);
+            $table->enum('type', array_column(BannerType::cases(), 'value'));
             $table->timestamps();
             $table->softDeletes();
         });

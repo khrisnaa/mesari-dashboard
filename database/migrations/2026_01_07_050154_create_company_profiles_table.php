@@ -28,8 +28,6 @@ return new class extends Migration
             $table->string('instagram')->nullable();
             $table->string('tiktok')->nullable();
             $table->string('facebook')->nullable();
-            $table->string('shopee')->nullable();
-            $table->string('tokopedia')->nullable();
             $table->timestamps();
         });
     }

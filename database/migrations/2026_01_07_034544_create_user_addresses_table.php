@@ -14,16 +14,14 @@ return new class extends Migration
         Schema::create('user_addresses', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
+            $table->unsignedInteger('city_id');
+            $table->foreign('city_id')->references('id')->on('cities');
             $table->string('recipient_name');
             $table->string('phone');
             $table->string('label');
             $table->string('address_line');
-            $table->string('province_id');
             $table->string('province_name');
-            $table->string('city_id');
             $table->string('city_name');
-            $table->string('subdistrict_id');
-            $table->string('subdistrict_name');
             $table->string('postal_code');
             $table->boolean('is_default');
             $table->timestamps();

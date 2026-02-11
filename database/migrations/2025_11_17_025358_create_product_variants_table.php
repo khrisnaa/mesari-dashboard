@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('product_id')->constrained();
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 12, 2);
             $table->integer('stock')->default(0);
             $table->timestamps();
             $table->softDeletes();

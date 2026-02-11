@@ -14,11 +14,10 @@ return new class extends Migration
         Schema::create('cart_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('cart_id')->constrained()->onDelete('cascade');
-            $table->foreignUuid('product_id')->constrained();
             $table->foreignUuid('product_variant_id')->constrained();
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 12, 2);
             $table->integer('quantity');
-            $table->decimal('subtotal', 10, 2);
+            $table->decimal('subtotal', 12, 2);
             $table->timestamps();
         });
     }

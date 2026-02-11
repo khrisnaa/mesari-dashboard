@@ -16,7 +16,6 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('product_id')->constrained();
             $table->string('path');
-            $table->string('url')->nullable();
             $table->enum('type', array_column(ImageType::cases(), 'value'))->default(ImageType::GALLERY->value);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
