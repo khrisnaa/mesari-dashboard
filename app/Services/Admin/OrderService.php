@@ -24,7 +24,7 @@ class OrderService
         $direction = ($params['direction'] ?? '') === 'asc' ? 'asc' : 'desc';
 
         $query = Order::query()
-            ->with(['user', 'items', 'address']);
+            ->with(['user', 'items']);
 
         $query->when($params['search'] ?? null, function ($q, $search) {
             $q->where('id', 'like', "%{$search}%")

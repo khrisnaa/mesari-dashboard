@@ -1,0 +1,112 @@
+[
+    {
+        "category": "T-Shirt",
+        "name": "Basic Cotton T-Shirt",
+        "slug": "basic-cotton-t-shirt",
+        "description": "Classic cotton t-shirt suitable for daily use.",
+        "price": 129000,
+        "colors": ["Black", "White", "Red"],
+        "sizes": ["M", "L", "XL"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    },
+    {
+        "category": "T-Shirt",
+        "name": "Premium Oversize Tee",
+        "slug": "premium-oversize-tee",
+        "description": "Oversized premium tee with soft cotton fabric.",
+        "price": 189000,
+        "colors": ["White", "Navy", "Blue"],
+        "sizes": ["S", "M", "L"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    },
+    {
+        "category": "T-Shirt",
+        "name": "Urban Graphic T-Shirt",
+        "slug": "urban-graphic-t-shirt",
+        "description": "Streetwear graphic tee with modern styling.",
+        "price": 159000,
+        "colors": ["Black", "White", "Blue"],
+        "sizes": ["S", "M", "L"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    },
+    {
+        "category": "T-Shirt",
+        "name": "Retro Print T-Shirt",
+        "slug": "retro-print-t-shirt",
+        "description": "Vintage style tee with retro print.",
+        "price": 149000,
+        "colors": ["Red", "Black", "White"],
+        "sizes": ["M", "L", "XL"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    },
+    {
+        "category": "Long Sleeves",
+        "name": "Casual Long Sleeve Tee",
+        "slug": "casual-long-sleeve-tee",
+        "description": "Soft long sleeve ideal for everyday comfort.",
+        "price": 159000,
+        "colors": ["Navy", "White", "Black"],
+        "sizes": ["M", "L", "XL"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    },
+    {
+        "category": "Long Sleeves",
+        "name": "Premium Long Sleeve Shirt",
+        "slug": "premium-long-sleeve-shirt",
+        "description": "Long sleeve made with premium breathable material.",
+        "price": 199000,
+        "colors": ["Blue", "Black", "White"],
+        "sizes": ["S", "M", "L"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    },
+    {
+        "category": "Long Sleeves",
+        "name": "Urban Long Sleeve Tee",
+        "slug": "urban-long-sleeve-tee",
+        "description": "Minimalist urban-style long sleeve shirt.",
+        "price": 169000,
+        "colors": ["Black", "Green", "White"],
+        "sizes": ["M", "L", "XL"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    },
+    {
+        "category": "Tanktop",
+        "name": "Sportfit Tanktop",
+        "slug": "sportfit-tanktop",
+        "description": "Breathable tanktop designed for active sports.",
+        "price": 99000,
+        "colors": ["Green", "Black", "Blue"],
+        "sizes": ["S", "M", "L"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    },
+    {
+        "category": "Tanktop",
+        "name": "Casual Daily Tanktop",
+        "slug": "casual-daily-tanktop",
+        "description": "Comfortable tanktop suitable for daily activities.",
+        "price": 89000,
+        "colors": ["White", "Black", "Red"],
+        "sizes": ["M", "L", "XL"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    },
+    {
+        "category": "Tanktop",
+        "name": "Training Performance Tanktop",
+        "slug": "training-performance-tanktop",
+        "description": "High performance tanktop for workout sessions.",
+        "price": 119000,
+        "colors": ["Blue", "Black", "Green"],
+        "sizes": ["S", "M", "L"],
+        "thumbnail": "/default-thumbnail.jpg",
+        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+    }
+]

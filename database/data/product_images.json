@@ -1,0 +1,251 @@
+[
+    {
+        "product_slug": "kaos-polos-cotton-combed-30s",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "kaos-polos-cotton-combed-30s",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "kaos-polos-cotton-combed-30s",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "kaos-polos-cotton-combed-30s",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    },
+
+    {
+        "product_slug": "kaos-oversize-premium-24s",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "kaos-oversize-premium-24s",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "kaos-oversize-premium-24s",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "kaos-oversize-premium-24s",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    },
+
+    {
+        "product_slug": "kaos-cotton-bamboo-antibakteri",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "kaos-cotton-bamboo-antibakteri",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "kaos-cotton-bamboo-antibakteri",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "kaos-cotton-bamboo-antibakteri",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    },
+
+    {
+        "product_slug": "jersey-dryfit-premium",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "jersey-dryfit-premium",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "jersey-dryfit-premium",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "jersey-dryfit-premium",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    },
+
+    {
+        "product_slug": "jersey-futsal-breathable",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "jersey-futsal-breathable",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "jersey-futsal-breathable",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "jersey-futsal-breathable",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    },
+
+    {
+        "product_slug": "jersey-sepeda-aero-fit",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "jersey-sepeda-aero-fit",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "jersey-sepeda-aero-fit",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "jersey-sepeda-aero-fit",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    },
+
+    {
+        "product_slug": "long-sleeve-cotton-24s",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "long-sleeve-cotton-24s",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "long-sleeve-cotton-24s",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "long-sleeve-cotton-24s",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    },
+
+    {
+        "product_slug": "long-sleeve-oversize-korean-fit",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "long-sleeve-oversize-korean-fit",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "long-sleeve-oversize-korean-fit",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "long-sleeve-oversize-korean-fit",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    },
+
+    {
+        "product_slug": "tanktop-cotton-30s-premium",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "tanktop-cotton-30s-premium",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "tanktop-cotton-30s-premium",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "tanktop-cotton-30s-premium",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    },
+
+    {
+        "product_slug": "tanktop-gym-dryfit",
+        "path": "/dummy-thumbnail.jpg",
+        "type": "thumbnail",
+        "sort_order": 0
+    },
+    {
+        "product_slug": "tanktop-gym-dryfit",
+        "path": "/dummy-gallery-1.jpg",
+        "type": "gallery",
+        "sort_order": 1
+    },
+    {
+        "product_slug": "tanktop-gym-dryfit",
+        "path": "/dummy-gallery-2.jpg",
+        "type": "gallery",
+        "sort_order": 2
+    },
+    {
+        "product_slug": "tanktop-gym-dryfit",
+        "path": "/dummy-gallery-3.jpg",
+        "type": "gallery",
+        "sort_order": 3
+    }
+]

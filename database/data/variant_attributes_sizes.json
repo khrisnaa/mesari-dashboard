@@ -1,0 +1,8 @@
+[
+    { "name": "XS", "hex": null, "type": "size" },
+    { "name": "S", "hex": null, "type": "size" },
+    { "name": "M", "hex": null, "type": "size" },
+    { "name": "L", "hex": null, "type": "size" },
+    { "name": "XL", "hex": null, "type": "size" },
+    { "name": "XXL", "hex": null, "type": "size" }
+]

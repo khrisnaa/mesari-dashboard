@@ -35,10 +35,10 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
             </Button>
         ),
         cell: ({ row }) => (
-            <span className="truncate font-mono font-medium">{row.original.id.slice(0, 8)}…</span>
+            <span className="truncate font-mono font-medium">{row.original.id}…</span>
         ),
         meta: {
-            width: { type: 'fixed', px: 140 },
+            width: { type: 'flex', fr: 1 },
             //@ts-ignore
             sortKey: 'user_name',
         },
@@ -129,7 +129,7 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
             </Button>
         ),
         cell: ({ row }) => {
-            const status: string = row.original.status;
+            const status: string = row.original.order_status;
 
             const statusVariantMap: Record<
                 string,
@@ -175,7 +175,12 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
             const status = row.original.payment_status;
 
             return (
-                <StatusBadge variant={status === 'paid' ? 'success' : 'warning'} label={status} />
+                <StatusBadge
+                    variant={
+                        status === 'paid' ? 'success' : status === 'failed' ? 'danger' : 'warning'
+                    }
+                    label={status}
+                />
             );
         },
         meta: { width: { type: 'fixed', px: 200 } },
