@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CompanyProfileController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\OrderController;
@@ -32,6 +33,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::get('/company-detail', [CompanyProfileController::class, 'index']);
 Route::get('/banners', [BannerController::class, 'index']);
+Route::get('/cities', [CityController::class, 'index']);
 
 
 // protected routes
@@ -45,8 +47,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // cart
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart/add', [CartController::class, 'addItem']);
-    Route::put('/cart/item/{id}', [CartController::class, 'updateItem']);
-    Route::delete('/cart/item/{id}', [CartController::class, 'deleteItem']);
+    Route::put('/cart/{id}', [CartController::class, 'updateItem']);
+    Route::delete('/cart/{id}', [CartController::class, 'deleteItem']);
 
     // user addresses
     Route::get('/addresses', [UserAddressController::class, 'index']);

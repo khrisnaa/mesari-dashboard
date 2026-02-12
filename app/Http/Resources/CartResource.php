@@ -6,13 +6,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class CartResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
-            'id'      => $this->id,
-            'user_id' => $this->user_id,
+            'id' => $this->id,
             'items' => CartItemResource::collection($this->items),
-            'total' => $this->items->sum('subtotal'),
+            'total' => (float) $this->items->sum('subtotal'),
+            'total_quantity' => $this->items->sum('quantity'),
         ];
     }
 }

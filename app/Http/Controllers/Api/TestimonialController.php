@@ -16,8 +16,9 @@ class TestimonialController extends Controller
             ->limit(5)
             ->get();
 
-        return ApiResponse::success("List of testimonials", [
-            "items" => TestimonialResource::collection($testimonials)
-        ]);
+        return ApiResponse::success(
+            "List of testimonials",
+            TestimonialResource::collection($testimonials)
+        );
     }
 }

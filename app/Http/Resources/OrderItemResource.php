@@ -6,17 +6,23 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderItemResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray($request): array
     {
+        $variant = $this->variant;
+        $product = $variant?->product;
+
         return [
-            'id'                => $this->id,
-            'product_id'        => $this->product_id,
-            'product_variant_id' => $this->product_variant_id,
-            'product_name'      => $this->product_name,
-            'variant_name'      => $this->variant_name,
-            'price'             => $this->price,
-            'quantity'          => $this->quantity,
-            'subtotal'          => $this->subtotal,
+            'id' => $this->id,
+            'product' => [
+                'name' => $this->product_name,
+                'image' => $product?->images?->firstWhere('type', 'thumbnail')?->path,
+            ],
+            'variant' => [
+                'name' => $this->variant_name,
+            ],
+            'price' => (float) $this->price,
+            'quantity' => (int) $this->quantity,
+            'subtotal' => (float) $this->subtotal,
         ];
     }
 }

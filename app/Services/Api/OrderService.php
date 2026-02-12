@@ -49,88 +49,98 @@ class OrderService
     private function processOrder($user, array $data, $items, bool $fromCart)
     {
         return DB::transaction(function () use ($user, $data, $items, $fromCart) {
-            // lock variants to avoid race condition
+
             $variantIds = $items->pluck('product_variant_id');
 
-            $variants = ProductVariant::whereIn('id', $variantIds)->lockForUpdate()->get()->keyBy('id');
-
-            // reduce stock
+            $variants = ProductVariant::whereIn('id', $variantIds)
+                ->lockForUpdate()
+                ->with('product.images', 'attributes')
+                ->get()
+                ->keyBy('id');
 
             foreach ($items as $item) {
                 $variant = $variants[$item->product_variant_id];
 
                 if ($variant->stock < $item->quantity) {
-                    throw new Exception("Stock not enough for variant {$variant->id}");
+                    throw new Exception("Stock not enough.");
                 }
-                $variant->stock -= $item->quantity;
 
-                $variant->save();
+                $variant->decrement('stock', $item->quantity);
             }
 
-            // calculate totals
             $subtotal = $items->sum('subtotal');
             $total = $subtotal + $data['shipping_cost'];
 
-            // create order
+            $address = $user->addresses()->findOrFail($data['address_id']);
+
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_status' => 'pending',
+                'payment_status' => 'pending',
+                'payment_method' => $data['payment_method'],
                 'subtotal' => $subtotal,
                 'total' => $total,
-                'payment_method' => $data['payment_method'],
-                'payment_status' => 'pending',
+
+                // snapshot address
+                'recipient_name' => $address->recipient_name,
+                'recipient_phone' => $address->phone,
+                'recipient_address' => $address->address_line,
+                'province_name' => $address->province_name,
+                'city_name' => $address->city_name,
+                'postal_code' => $address->postal_code,
+
                 'shipping_courier' => $data['shipping_courier'],
                 'shipping_service' => $data['shipping_service'],
                 'shipping_cost' => $data['shipping_cost'],
                 'shipping_weight' => $data['shipping_weight'],
-                'shipping_etd' => $data['shipping_etd'],
+                'shipping_estimation' => $data['shipping_estimation'] ?? null,
             ]);
 
-            // create order address
-            $address = $user->addresses()->findOrFail($data['address_id']);
-            //nothing to do
-
-            // create order items
             foreach ($items as $item) {
-                $productName = $fromCart ? $item->variant->product->name : $item->product_name;
-
-                $variantName = $fromCart ? $item->variant->attributes->pluck('name')->implode(' / ') : $item->variant_name;
+                $variant = $variants[$item->product_variant_id];
 
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $item->product_id,
-                    'product_variant_id' => $item->product_variant_id,
-                    'product_name' => $productName,
-                    'variant_name' => $variantName,
-                    'price' => $item->price,
+                    'product_variant_id' => $variant->id,
+                    'product_name' => $variant->product->name,
+                    'variant_name' => $variant->attributes->pluck('name')->implode(' / '),
+                    'price' => $variant->price,
                     'quantity' => $item->quantity,
-                    'subtotal' => $item->subtotal,
+                    'subtotal' => $variant->price * $item->quantity,
                 ]);
             }
 
-            // clear cart if from cart
             if ($fromCart && $user->cart) {
                 $user->cart->items()->delete();
             }
 
-            return $order;
+            return $order->load([
+                'items',
+                'items.variant.product.images',
+            ]);
         });
     }
 
+
     // get order list
-    public function getOrderHistory($user)
+    public function getOrderHistory($user, int $perPage = 10)
     {
         return Order::where('user_id', $user->id)
-            ->with(['address'])
+            ->with([
+                'items.variant.product.images',
+            ])
             ->latest()
-            ->paginate(10); // pagination 10
+            ->paginate($perPage);
     }
+
 
     // get order detail
     public function getOrderDetail($user, $orderId)
     {
         return Order::where('user_id', $user->id)
-            ->with(['address', 'items', 'items.product', 'items.variant'])
+            ->with([
+                'items.variant.product.images',
+            ])
             ->findOrFail($orderId);
     }
 }

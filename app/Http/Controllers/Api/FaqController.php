@@ -16,8 +16,9 @@ class FaqController extends Controller
             ->limit(5)
             ->get();
 
-        return ApiResponse::success("List of FAQs", [
-            'items' => FaqResource::collection($faqs)
-        ]);
+        return ApiResponse::success(
+            "List of FAQs",
+            FaqResource::collection($faqs)
+        );
     }
 }

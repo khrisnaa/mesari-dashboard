@@ -14,15 +14,15 @@ class DirectCheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_variant_id' => ['required', 'uuid'],
+            'product_variant_id' => ['required', 'uuid', 'exists:product_variants,id'],
             'quantity'           => ['required', 'integer', 'min:1'],
-            'address_id'         => ['required', 'uuid'],
-            'shipping_courier'   => ['required', 'string'],
-            'shipping_service'   => ['required', 'string'],
-            'shipping_cost'      => ['required', 'numeric'],
-            'shipping_weight'    => ['required', 'numeric'],
-            'shipping_etd'       => ['required', 'date'],
-            'payment_method'     => ['required', 'string'],
+            'address_id'         => ['required', 'uuid', 'exists:user_addresses,id'],
+            'shipping_courier'   => ['required', 'string', 'max:100'],
+            'shipping_service'   => ['required', 'string', 'max:100'],
+            'shipping_cost'      => ['required', 'numeric', 'min:0'],
+            'shipping_weight'    => ['required', 'numeric', 'min:0'],
+            'shipping_estimation' => ['nullable', 'string', 'max:50'],
+            'payment_method'     => ['required', 'string', 'max:100'],
         ];
     }
 }

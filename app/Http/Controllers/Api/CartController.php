@@ -16,9 +16,14 @@ class CartController extends Controller
         protected CartService $cartService
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $cart = $this->cartService->getCart(Auth::id());
+        $cart = $this->cartService->getCart($request->user()->id);
+
+        $cart->load([
+            'items.variant.product.images',
+            'items.variant.attributes',
+        ]);
 
         return ApiResponse::success(
             'Cart fetched successfully',
@@ -30,15 +35,21 @@ class CartController extends Controller
     public function addItem(Request $request)
     {
         $request->validate([
-            'product_id' => ['required'],
-            'product_variant_id' => ['required'],
-            'price' => ['required', 'numeric'],
-            'quantity' => ['required', 'numeric', 'min:1'],
+            'product_variant_id' => ['required', 'uuid', 'exists:product_variants,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $cart = $this->cartService->getCart(Auth::id());
+        $cart = $this->cartService->getCart($request->user()->id);
 
-        $item = $this->cartService->addItem($cart, $request->all());
+        $this->cartService->addItem($cart, $request->only([
+            'product_variant_id',
+            'quantity',
+        ]));
+
+        $cart->load([
+            'items.variant.product.images',
+            'items.variant.attributes',
+        ]);
 
         return ApiResponse::success(
             'Item added to cart',
@@ -50,23 +61,47 @@ class CartController extends Controller
     public function updateItem(Request $request, string $itemId)
     {
         $request->validate([
-            'quantity' => ['required', 'numeric', 'min:1']
+            'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $item = CartItem::findOrFail($itemId);
+        $cart = $this->cartService->getCart($request->user()->id);
+
+        $item = $cart->items()
+            ->where('id', $itemId)
+            ->firstOrFail();
 
         $this->cartService->updateItem($item, $request->quantity);
 
-        return ApiResponse::success('Cart item updated');
+        $cart->load([
+            'items.variant.product.images',
+            'items.variant.attributes',
+        ]);
+
+        return ApiResponse::success(
+            'Cart item updated',
+            new CartResource($cart)
+        );
     }
 
     // remove cart item
-    public function deleteItem(string $itemId)
+    public function deleteItem(string $itemId, Request $request)
     {
-        $item = CartItem::findOrFail($itemId);
+        $cart = $this->cartService->getCart($request->user()->id);
+
+        $item = $cart->items()
+            ->where('id', $itemId)
+            ->firstOrFail();
 
         $this->cartService->deleteItem($item);
 
-        return ApiResponse::success('Cart item removed');
+        $cart->load([
+            'items.variant.product.images',
+            'items.variant.attributes',
+        ]);
+
+        return ApiResponse::success(
+            'Cart item removed',
+            new CartResource($cart)
+        );
     }
 }

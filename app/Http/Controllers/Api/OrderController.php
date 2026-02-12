@@ -49,13 +49,25 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
-        $orders = $this->orderService->getOrderHistory($request->user());
+        $perPage = min($request->integer('per_page', 10), 50);
+
+        $orders = $this->orderService
+            ->getOrderHistory($request->user(), $perPage);
 
         return ApiResponse::success(
             'Order history retrieved',
-            OrderListResource::collection($orders)
+            OrderListResource::collection($orders),
+            200,
+            [
+                'current_page' => $orders->currentPage(),
+                'last_page'    => $orders->lastPage(),
+                'per_page'     => $orders->perPage(),
+                'total'        => $orders->total(),
+                'has_more'     => $orders->hasMorePages(),
+            ]
         );
     }
+
 
     public function show($id, Request $request)
     {

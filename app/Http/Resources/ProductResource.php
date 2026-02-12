@@ -10,16 +10,20 @@ class ProductResource extends JsonResource
     public function toArray(Request $request)
     {
         return [
-            'id'           => $this->id,
-            'category_id'  => $this->category_id,
-            'name'         => $this->name,
-            'slug'         => $this->slug,
-            'description'  => $this->description,
-            'is_published' => $this->is_published,
-
-
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'is_customizable' => (bool) $this->is_customizable,
+            'additional_price' => $this->additional_price !== null ? (float) $this->additional_price : null,
+            'discount' => [
+                'type' => $this->discount_type,
+                'value' => $this->discount_value !== null ? (float) $this->discount_value : null,
+                'start_at' => $this->discount_start_at,
+                'end_at' => $this->discount_end_at,
+            ],
             'category' => new CategoryResource($this->whenLoaded('category')),
-            'images'   => ProductImageResource::collection($this->whenLoaded('images')),
+            'images' => ProductImageResource::collection($this->whenLoaded('images')),
             'variants' => ProductVariantResource::collection($this->whenLoaded('variants')),
         ];
     }

@@ -14,8 +14,9 @@ class CompanyProfileController extends Controller
     {
         $company = CompanyProfile::first();
 
-        return ApiResponse::success("Company profile", [
-            'item' => new CompanyProfileResource($company)
-        ]);
+        return ApiResponse::success(
+            "Company profile",
+            new CompanyProfileResource($company)
+        );
     }
 }
