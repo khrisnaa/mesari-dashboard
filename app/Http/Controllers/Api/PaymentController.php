@@ -32,11 +32,12 @@ class PaymentController extends Controller
         ]);
 
         try {
-            $order = Order::with(['user', 'items.variant.product'])->findOrFail($request->order_id);
+            $order = Order::with(['user', 'items.variant.product'])
+                ->lockForUpdate()
+                ->findOrFail($request->order_id);
 
             $existingPayment = Payment::where('order_id', $order->id)
-                ->where('transaction_status', PaymentStatus::PENDING->value)
-                ->first();
+                ->where('transaction_status', PaymentStatus::PENDING->value)->first();
 
             if ($existingPayment) {
                 $isExpired = $existingPayment->created_at->diffInHours(now()) >= 23;
@@ -46,15 +47,15 @@ class PaymentController extends Controller
                         'status' => 'success',
                         'snap_token' => $existingPayment->snap_token,
                         'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v4/redirection/' . $existingPayment->snap_token,
-                        'message' => 'Continue previous transaction'
+                        'message' => 'Continue previous transaction',
                     ]);
                 }
 
                 $existingPayment->update(['transaction_status' => PaymentStatus::FAILED->value]);
             }
 
-            return DB::transaction(function () use ($request, $order) {
-                $midtransOrderId = 'TRX-' . $order->id . '-' . Str::random(5);
+            return DB::transaction(function () use ($order) {
+                $midtransOrderId = 'TRX-' . $order->id . '-' . now()->timestamp;
 
                 $itemDetails = $order->items
                     ->map(function ($item) {
@@ -62,7 +63,7 @@ class PaymentController extends Controller
                             'id' => $item->product_variant_id,
                             'price' => (int) $item->price,
                             'quantity' => (int) $item->quantity,
-                            'name' => $item->product_name . ' - ' . $item->variant_name,
+                            'name' => substr($item->product_name . ' - ' . $item->variant_name, 0, 50),
                         ];
                     })
                     ->toArray();
@@ -95,106 +96,104 @@ class PaymentController extends Controller
                 ];
 
                 $transaction = Snap::createTransaction($params);
-                $snapToken = $transaction->token;
-                $redirectUrl = $transaction->redirect_url;
 
                 $payment = Payment::create([
                     'order_id' => $order->id,
                     'midtrans_order_id' => $midtransOrderId,
-                    'midtrans_transaction_id' => null, // insert in webhook
-                    'snap_token' => $snapToken,
+                    'midtrans_transaction_id' => null,
+                    'snap_token' => $transaction->token,
                     'gross_amount' => $order->grand_total,
-                    'transaction_status' => 'pending', // initial status
+                    'transaction_status' => PaymentStatus::PENDING->value,
                 ]);
 
                 return response()->json([
                     'status' => 'success',
-                    'snap_token' => $snapToken,
-                    'redirect_url' => $redirectUrl,
+                    'snap_token' => $transaction->token,
+                    'redirect_url' => $transaction->redirect_url,
                     'payment' => $payment,
                 ]);
             });
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            Log::error('Payment Store Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to process payment'], 500);
         }
     }
 
     public function notification(Request $request)
     {
         try {
-            // receive notification from midtrans
-            $notif = new Notification();
-            // $notif = (object) $request->all();
+            // DB Transaction to ensure data consistency
+            return DB::transaction(function () use ($request) {
 
-            // extract important fields
-            $transaction = $notif->transaction_status;
-            $type = $notif->payment_type;
-            $orderId = $notif->order_id;
-            $fraud = $notif->fraud_status;
-            $payload = $notif->getResponse();
-            // $payload = null;
+                // receive notification from midtrans
+                $notif = new Notification();
+                // $notif = (object) $request->all(); // For Postman Test
 
-            // find payment by midtrans order id
-            $payment = Payment::where('midtrans_order_id', $orderId)->first();
+                $transaction = $notif->transaction_status;
+                $type = $notif->payment_type;
+                $orderId = $notif->order_id;
+                $fraud = $notif->fraud_status;
 
-            if (!$payment) {
-                return response()->json(['message' => 'payment not found'], 404);
-            }
+                // Fix for Postman: getResponse() only works with Notification object
+                $payload = method_exists($notif, 'getResponse') ? $notif->getResponse() : json_encode($request->all());
 
-            // determine payment and order status
-            $paymentStatus = PaymentStatus::PENDING->value;
-            $orderStatus = OrderStatus::PENDING->value;
+                // Use lockForUpdate to prevent race conditions from duplicate notifications
+                $payment = Payment::where('midtrans_order_id', $orderId)->lockForUpdate()->first();
 
-            if ($transaction == 'capture') {
-                if ($type == 'credit_card') {
-                    if ($fraud == 'challenge') {
-                        $paymentStatus = PaymentStatus::PENDING->value;
-                        $orderStatus = OrderStatus::PENDING->value;
-                    } else {
-                        $paymentStatus = PaymentStatus::PAID->value;
-                        $orderStatus = OrderStatus::PAID->value;
-                    }
+                if (!$payment) {
+                    return response()->json(['message' => 'payment not found'], 404);
                 }
-            } elseif ($transaction == 'settlement') {
-                $paymentStatus = PaymentStatus::PAID->value;
-                $orderStatus = OrderStatus::PAID->value;
-            } elseif ($transaction == 'pending') {
+
                 $paymentStatus = PaymentStatus::PENDING->value;
                 $orderStatus = OrderStatus::PENDING->value;
-            } elseif (in_array($transaction, ['deny', 'expire', 'cancel'])) {
-                $paymentStatus = PaymentStatus::FAILED->value;
-                $orderStatus = OrderStatus::CANCELLED->value;
-            }
 
-            // update payment record
-            $payment->update([
-                'transaction_status' => $paymentStatus,
-                'midtrans_transaction_id' => $notif->transaction_id,
-                'payment_type' => $type,
-                'fraud_status' => $fraud,
-                'transaction_time' => $notif->transaction_time,
-                'settlement_time' => $notif->settlement_time ?? null,
-                'payload' => $payload,
-            ]);
+                if ($transaction == 'capture') {
+                    if ($type == 'credit_card') {
+                        if ($fraud == 'challenge') {
+                            $paymentStatus = PaymentStatus::PENDING->value;
+                            $orderStatus = OrderStatus::PENDING->value;
+                        } else {
+                            $paymentStatus = PaymentStatus::PAID->value;
+                            $orderStatus = OrderStatus::PAID->value;
+                        }
+                    }
+                } elseif ($transaction == 'settlement') {
+                    $paymentStatus = PaymentStatus::PAID->value;
+                    $orderStatus = OrderStatus::PAID->value;
+                } elseif ($transaction == 'pending') {
+                    $paymentStatus = PaymentStatus::PENDING->value;
+                    $orderStatus = OrderStatus::PENDING->value;
+                } elseif (in_array($transaction, ['deny', 'expire', 'cancel'])) {
+                    $paymentStatus = PaymentStatus::FAILED->value;
+                    $orderStatus = OrderStatus::CANCELLED->value;
+                }
 
-            // update related order status
-            $payment->order->update([
-                'order_status' => $orderStatus,
-                'payment_status' => $paymentStatus,
-            ]);
+                // update payment record
+                $payment->update([
+                    'transaction_status' => $paymentStatus,
+                    'midtrans_transaction_id' => $notif->transaction_id,
+                    'payment_type' => $type,
+                    'fraud_status' => $fraud,
+                    'transaction_time' => $notif->transaction_time,
+                    'settlement_time' => $notif->settlement_time ?? null,
+                    'payload' => $payload,
+                ]);
 
-            // return ok to prevent retry
-            return response()->json(['message' => 'notification processed'], 200);
+                // update related order status
+                $payment->order->update([
+                    'order_status' => $orderStatus,
+                    'payment_status' => $paymentStatus,
+                ]);
+
+                return response()->json(['message' => 'notification processed'], 200);
+            });
         } catch (\Exception $e) {
             Log::error('midtrans error: ' . $e->getMessage());
 
-            return response()->json(
-                [
-                    'message' => 'error processing notification',
-                    'error_detail' => $e->getMessage(),
-                ],
-                500,
-            );
+            return response()->json([
+                'message' => 'error processing notification',
+                'error_detail' => $e->getMessage(),
+            ], 500);
         }
     }
 }
