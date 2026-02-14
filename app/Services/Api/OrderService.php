@@ -166,15 +166,15 @@ class OrderService
         string $courierService
     ): array {
 
-        $origin = config('services.rajaongkir.origin');
+        $origin = config('rajaongkir.origin');
 
         $response = Http::asForm()
             ->timeout(10)
             ->withHeaders([
-                'key' => config('services.rajaongkir.key'),
+                'key' => config('rajaongkir.key'),
                 'Accept' => 'application/json',
             ])
-            ->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
+            ->post(config('rajaongkir.cost_api_url'), [
                 'origin' => $origin,
                 'destination' => $destination,
                 'weight' => $weight,
@@ -258,16 +258,16 @@ class OrderService
         int $destination,
     ) {
 
-        $origin = config('services.rajaongkir.origin');
-        $courier = config('services.rajaongkir.courier');
+        $origin = config('rajaongkir.origin');
+        $courier = config('rajaongkir.courier');
 
         $response = Http::asForm()
             ->timeout(10)
             ->withHeaders([
-                'key' => config('services.rajaongkir.key'),
+                'key' => config('rajaongkir.key'),
                 'Accept' => 'application/json',
             ])
-            ->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
+            ->post(config('rajaongkir.cost_api_url'), [
                 'origin' => $origin,
                 'destination' => $destination,
                 'weight' => $weight,

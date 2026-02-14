@@ -18,10 +18,10 @@ class LocationController extends Controller
 
         $response = Http::timeout(10)
             ->withHeaders([
-                'key' => config('services.rajaongkir.key'),
+                'key' => config('rajaongkir.api_key'),
                 'Accept' => 'application/json',
             ])
-            ->get('https://rajaongkir.komerce.id/api/v1/destination/domestic-destination', [
+            ->get(config('rajaongkir.destination_api_url'), [
                 'search' => $request->search,
                 'limit'  => $request->limit ?? 10,
                 'offset' => $request->offset ?? 0,
