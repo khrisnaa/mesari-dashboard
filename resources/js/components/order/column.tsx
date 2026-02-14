@@ -74,7 +74,7 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
     },
 
     {
-        accessorKey: 'total',
+        accessorKey: 'grand_total',
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -96,7 +96,7 @@ export const getColumns = (onEdit: (order: Order) => void): ColumnDef<Order>[] =
             </Button>
         ),
         cell: ({ row }) => {
-            const total = row.original.total;
+            const total = row.original.grand_total;
             return (
                 <div className="truncate font-medium">
                     Rp {Number(total).toLocaleString('id-ID')}

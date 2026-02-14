@@ -4,16 +4,23 @@ import { User } from './user';
 export interface Order {
     id: string;
     user_id: string;
+
     order_status: OrderStatus;
-    subtotal: number;
-    total: number;
-    payment_method: string;
     payment_status: PaymentStatus;
-    shipping_courier: string;
-    shipping_service: string;
-    shipping_cost: number;
-    shipping_weight: number;
-    shipping_etd: string;
+    payment_method: string | null;
+
+    subtotal: number;
+    shipping_price: number;
+    insurance_price: number;
+    discount_amount: number;
+    grand_total: number;
+
+    shipping_courier_code: string;
+    shipping_courier_service: string;
+    shipping_estimation: string | null;
+    shipping_weight_grams: number;
+    tracking_number: string | null;
+
     created_at: string;
     updated_at: string;
 
@@ -24,13 +31,15 @@ export interface Order {
 export interface OrderItem {
     id: string;
     order_id: string;
-    product_id: string;
     product_variant_id: string;
+
     product_name: string;
     variant_name: string;
+
     price: number;
     quantity: number;
     subtotal: number;
+
     created_at: string;
     updated_at: string;
 }
