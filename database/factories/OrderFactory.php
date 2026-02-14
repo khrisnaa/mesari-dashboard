@@ -13,34 +13,56 @@ use Illuminate\Support\Str;
  */
 class OrderFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+
     public function definition(): array
     {
+        $totalItem = $this->faker->numberBetween(100000, 500000);
+        $shipping = $this->faker->numberBetween(10000, 40000);
+        $insurance = 0;
+        $discount = 0;
+
+        $grandTotal = $totalItem + $shipping + $insurance - $discount;
+
         return [
-            'user_id'            => null,
-            'order_status'       => $this->faker->randomElement(array_column(OrderStatus::cases(), 'value')),
-            'payment_status'     => $this->faker->randomElement(array_column(PaymentStatus::cases(), 'value')),
-            'payment_method'     => $this->faker->randomElement(['bank_transfer', 'credit_card', 'ewallet']),
+            'id' => Str::uuid(),
+            'user_id' => User::factory(),
 
-            'subtotal'           => $this->faker->randomFloat(2, 10000, 500000),
-            'total'              => $this->faker->randomFloat(2, 10000, 500000),
+            'order_number' => 'ORD-' . now()->format('Ymd') . '-' . $this->faker->unique()->numberBetween(100, 999),
 
-            'recipient_name'     => $this->faker->name(),
-            'recipient_phone'    => $this->faker->phoneNumber(),
-            'recipient_address'  => $this->faker->streetAddress(),
-            'province_name'      => $this->faker->state(),
-            'city_name'          => $this->faker->city(),
-            'postal_code'        => $this->faker->postcode(),
+            // status
+            'order_status' => OrderStatus::PENDING->value,
+            'payment_status' => PaymentStatus::PENDING->value,
 
-            'shipping_courier'   => $this->faker->randomElement(['jne', 'tiki', 'pos']),
-            'shipping_service'   => $this->faker->randomElement(['REG', 'ECO', 'YES']),
-            'shipping_cost'      => $this->faker->numberBetween(10000, 40000),
-            'shipping_weight'    => $this->faker->randomFloat(2, 0.1, 5),
-            'shipping_estimation' => $this->faker->randomElement(['2-3 days', '3-5 days', 'Next Day']),
+            'payment_type' => $this->faker->randomElement(['bank_transfer', 'credit_card', 'ewallet']),
+            'payment_token' => null,
+            'payment_url' => null,
+
+            // pricing
+            'total_item_price' => $totalItem,
+            'shipping_price' => $shipping,
+            'insurance_price' => $insurance,
+            'discount_amount' => $discount,
+            'grand_total' => $grandTotal,
+
+            // shipping snapshot
+            'shipping_courier_code' => $this->faker->randomElement(['jne', 'tiki', 'pos']),
+            'shipping_courier_service' => $this->faker->randomElement(['REG', 'ECO', 'YES']),
+            'shipping_estimation' => $this->faker->randomElement(['2-3 days', '3-5 days', '1 day']),
+            'shipping_tracking_number' => null,
+            'shipping_weight_grams' => $this->faker->numberBetween(500, 3000),
+
+            // address snapshot 
+            'recipient_name' => $this->faker->name(),
+            'recipient_phone' => $this->faker->phoneNumber(),
+            'recipient_address_line' => $this->faker->streetAddress(),
+
+            'recipient_province' => 'DKI JAKARTA',
+            'recipient_city' => 'JAKARTA PUSAT',
+            'recipient_district' => 'GAMBIR',
+            'recipient_subdistrict' => 'KEBON KELAPA',
+            'postal_code' => '10120',
+
+            'note' => null,
         ];
     }
 }

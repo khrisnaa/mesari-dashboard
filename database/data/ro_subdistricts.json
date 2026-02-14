@@ -1,0 +1,18 @@
+[
+    {
+        "id": 17489,
+        "province_name": "DKI JAKARTA",
+        "city_name": "JAKARTA BARAT",
+        "district_name": "KEBON JERUK",
+        "subdistrict_name": "KELAPA DUA",
+        "zip_code": "11550"
+    },
+    {
+        "id": 17602,
+        "province_name": "DKI JAKARTA",
+        "city_name": "JAKARTA PUSAT",
+        "district_name": "GAMBIR",
+        "subdistrict_name": "KEBON KELAPA",
+        "zip_code": "10120"
+    }
+]

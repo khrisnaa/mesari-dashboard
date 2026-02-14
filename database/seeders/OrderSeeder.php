@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\VariantAttributeType;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -33,46 +35,72 @@ class OrderSeeder extends Seeder
             return;
         }
 
-        $orderStatuses = ['pending', 'paid', 'packed', 'shipped', 'completed', 'cancelled'];
-        $paymentStatuses = ['pending', 'paid', 'failed'];
-
         foreach ($users as $user) {
             for ($o = 1; $o <= 4; $o++) {
 
                 $orderId = Str::uuid();
-                $shippingCost = rand(10000, 30000);
+                $shippingPrice = rand(10000, 30000);
+
+                $totalItemPrice = 0;
+                $totalWeight = 0;
+                $weight = 500;
 
                 DB::table('orders')->insert([
-                    'id'                 => $orderId,
-                    'user_id'            => $user->id,
-                    'order_status'       => $orderStatuses[array_rand($orderStatuses)],
-                    'payment_status'     => $paymentStatuses[array_rand($paymentStatuses)],
-                    'payment_method'     => 'manual_transfer',
-                    'subtotal'           => 0,
-                    'total'              => 0,
-                    'recipient_name'     => $user->name,
-                    'recipient_phone'    => '081234567890',
-                    'recipient_address'  => 'Jl. Contoh No. 123',
-                    'province_name'      => 'DKI Jakarta',
-                    'city_name'          => 'Jakarta Selatan',
-                    'postal_code'        => '12120',
-                    'shipping_courier'   => 'jne',
-                    'shipping_service'   => 'REG',
-                    'shipping_cost'      => $shippingCost,
-                    'shipping_weight'    => rand(200, 800),
-                    'shipping_estimation' => '2-3 days',
-                    'created_at'         => now(),
-                    'updated_at'         => now(),
+                    'id'                      => $orderId,
+                    'user_id'                 => $user->id,
+                    'order_number'            => 'ORD-' . now()->format('Ymd') . '-' . rand(100, 999),
+
+                    // status
+                    'order_status'            => OrderStatus::PENDING->value,
+                    'payment_status'          => PaymentStatus::PENDING->value,
+
+                    'payment_type'            => 'bank_transfer',
+                    'payment_token'           => null,
+                    'payment_url'             => null,
+
+                    // Pricing 
+                    'total_item_price'        => 0,
+                    'shipping_price'          => $shippingPrice,
+                    'insurance_price'         => 0,
+                    'discount_amount'         => 0,
+                    'grand_total'             => 0,
+
+                    // shipping snapshot
+                    'shipping_courier_code'   => 'jne',
+                    'shipping_courier_service' => 'REG',
+                    'shipping_estimation'     => '2-3 days',
+                    'shipping_tracking_number' => null,
+                    'shipping_weight_grams'   => 0,
+
+                    // address snapshot
+                    'recipient_name'          => $user->name,
+                    'recipient_phone'         => '081234567890',
+                    'recipient_address_line'  => 'Jl. Contoh No. 123',
+
+                    'recipient_province'      => 'DKI JAKARTA',
+                    'recipient_city'          => 'JAKARTA SELATAN',
+                    'recipient_district'      => 'KEBAYORAN BARU',
+                    'recipient_subdistrict'   => 'GUNUNG',
+                    'postal_code'             => '12120',
+
+                    'note'                    => null,
+
+                    'created_at'              => now(),
+                    'updated_at'              => now(),
                 ]);
 
-                $subtotal = 0;
+                // insert items
                 $itemsCount = rand(2, 3);
                 $selectedVariants = $variants->random($itemsCount);
 
                 foreach ($selectedVariants as $variant) {
                     $qty = rand(1, 3);
                     $lineSubtotal = $variant->price * $qty;
-                    $subtotal += $lineSubtotal;
+
+                    $totalItemPrice += $lineSubtotal;
+
+                    // variant weight_grams
+                    $totalWeight += ($weight * $qty);
 
                     DB::table('order_items')->insert([
                         'id'                 => Str::uuid(),
@@ -89,9 +117,13 @@ class OrderSeeder extends Seeder
                     ]);
                 }
 
+                $grandTotal = $totalItemPrice + $shippingPrice;
+
+                // update total final
                 DB::table('orders')->where('id', $orderId)->update([
-                    'subtotal' => $subtotal,
-                    'total'    => $subtotal + $shippingCost
+                    'total_item_price'      => $totalItemPrice,
+                    'shipping_weight_grams' => $totalWeight,
+                    'grand_total'           => $grandTotal,
                 ]);
             }
         }

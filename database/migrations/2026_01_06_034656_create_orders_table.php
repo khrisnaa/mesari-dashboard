@@ -2,7 +2,6 @@
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
-use App\Models\Order;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,23 +16,49 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->enum('order_status', array_column(OrderStatus::cases(), 'value'))->default(OrderStatus::PENDING->value);
-            $table->enum('payment_status', array_column(PaymentStatus::cases(), 'value'))->default(PaymentStatus::PENDING->value);
-            $table->string('payment_method');
-            $table->decimal('subtotal', 12, 2);
-            $table->decimal('total', 12, 2);
-            $table->string('recipient_name', 255);
-            $table->string('recipient_phone', 20);
-            $table->text('recipient_address');
-            $table->string('province_name', 255);
-            $table->string('city_name', 255);
-            $table->string('postal_code', 20);
-            $table->string('shipping_courier');
-            $table->string('shipping_service');
-            $table->decimal('shipping_cost', 12, 2);
-            $table->decimal('shipping_weight', 8, 2);
-            $table->string('shipping_estimation', 50)->nullable();
+            $table->string('order_number')->unique()->comment('Format: ORD-20260214-001');
+
+            // status
+            $table->enum('order_status', array_column(OrderStatus::cases(), 'value'))
+                ->default(OrderStatus::PENDING->value);
+            $table->enum('payment_status', array_column(PaymentStatus::cases(), 'value'))
+                ->default(PaymentStatus::PENDING->value);
+
+            // snapshot payment
+            $table->string('payment_type')->nullable();
+            $table->string('payment_token')->nullable();
+            $table->string('payment_url')->nullable();
+
+            // pricing snapshot
+            $table->decimal('total_item_price', 16, 2);
+            $table->decimal('shipping_price', 16, 2);
+            $table->decimal('insurance_price', 16, 2)->default(0);
+            $table->decimal('discount_amount', 16, 2)->default(0);
+            $table->decimal('grand_total', 16, 2);
+
+            // shipping snapshot
+            $table->string('shipping_courier_code');
+            $table->string('shipping_courier_service');
+            $table->string('shipping_estimation')->nullable();
+            $table->string('shipping_tracking_number')->nullable()->comment('Nomor Resi');
+
+            // weight
+            $table->unsignedInteger('shipping_weight_grams');
+
+            // address snapshot
+            $table->string('recipient_name');
+            $table->string('recipient_phone');
+            $table->text('recipient_address_line');
+            $table->string('recipient_province');
+            $table->string('recipient_city');
+            $table->string('recipient_district');
+            $table->string('recipient_subdistrict')->nullable();
+            $table->string('postal_code')->nullable();
+
+            // note
+            $table->text('note')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -14,14 +14,16 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('order_id')->constrained()->onDelete('cascade');
-            $table->string('midtrans_transaction_id')->nullable();
-            $table->string('payment_type', 50)->nullable();
-            $table->string('transaction_status', 50)->nullable();
-            $table->decimal('transaction_amount', 12, 2)->nullable();
+            $table->string('midtrans_transaction_id')->nullable()->index();
+            $table->string('payment_type')->nullable();
+            $table->string('transaction_status')->nullable();
+            $table->string('fraud_status')->nullable();
+            $table->decimal('transaction_amount', 12, 2);
             $table->timestamp('transaction_time')->nullable();
             $table->timestamp('settlement_time')->nullable();
-            $table->text('callback_data')->nullable();
+            $table->json('payload')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
