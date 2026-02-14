@@ -24,15 +24,9 @@ return new class extends Migration
             $table->enum('payment_status', array_column(PaymentStatus::cases(), 'value'))
                 ->default(PaymentStatus::PENDING->value);
 
-            // snapshot payment
-            $table->string('payment_method')->nullable();
-            $table->string('payment_token')->nullable();
-            $table->string('payment_url')->nullable();
-
             // pricing snapshot
             $table->decimal('subtotal', 16, 2);
-            $table->decimal('shipping_price', 16, 2);
-            $table->decimal('insurance_price', 16, 2)->default(0);
+            $table->decimal('shipping_cost', 16, 2);
             $table->decimal('discount_amount', 16, 2)->default(0);
             $table->decimal('grand_total', 16, 2);
 

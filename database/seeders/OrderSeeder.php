@@ -54,14 +54,9 @@ class OrderSeeder extends Seeder
                     'order_status'            => OrderStatus::PENDING->value,
                     'payment_status'          => PaymentStatus::PENDING->value,
 
-                    'payment_method'            => 'bank_transfer',
-                    'payment_token'           => null,
-                    'payment_url'             => null,
-
                     // Pricing 
                     'subtotal'        => 0,
-                    'shipping_price'          => $shippingPrice,
-                    'insurance_price'         => 0,
+                    'shipping_cost'          => $shippingPrice,
                     'discount_amount'         => 0,
                     'grand_total'             => 0,
 

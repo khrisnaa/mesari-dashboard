@@ -102,13 +102,8 @@ class OrderService
                 'order_status' => OrderStatus::PENDING->value,
                 'payment_status' => PaymentStatus::PENDING->value,
 
-                'payment_method' => null,
-                'payment_token' => null,
-                'payment_url' => null,
-
                 'subtotal' => $totalItemPrice,
-                'shipping_price' => $shippingPrice,
-                'insurance_price' => 0,
+                'shipping_cost' => $shippingPrice,
                 'discount_amount' => 0,
                 'grand_total' => $grandTotal,
 

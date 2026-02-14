@@ -17,8 +17,7 @@ class OrderDetailResource extends JsonResource
             'items' => OrderItemResource::collection($this->items),
 
             'subtotal' => (float) $this->subtotal,
-            'shipping_cost' => (float) $this->shipping_price,
-            'insurance_price' => (float) $this->insurance_price,
+            'shipping_cost' => (float) $this->shipping_cost,
             'discount_amount' => (float) $this->discount_amount,
             'grand_total' => (float) $this->grand_total,
 

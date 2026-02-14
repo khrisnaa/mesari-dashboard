@@ -10,8 +10,7 @@ export interface Order {
     payment_method: string | null;
 
     subtotal: number;
-    shipping_price: number;
-    insurance_price: number;
+    shipping_cost: number;
     discount_amount: number;
     grand_total: number;
 

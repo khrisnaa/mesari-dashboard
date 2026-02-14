@@ -33,14 +33,9 @@ class OrderFactory extends Factory
             'order_status' => OrderStatus::PENDING->value,
             'payment_status' => PaymentStatus::PENDING->value,
 
-            'payment_method' => $this->faker->randomElement(['bank_transfer', 'credit_card', 'ewallet']),
-            'payment_token' => null,
-            'payment_url' => null,
-
             // pricing
             'subtotal' => $totalItem,
-            'shipping_price' => $shipping,
-            'insurance_price' => $insurance,
+            'shipping_cost' => $shipping,
             'discount_amount' => $discount,
             'grand_total' => $grandTotal,
 
