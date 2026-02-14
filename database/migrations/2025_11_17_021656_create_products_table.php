@@ -14,16 +14,16 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('category_id')->constrained();
-            $table->string('name');
+            $table->foreignUuid('category_id')->constrained()->cascadeOnDelete();
+            $table->string('name')->index();
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->unsignedInteger('weight')->default(0);
-            $table->boolean('is_published')->default(false);
+            $table->boolean('is_published')->default(false)->index();
             $table->boolean('is_customizable')->default(false);
-            $table->decimal('additional_price', 12, 2)->nullable();
-            $table->enum('discount_type', array_column(DiscountType::cases(), 'value'))->nullable();
-            $table->decimal('discount_value', 10, 2)->nullable();
+            $table->decimal('custom_additional_price', 12, 2)->nullable();
+            $table->string('discount_type')->nullable();
+            $table->decimal('discount_value', 10, 2)->default(0);
             $table->timestamp('discount_start_at')->nullable();
             $table->timestamp('discount_end_at')->nullable();
             $table->timestamps();
