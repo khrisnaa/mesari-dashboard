@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CompanyProfileController;
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\TestimonialController;
@@ -33,7 +34,6 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::get('/company-detail', [CompanyProfileController::class, 'index']);
 Route::get('/banners', [BannerController::class, 'index']);
-Route::get('/cities', [CityController::class, 'index']);
 
 
 // protected routes
@@ -64,4 +64,10 @@ Route::middleware('auth:sanctum')->group(function () {
     //orders
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
+
+    //shipping cost
+    Route::post('/shipping/preview', [OrderController::class, 'previewShipping']);
+
+    //locations
+    Route::get('/locations', [LocationController::class, 'index']);
 });

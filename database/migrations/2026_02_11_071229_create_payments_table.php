@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('order_id')->constrained()->onDelete('cascade');
             $table->string('midtrans_transaction_id')->nullable()->index();
-            $table->string('payment_type')->nullable();
+            $table->string('payment_method')->nullable();
             $table->string('transaction_status')->nullable();
             $table->string('fraud_status')->nullable();
             $table->decimal('transaction_amount', 12, 2);

@@ -25,12 +25,12 @@ return new class extends Migration
                 ->default(PaymentStatus::PENDING->value);
 
             // snapshot payment
-            $table->string('payment_type')->nullable();
+            $table->string('payment_method')->nullable();
             $table->string('payment_token')->nullable();
             $table->string('payment_url')->nullable();
 
             // pricing snapshot
-            $table->decimal('total_item_price', 16, 2);
+            $table->decimal('subtotal', 16, 2);
             $table->decimal('shipping_price', 16, 2);
             $table->decimal('insurance_price', 16, 2)->default(0);
             $table->decimal('discount_amount', 16, 2)->default(0);
@@ -40,10 +40,10 @@ return new class extends Migration
             $table->string('shipping_courier_code');
             $table->string('shipping_courier_service');
             $table->string('shipping_estimation')->nullable();
-            $table->string('shipping_tracking_number')->nullable()->comment('Nomor Resi');
+            $table->string('shipping_tracking_number')->nullable();
 
             // weight
-            $table->unsignedInteger('shipping_weight_grams');
+            $table->unsignedInteger('shipping_weight');
 
             // address snapshot
             $table->string('recipient_name');

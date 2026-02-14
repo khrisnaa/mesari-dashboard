@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'rajaongkir' => [
+        'key' => env('SHIPPING_COST_API_KEY'),
+        'origin' => 26551,
+        'courier' => 'jne:sicepat:jnt:anteraja'
+    ]
 
 ];

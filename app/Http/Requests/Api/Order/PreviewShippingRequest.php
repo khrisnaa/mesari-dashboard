@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\Order;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CheckoutRequest extends FormRequest
+class PreviewShippingRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,9 +15,9 @@ class CheckoutRequest extends FormRequest
     {
         return [
             'address_id' => ['required', 'uuid', 'exists:user_addresses,id'],
-            'shipping_courier_code' => ['required', 'string'],
-            'shipping_courier_service' => ['required', 'string'],
-            'note' => ['nullable', 'string'],
+
+            'product_variant_id' => ['nullable', 'uuid', 'exists:product_variants,id'],
+            'quantity' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

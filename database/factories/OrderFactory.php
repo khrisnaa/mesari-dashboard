@@ -33,12 +33,12 @@ class OrderFactory extends Factory
             'order_status' => OrderStatus::PENDING->value,
             'payment_status' => PaymentStatus::PENDING->value,
 
-            'payment_type' => $this->faker->randomElement(['bank_transfer', 'credit_card', 'ewallet']),
+            'payment_method' => $this->faker->randomElement(['bank_transfer', 'credit_card', 'ewallet']),
             'payment_token' => null,
             'payment_url' => null,
 
             // pricing
-            'total_item_price' => $totalItem,
+            'subtotal' => $totalItem,
             'shipping_price' => $shipping,
             'insurance_price' => $insurance,
             'discount_amount' => $discount,
@@ -49,7 +49,7 @@ class OrderFactory extends Factory
             'shipping_courier_service' => $this->faker->randomElement(['REG', 'ECO', 'YES']),
             'shipping_estimation' => $this->faker->randomElement(['2-3 days', '3-5 days', '1 day']),
             'shipping_tracking_number' => null,
-            'shipping_weight_grams' => $this->faker->numberBetween(500, 3000),
+            'shipping_weight' => $this->faker->numberBetween(500, 3000),
 
             // address snapshot 
             'recipient_name' => $this->faker->name(),

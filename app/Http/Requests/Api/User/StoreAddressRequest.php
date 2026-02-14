@@ -14,15 +14,21 @@ class StoreAddressRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'city_id' => ['required', 'integer', 'exists:cities,id'],
-            'recipient_name'   => ['required', 'string', 'max:255'],
-            'phone'            => ['required', 'string', 'max:20'],
-            'label'            => ['required', 'string'],
-            'address_line'     => ['required', 'string'],
-            'province_name'    => ['required', 'string'],
-            'city_name'        => ['required', 'string'],
-            'postal_code'      => ['required', 'string'],
-            'is_default'       => ['boolean'],
+            'ro_subdistrict_id' => ['required', 'integer'],
+
+            'recipient_name' => ['required', 'string'],
+            'phone' => ['required', 'string'],
+            'label' => ['required', 'string'],
+            'address_line' => ['required', 'string'],
+
+            'province_name' => ['required', 'string'],
+            'city_name' => ['required', 'string'],
+            'district_name' => ['required', 'string'],
+
+            'subdistrict_name' => ['nullable', 'string'],
+            'postal_code' => ['nullable', 'integer'],
+
+            'is_default' => ['nullable', 'boolean'],
         ];
     }
 }

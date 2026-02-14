@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('district_name');
             $table->string('subdistrict_name')->nullable();
             $table->string('postal_code')->nullable();
-            $table->boolean('is_default')->default(false);
+            $table->unsignedBigInteger('is_default')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

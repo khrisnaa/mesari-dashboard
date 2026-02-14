@@ -23,8 +23,8 @@ class OrderListResource extends JsonResource
                     ?->firstWhere('type', 'thumbnail')
                     ?->path,
             ],
-            'total_items' => $this->items->sum('quantity'),
-            'total' => (float) $this->total,
+            'quantity' => $this->items->sum('quantity'),
+            'grand_total' => (float) $this->grand_total,
             'created_at' => $this->created_at,
         ];
     }

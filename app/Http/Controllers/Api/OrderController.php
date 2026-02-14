@@ -6,9 +6,11 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Order\CheckoutRequest;
 use App\Http\Requests\Api\Order\DirectCheckoutRequest;
+use App\Http\Requests\Api\Order\PreviewShippingRequest;
 use App\Http\Resources\OrderDetailResource;
 use App\Http\Resources\OrderListResource;
 use App\Http\Resources\OrderResource;
+use App\Models\ProductVariant;
 use App\Services\Api\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -77,5 +79,48 @@ class OrderController extends Controller
             'Order detail retrieved',
             new OrderDetailResource($order)
         );
+    }
+
+    public function previewShipping(PreviewShippingRequest $request)
+    {
+        $user = $request->user();
+
+        $address = $user->addresses()
+            ->findOrFail($request->address_id);
+
+        if ($request->filled('product_variant_id')) {
+            $variant = ProductVariant::with('product')
+                ->findOrFail($request->product_variant_id);
+
+            $productWeight = $variant->product->weight ?? 0;
+            $totalWeight = $productWeight * $request->quantity;
+        } else {
+            $totalWeight = $this->calculateCartWeight($user);
+        }
+
+        if ($totalWeight <= 0) {
+            return response()->json([
+                'message' => 'No items found.'
+            ], 422);
+        }
+
+        $services = $this->orderService->previewShipping(
+            $totalWeight,
+            $address->ro_subdistrict_id,
+        );
+
+        return response()->json([
+            'data' => $services
+        ]);
+    }
+
+    private function calculateCartWeight($user): int
+    {
+        if (!$user->cart) {
+            return 0;
+        }
+        return $user->cart->items->sum(function ($item) {
+            return ($item->variant->product->weight ?? 0) * $item->quantity;
+        });
     }
 }

@@ -2,12 +2,15 @@
 
 namespace App\Services\Api;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Http;
 
 class OrderService
 {
@@ -54,9 +57,12 @@ class OrderService
 
             $variants = ProductVariant::whereIn('id', $variantIds)
                 ->lockForUpdate()
-                ->with('product.images', 'attributes')
+                ->with(['product', 'product.images', 'attributes'])
                 ->get()
                 ->keyBy('id');
+
+            $totalItemPrice = 0;
+            $totalWeight = 0;
 
             foreach ($items as $item) {
                 $variant = $variants[$item->product_variant_id];
@@ -66,34 +72,64 @@ class OrderService
                 }
 
                 $variant->decrement('stock', $item->quantity);
-            }
 
-            $subtotal = $items->sum('subtotal');
-            $total = $subtotal + $data['shipping_cost'];
+                $lineSubtotal = $variant->price * $item->quantity;
+                $totalItemPrice += $lineSubtotal;
+
+                $productWeight = $variant->product->weight ?? 0;
+                $totalWeight += $productWeight * $item->quantity;
+            }
 
             $address = $user->addresses()->findOrFail($data['address_id']);
 
+            // shipping API & filter service
+            $shipping = $this->calculateShipping(
+                $totalWeight,
+                $address->ro_subdistrict_id,
+                $data['shipping_courier_code'],
+                $data['shipping_courier_service']
+            );
+
+            $shippingPrice = $shipping['cost'];
+            $shippingEstimation = $shipping['etd'];
+
+            $grandTotal = $totalItemPrice + $shippingPrice;
+
             $order = Order::create([
                 'user_id' => $user->id,
-                'order_status' => 'pending',
-                'payment_status' => 'pending',
-                'payment_method' => $data['payment_method'],
-                'subtotal' => $subtotal,
-                'total' => $total,
+                'order_number' => $this->generateOrderNumber(),
+
+                'order_status' => OrderStatus::PENDING->value,
+                'payment_status' => PaymentStatus::PENDING->value,
+
+                'payment_method' => null,
+                'payment_token' => null,
+                'payment_url' => null,
+
+                'subtotal' => $totalItemPrice,
+                'shipping_price' => $shippingPrice,
+                'insurance_price' => 0,
+                'discount_amount' => 0,
+                'grand_total' => $grandTotal,
+
+                'shipping_courier_code' => $data['shipping_courier_code'],
+                'shipping_courier_service' => $data['shipping_courier_service'],
+                'shipping_estimation' => $shippingEstimation,
+                'shipping_tracking_number' => null,
+
+                'shipping_weight' => $totalWeight,
 
                 // snapshot address
                 'recipient_name' => $address->recipient_name,
                 'recipient_phone' => $address->phone,
-                'recipient_address' => $address->address_line,
-                'province_name' => $address->province_name,
-                'city_name' => $address->city_name,
+                'recipient_address_line' => $address->address_line,
+                'recipient_province' => $address->province_name,
+                'recipient_city' => $address->city_name,
+                'recipient_district' => $address->district_name,
+                'recipient_subdistrict' => $address->subdistrict_name,
                 'postal_code' => $address->postal_code,
 
-                'shipping_courier' => $data['shipping_courier'],
-                'shipping_service' => $data['shipping_service'],
-                'shipping_cost' => $data['shipping_cost'],
-                'shipping_weight' => $data['shipping_weight'],
-                'shipping_estimation' => $data['shipping_estimation'] ?? null,
+                'note' => $data['note'] ?? null,
             ]);
 
             foreach ($items as $item) {
@@ -122,6 +158,78 @@ class OrderService
     }
 
 
+
+    private function calculateShipping(
+        int $weight,
+        int $destination,
+        string $courierCode,
+        string $courierService
+    ): array {
+
+        $origin = config('services.rajaongkir.origin');
+
+        $response = Http::asForm()
+            ->timeout(10)
+            ->withHeaders([
+                'key' => config('services.rajaongkir.key'),
+                'Accept' => 'application/json',
+            ])
+            ->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
+                'origin' => $origin,
+                'destination' => $destination,
+                'weight' => $weight,
+                'courier' => $courierCode,
+                'price' => 'lowest',
+            ]);
+
+        if (!$response->successful()) {
+            throw new \Exception('Failed to calculate shipping cost.');
+        }
+
+        $data = $response->json();
+
+        if (!isset($data['data']) || empty($data['data'])) {
+            throw new \Exception('Shipping services not found.');
+        }
+
+        $services = collect($data['data']);
+
+        $selected = $services->first(function ($service) use ($courierCode, $courierService) {
+            return $service['code'] === $courierCode
+                && $service['service'] === $courierService;
+        });
+
+        if (!$selected) {
+            throw new \Exception('Selected courier service not available.');
+        }
+
+        return [
+            'cost' => (int) $selected['cost'],
+            'etd'  => $selected['etd'] ?? null,
+        ];
+    }
+
+    private function generateOrderNumber(): string
+    {
+        $date = now()->format('Ymd');
+
+        $lastOrder = Order::whereDate('created_at', now())
+            ->orderByDesc('created_at')
+            ->lockForUpdate()
+            ->first();
+
+        if ($lastOrder) {
+            $lastNumber = (int) substr($lastOrder->order_number, -3);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return sprintf('ORD-%s-%03d', $date, $nextNumber);
+    }
+
+
+
     // get order list
     public function getOrderHistory($user, int $perPage = 10)
     {
@@ -142,5 +250,46 @@ class OrderService
                 'items.variant.product.images',
             ])
             ->findOrFail($orderId);
+    }
+
+
+    public function previewShipping(
+        int $weight,
+        int $destination,
+    ) {
+
+        $origin = config('services.rajaongkir.origin');
+        $courier = config('services.rajaongkir.courier');
+
+        $response = Http::asForm()
+            ->timeout(10)
+            ->withHeaders([
+                'key' => config('services.rajaongkir.key'),
+                'Accept' => 'application/json',
+            ])
+            ->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
+                'origin' => $origin,
+                'destination' => $destination,
+                'weight' => $weight,
+                'courier' => $courier,
+                'price' => 'lowest',
+            ]);
+
+        if (!$response->successful()) {
+            throw new \Exception('Failed to fetch shipping cost.');
+        }
+
+        $data = $response->json();
+
+        return collect($data['data'])->map(function ($service) {
+            return [
+                'name' => $service['name'],
+                'code' => $service['code'],
+                'service' => $service['service'],
+                'description' => $service['description'],
+                'cost' => (int) $service['cost'],
+                'etd' => $service['etd'] ?? null,
+            ];
+        })->values()->toArray();
     }
 }

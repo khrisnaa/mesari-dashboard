@@ -54,12 +54,12 @@ class OrderSeeder extends Seeder
                     'order_status'            => OrderStatus::PENDING->value,
                     'payment_status'          => PaymentStatus::PENDING->value,
 
-                    'payment_type'            => 'bank_transfer',
+                    'payment_method'            => 'bank_transfer',
                     'payment_token'           => null,
                     'payment_url'             => null,
 
                     // Pricing 
-                    'total_item_price'        => 0,
+                    'subtotal'        => 0,
                     'shipping_price'          => $shippingPrice,
                     'insurance_price'         => 0,
                     'discount_amount'         => 0,
@@ -70,7 +70,7 @@ class OrderSeeder extends Seeder
                     'shipping_courier_service' => 'REG',
                     'shipping_estimation'     => '2-3 days',
                     'shipping_tracking_number' => null,
-                    'shipping_weight_grams'   => 0,
+                    'shipping_weight'   => 0,
 
                     // address snapshot
                     'recipient_name'          => $user->name,
@@ -99,7 +99,7 @@ class OrderSeeder extends Seeder
 
                     $totalItemPrice += $lineSubtotal;
 
-                    // variant weight_grams
+                    // variant weight
                     $totalWeight += ($weight * $qty);
 
                     DB::table('order_items')->insert([
@@ -121,8 +121,8 @@ class OrderSeeder extends Seeder
 
                 // update total final
                 DB::table('orders')->where('id', $orderId)->update([
-                    'total_item_price'      => $totalItemPrice,
-                    'shipping_weight_grams' => $totalWeight,
+                    'subtotal'      => $totalItemPrice,
+                    'shipping_weight' => $totalWeight,
                     'grand_total'           => $grandTotal,
                 ]);
             }
