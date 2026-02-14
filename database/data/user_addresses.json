@@ -1,41 +1,21 @@
 {
     "member@example.com": [
         {
+            "ro_subdistrict_id": 17489,
             "recipient_name": "John Doe",
             "phone": "081234567890",
-            "label": "Home",
-            "address_line": "Jl. Mawar No. 123",
-            "city_id": 1101,
-            "postal_code": "12120",
+            "label": "Rumah",
+            "address_line": "Jl. Mawar No. 10",
             "is_default": true
-        },
-        {
-            "recipient_name": "John Doe",
-            "phone": "081234567890",
-            "label": "Office",
-            "address_line": "Gedung A, Lantai 2",
-            "city_id": 1102,
-            "postal_code": "11220",
-            "is_default": false
         }
     ],
     "guest@example.com": [
         {
-            "recipient_name": "Jane Guest",
-            "phone": "081298765432",
-            "label": "Home",
-            "address_line": "Jl. Melati No. 45",
-            "city_id": 1103,
-            "postal_code": "40212",
-            "is_default": true
-        },
-        {
-            "recipient_name": "Jane Guest",
-            "phone": "081298765432",
-            "label": "Parent House",
-            "address_line": "Komplek Anggrek Blok B2",
-            "city_id": 1101,
-            "postal_code": "12120",
+            "ro_subdistrict_id": 17602,
+            "recipient_name": "Guest User",
+            "phone": "089876543210",
+            "label": "Kantor",
+            "address_line": "Jl. Melati No. 20",
             "is_default": false
         }
     ]

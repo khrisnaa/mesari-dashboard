@@ -14,23 +14,17 @@ class UserAddressSeeder extends Seeder
 {
     public function run(): void
     {
-        $citiesJson = json_decode(file_get_contents(database_path('data/cities.json')), true);
-        $addressesJson = json_decode(file_get_contents(database_path('data/user_addresses.json')), true);
+        $roJson = collect(
+            json_decode(file_get_contents(database_path('data/ro_subdistricts.json')), true)
+        );
 
-        foreach ($citiesJson as $city) {
-            DB::table('cities')->updateOrInsert(
-                ['id' => $city['id']],
-                [
-                    'province_name' => $city['province_name'],
-                    'city_name' => $city['city_name'],
-                    'type' => $city['type'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-            );
-        }
+        $addressesJson = json_decode(
+            file_get_contents(database_path('data/user_addresses.json')),
+            true
+        );
 
         foreach ($addressesJson as $email => $addressList) {
+
             $user = User::where('email', $email)->first();
 
             if (!$user) {
@@ -38,40 +32,33 @@ class UserAddressSeeder extends Seeder
             }
 
             foreach ($addressList as $addr) {
-                $city = collect($citiesJson)->firstWhere('id', $addr['city_id']);
+
+                $ro = $roJson->firstWhere('id', $addr['ro_subdistrict_id']);
+
+                if (!$ro) {
+                    continue; // skip jika id tidak ditemukan
+                }
 
                 DB::table('user_addresses')->insert([
                     'id' => Str::uuid(),
                     'user_id' => $user->id,
-                    'city_id' => $addr['city_id'],
+                    'ro_subdistrict_id' => $ro['id'],
+
                     'recipient_name' => $addr['recipient_name'],
                     'phone' => $addr['phone'],
                     'label' => $addr['label'],
                     'address_line' => $addr['address_line'],
-                    'province_name' => $city['province_name'],
-                    'city_name' => $city['city_name'],
-                    'postal_code' => $addr['postal_code'],
-                    'is_default' => $addr['is_default'],
+
+                    'province_name' => $ro['province_name'],
+                    'city_name' => $ro['city_name'],
+                    'district_name' => $ro['district_name'],
+                    'subdistrict_name' => $ro['subdistrict_name'],
+                    'postal_code' => $ro['zip_code'],
+
+                    'is_default' => $addr['is_default'] ?? false,
+
                     'created_at' => now(),
                     'updated_at' => now(),
-                ]);
-            }
-        }
-    }
-
-    public function test(): void
-    {
-        $users = User::whereIn('email', ['member@example.com', 'guest@example.com'])->get();
-
-        foreach ($users as $user) {
-            for ($i = 0; $i < 3; $i++) {
-                $city = City::factory()->create();
-
-                UserAddress::factory()->create([
-                    'user_id' => $user->id,
-                    'city_id' => $city->id,
-                    'province_name' => $city->province_name,
-                    'city_name' => $city->city_name,
                 ]);
             }
         }

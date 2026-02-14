@@ -64,9 +64,10 @@ class ProductSeeder extends Seeder
                 'name' => $item['name'],
                 'slug' => $item['slug'],
                 'description' => $item['description'],
+                'weight' => 500,
                 'is_published' => true,
                 'is_customizable' => false,
-                'additional_price' => null,
+                'custom_additional_price' => null,
                 'discount_type' => null,
                 'discount_value' => null,
             ]);

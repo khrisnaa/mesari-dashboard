@@ -23,7 +23,7 @@ return new class extends Migration
             $table->boolean('is_customizable')->default(false);
             $table->decimal('custom_additional_price', 12, 2)->nullable();
             $table->string('discount_type')->nullable();
-            $table->decimal('discount_value', 10, 2)->default(0);
+            $table->decimal('discount_value', 10, 2)->default(0)->nullable();
             $table->timestamp('discount_start_at')->nullable();
             $table->timestamp('discount_end_at')->nullable();
             $table->timestamps();
