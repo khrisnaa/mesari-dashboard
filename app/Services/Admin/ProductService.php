@@ -204,6 +204,7 @@ class ProductService
                     'discount_value'     => $data['discount_value'] ?? null,
                     'discount_start_at'  => $data['discount_start_at'] ?? null,
                     'discount_end_at'    => $data['discount_end_at'] ?? null,
+                    'weight'    => $data['weight'] ?? 0,
                 ]);
 
                 // decode variants from request

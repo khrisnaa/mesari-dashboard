@@ -15,7 +15,14 @@ class ProductService
 
         $query = Product::query()
             ->where('is_published', true)
-            ->with(['category', 'variants.attributes', 'images']);
+            ->with([
+                'category',
+                'images',
+                'variants' => function ($q) {
+                    $q->where('price', '>', 0);
+                },
+                'variants.attributes'
+            ]);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -64,7 +71,15 @@ class ProductService
     // get product detail
     public function show(string $id)
     {
-        $product = Product::with(['category', 'variants.attributes', 'images', 'reviews.user'])->findOrFail($id);
+        $product = Product::with([
+            'category',
+            'images',
+            'reviews.user',
+            'variants' => function ($query) {
+                $query->where('price', '>', 0);
+            },
+            'variants.attributes'
+        ])->findOrFail($id);
 
         return [
             'item' => new ProductResource($product),

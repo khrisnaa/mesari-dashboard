@@ -21,8 +21,8 @@ return new class extends Migration
         });
 
         Schema::create('product_variant_attributes', function (Blueprint $table) {
-            $table->foreignUuid('product_variant_id')->constrained();
-            $table->foreignUuid('variant_attribute_id')->constrained();
+            $table->foreignUuid('product_variant_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('variant_attribute_id')->constrained()->onDelete('cascade');
             $table->primary(['product_variant_id', 'variant_attribute_id']);
         });
     }

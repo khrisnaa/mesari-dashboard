@@ -38,7 +38,7 @@ import { Product, VariantAttribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
-import { ArrowLeft, Plus, Save } from 'lucide-react';
+import { ArrowLeft, Plus, Save, TruckIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -102,10 +102,11 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
             custom_additional_price: product.custom_additional_price
                 ? Number(product.custom_additional_price)
                 : 0,
-            discount_type: product.discount_type,
+            discount_type: product.discount_type ?? '',
             discount_value: product.discount_value ? Number(product.discount_value) : 0,
-            discount_start_at: product.discount_start_at,
-            discount_end_at: product.discount_end_at,
+            discount_start_at: product.discount_start_at ?? '',
+            discount_end_at: product.discount_end_at ?? '',
+            weight: product.weight ?? 0,
         },
     });
 
@@ -259,6 +260,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
             'custom_additional_price',
             data.custom_additional_price ? String(data.custom_additional_price) : '',
         );
+        formData.append('weight', data.weight ? String(data.weight) : '');
 
         formData.append(
             'image_state',
@@ -455,6 +457,72 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
+                                </div>
+
+                                <div className="mt-16 grid grid-cols-2 items-start gap-8">
+                                    <div className="col-span-1">
+                                        <FormField
+                                            control={form.control}
+                                            name="weight"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Product Weight</FormLabel>
+                                                    <FormControl>
+                                                        <div className="group relative">
+                                                            <Input
+                                                                placeholder="0"
+                                                                inputMode="numeric"
+                                                                value={
+                                                                    field.value
+                                                                        ? formatNumber(
+                                                                              field.value.toString(),
+                                                                          )
+                                                                        : ''
+                                                                }
+                                                                onChange={(e) => {
+                                                                    const numericValue =
+                                                                        parseNumber(e.target.value);
+                                                                    field.onChange(numericValue);
+                                                                }}
+                                                            />
+                                                            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-medium text-muted-foreground group-focus-within:text-primary">
+                                                                grams
+                                                            </div>
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormDescription>
+                                                        Set the base weight used for shipping
+                                                        calculations.
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="col-span-1">
+                                        <div className="flex flex-col gap-3 border-l border-border pt-1 pl-6">
+                                            <div className="flex items-center gap-2 text-primary">
+                                                <TruckIcon className="h-4 w-4" />
+                                                <h4 className="text-sm font-bold tracking-wider uppercase">
+                                                    Shipping Calculation
+                                                </h4>
+                                            </div>
+
+                                            <p className="text-sm leading-relaxed text-muted-foreground">
+                                                Most logistics partners (JNE, J&T) use a{' '}
+                                                <span className="font-semibold text-foreground">
+                                                    1,300g threshold
+                                                </span>{' '}
+                                                for the first kilo. Anything above 1,301g will be
+                                                automatically charged as 2kg.
+                                            </p>
+
+                                            <div className="mt-1 w-fit rounded bg-muted px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground uppercase">
+                                                Pro Tip: Consider packaging weight (+/- 50-100g)
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -866,6 +934,8 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                     onOpenChange={pricesDialog.onOpenChange}
                     colors={selectedColors}
                     sizes={selectedSizes}
+                    setSelectedColors={setSelectedColors}
+                    setSelectedSizes={setSelectedSizes}
                 />
 
                 <NewCategoryDialog

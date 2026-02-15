@@ -64,6 +64,7 @@ export const updateProductSchema = z.object({
     discount_value: z.number().optional(),
     discount_start_at: z.string().optional(),
     discount_end_at: z.string().optional(),
+    weight: z.number().optional(),
 });
 
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;

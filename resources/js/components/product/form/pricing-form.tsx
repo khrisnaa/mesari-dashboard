@@ -14,8 +14,9 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { VariantAttribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
+import { TrashIcon } from 'lucide-react';
 
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export interface Variant {
@@ -33,6 +34,8 @@ interface PricingFormProps {
     onOpenChange: (value: boolean) => void;
     sizes: VariantAttribute[];
     colors: VariantAttribute[];
+    setSelectedColors?: Dispatch<SetStateAction<VariantAttribute[]>>;
+    setSelectedSizes?: Dispatch<SetStateAction<VariantAttribute[]>>;
     differentPricing?: boolean;
     onDifferentPricing?: (value: boolean) => void;
 }
@@ -55,6 +58,8 @@ const PricingForm = ({
     onOpenChange,
     colors,
     sizes,
+    setSelectedColors,
+    setSelectedSizes,
     differentPricing,
     onDifferentPricing,
 }: PricingFormProps) => {
@@ -215,9 +220,35 @@ const PricingForm = ({
     const handleSave = () => {
         const unique = dedupe(variants);
 
+        const uniqueColors: VariantAttribute[] = Array.from(
+            new Map(
+                unique
+                    .filter((v): v is typeof v & { color: VariantAttribute } => !!v.color)
+                    .map((v) => [v.color.id, v.color]),
+            ).values(),
+        );
+
+        const uniqueSizes: VariantAttribute[] = Array.from(
+            new Map(
+                unique
+                    .filter((v): v is typeof v & { size: VariantAttribute } => !!v.size)
+                    .map((v) => [v.size.id, v.size]),
+            ).values(),
+        );
+
+        if (setSelectedColors && setSelectedSizes) {
+            setSelectedColors(uniqueColors);
+            setSelectedSizes(uniqueSizes);
+        }
+
         form.setValue('variants', unique, { shouldDirty: true });
         handleClose();
         onDifferentPricing?.(true);
+    };
+
+    const handleRemove = (variant: Variant) => {
+        const keyToRemove = getKey(variant);
+        setVariants((prev) => prev.filter((v) => getKey(v) !== keyToRemove));
     };
 
     const handleClose = () => {
@@ -323,18 +354,19 @@ const PricingForm = ({
                     <Separator />
                     <div className="custom-scrollbar flex h-[50dvh] flex-col justify-between gap-4 overflow-y-auto pr-4">
                         <div className="grid gap-4">
-                            <div className="grid h-fit grid-cols-10 gap-4">
+                            <div className="grid h-fit grid-cols-11 gap-4">
                                 <Label>#</Label>
                                 <Label className="col-span-3">Variant</Label>
                                 <Label className="col-span-3">Pricing</Label>
                                 <Label className="col-span-3">Stock</Label>
+                                <Label className="col-span-3"></Label>
                             </div>
                             {/* Variants mapp */}
                             {variants.map((variant, i) => {
                                 return (
                                     <div
                                         key={getKey(variant)}
-                                        className="grid h-fit grid-cols-10 gap-4"
+                                        className="grid h-fit grid-cols-11 gap-4"
                                     >
                                         <div>
                                             <Checkbox
@@ -426,6 +458,16 @@ const PricingForm = ({
                                                     );
                                                 }}
                                             />
+                                        </div>
+                                        <div>
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                className="text-neutral-600"
+                                                onClick={() => handleRemove(variant)}
+                                            >
+                                                <TrashIcon />
+                                            </Button>
                                         </div>
                                     </div>
                                 );
