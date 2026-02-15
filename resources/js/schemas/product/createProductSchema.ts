@@ -70,7 +70,7 @@ export const createProductSchema = z.object({
     category_id: z.string().min(1, 'Product category is required'),
 
     is_customizable: z.boolean(),
-    additional_price: z.number().optional(),
+    custom_additional_price: z.number().optional(),
     discount_type: z.string().optional(),
     discount_value: z.number().optional(),
     discount_start_at: z.string().optional(),

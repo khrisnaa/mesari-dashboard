@@ -5,22 +5,22 @@ export interface Product {
     category_id: string;
     name: string;
     slug: string;
-    description?: string | null;
+    description?: string;
     weight: number;
     is_published: boolean;
     is_customizable: boolean;
-    custom_additional_price?: number | null;
-    discount_type?: string | null;
-    discount_value?: number | null;
-    discount_start_at?: string | null;
-    discount_end_at?: string | null;
-    variants?: ProductVariant[];
-    category?: Category;
-    images?: ProductImage[];
+    custom_additional_price?: number;
+    discount_type?: string;
+    discount_value?: number;
+    discount_start_at?: string;
+    discount_end_at?: string;
+    variants: ProductVariant[];
+    category: Category;
+    images: ProductImage[];
     total_stock?: number;
     created_at: string;
     updated_at: string;
-    deleted_at?: string | null;
+    deleted_at: string;
 }
 
 export interface ProductVariant {

@@ -29,7 +29,7 @@ class ProductFactory extends Factory
             'description' => $this->faker->paragraph(),
             'is_published' => false,
             'is_customizable' => false,
-            'additional_price' => $this->faker->optional()->randomFloat(2, 0, 20000),
+            'custom_additional_price' => $this->faker->optional()->randomFloat(2, 0, 20000),
             'discount_type' => $this->faker->optional()->randomElement(array_column(DiscountType::cases(), 'value')),
             'discount_value' => $this->faker->optional()->randomFloat(2, 0, 50000),
             'discount_start_at' => $this->faker->optional()->dateTimeBetween('-1 week', 'now'),

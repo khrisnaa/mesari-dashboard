@@ -99,7 +99,9 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
             base_stock: 0,
             selected_sizes: [],
             is_customizable: product.is_customizable,
-            additional_price: product.additional_price ? Number(product.additional_price) : 0,
+            custom_additional_price: product.custom_additional_price
+                ? Number(product.custom_additional_price)
+                : 0,
             discount_type: product.discount_type,
             discount_value: product.discount_value ? Number(product.discount_value) : 0,
             discount_start_at: product.discount_start_at,
@@ -254,8 +256,8 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         formData.append('discount_start_at', data.discount_start_at || '');
         formData.append('discount_end_at', data.discount_end_at || '');
         formData.append(
-            'additional_price',
-            data.additional_price ? String(data.additional_price) : '',
+            'custom_additional_price',
+            data.custom_additional_price ? String(data.custom_additional_price) : '',
         );
 
         formData.append(
@@ -719,7 +721,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                     <div className="pt-2">
                                         <FormField
                                             control={form.control}
-                                            name="additional_price"
+                                            name="custom_additional_price"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>

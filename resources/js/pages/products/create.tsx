@@ -89,7 +89,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
             base_stock: 0,
             selected_sizes: [],
             is_customizable: false,
-            additional_price: 0,
+            custom_additional_price: 0,
             discount_type: '',
             discount_value: 0,
             discount_start_at: '',
@@ -218,14 +218,14 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
         formData.append('category_id', data.category_id);
         formData.append('description', data.description || '');
         formData.append('is_published', data.is_published ? '1' : '0');
-        formData.append('is_customizable', data.is_published ? '1' : '0');
+        formData.append('is_customizable', data.is_customizable ? '1' : '0');
         formData.append('discount_type', data.discount_type || '');
         formData.append('discount_value', data.discount_value ? String(data.discount_value) : '');
         formData.append('discount_start_at', data.discount_start_at || '');
         formData.append('discount_end_at', data.discount_end_at || '');
         formData.append(
-            'additional_price',
-            data.additional_price ? String(data.additional_price) : '',
+            'custom_additional_price',
+            data.custom_additional_price ? String(data.custom_additional_price) : '',
         );
 
         images.forEach((img, index) => {
@@ -731,7 +731,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                     <div className="pt-2">
                                         <FormField
                                             control={form.control}
-                                            name="additional_price"
+                                            name="custom_additional_price"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>
