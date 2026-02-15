@@ -30,8 +30,12 @@ class ProductService
             $query->where('name', 'like', "%{$search}%");
         }
 
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+        if ($request->filled('category')) {
+            $slug = $request->category;
+
+            $query->whereHas('category', function ($q) use ($slug) {
+                $q->where('slug', $slug);
+            });
         }
 
         if ($request->filled('is_customizable')) {
@@ -69,7 +73,7 @@ class ProductService
     }
 
     // get product detail
-    public function show(string $id)
+    public function show(string $slug)
     {
         $product = Product::with([
             'category',
@@ -79,7 +83,9 @@ class ProductService
                 $query->where('price', '>', 0);
             },
             'variants.attributes'
-        ])->findOrFail($id);
+        ])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         return [
             'item' => new ProductResource($product),

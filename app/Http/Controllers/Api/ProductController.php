@@ -34,10 +34,10 @@ class ProductController extends Controller
         }
     }
 
-    public function show(string $id)
+    public function show(string $slug)
     {
         try {
-            $result = $this->productService->show($id);
+            $result = $this->productService->show($slug);
 
             return ApiResponse::success('Product detail', $result);
         } catch (ModelNotFoundException $e) {
