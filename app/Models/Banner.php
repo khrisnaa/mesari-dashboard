@@ -22,6 +22,16 @@ class Banner extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'cta_target_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'cta_target_id');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'banner_product');
     }
 }
