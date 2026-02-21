@@ -18,7 +18,7 @@ class BannerResource extends JsonResource
             'cta_text' => $this->cta_text,
             'cta_link' => $this->cta_link,
             'sort_order' => $this->sort_order,
-            'type' => $this->type,
+            'cta_type' => $this->cta_type,
         ];
     }
 }

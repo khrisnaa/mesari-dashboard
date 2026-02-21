@@ -30,7 +30,7 @@ class BannerFactory extends Factory
 
             'sort_order' => $this->faker->numberBetween(0, 10),
             'is_published' => $this->faker->boolean(),
-            'type' => $this->faker->randomElement(array_column(BannerType::cases(), 'value')),
+            'cta_type' => $this->faker->randomElement(array_column(BannerType::cases(), 'value')),
         ];
     }
 }

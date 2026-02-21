@@ -52,7 +52,7 @@ const Edit = ({ banner }: PageProps) => {
         cta_link: banner.cta_link ?? '',
         sort_order: banner.sort_order ?? 0,
         is_published: banner.is_published ?? true,
-        type: banner.type,
+        cta_type: banner.cta_type,
     });
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -252,25 +252,31 @@ const Edit = ({ banner }: PageProps) => {
                                 <div className="space-y-2">
                                     <Label htmlFor="type">Banner Type</Label>
                                     <Select
-                                        value={data.type as BannerType}
+                                        value={data.cta_type as BannerType}
                                         onValueChange={(value) =>
-                                            setData('type', value as BannerType)
+                                            setData('cta_type', value as BannerType)
                                         }
                                     >
                                         <SelectTrigger id="type">
                                             <SelectValue placeholder="Select banner type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value={BannerType.MARQUEE}>
-                                                Marquee
+                                            <SelectItem value={BannerType.NONE}>None</SelectItem>
+                                            <SelectItem value={BannerType.CATEGORY}>
+                                                Category
                                             </SelectItem>
-                                            <SelectItem value={BannerType.POPUP}>Popup</SelectItem>
-                                            <SelectItem value={BannerType.BANNER}>
-                                                Banner
+                                            <SelectItem value={BannerType.PRODUCT}>
+                                                Product
+                                            </SelectItem>
+                                            <SelectItem value={BannerType.PRODUCTS}>
+                                                Products
+                                            </SelectItem>
+                                            <SelectItem value={BannerType.EXTERNAL}>
+                                                External
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <InputError message={errors.type} />
+                                    <InputError message={errors.cta_type} />
                                 </div>
 
                                 <div className="space-y-2">

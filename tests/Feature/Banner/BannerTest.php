@@ -54,7 +54,7 @@ it('can store a banner', function () {
         'cta_link' => 'https://example.com',
         'sort_order' => 1,
         'is_published' => true,
-        'type' => BannerType::BANNER->value,
+        'cta_type' => BannerType::NONE->value,
     ];
 
     $this->post(route('banners.store'), $data)
@@ -92,7 +92,7 @@ it('can update a banner', function () {
         'image_path' => 'images/new.jpg',
         'sort_order' => 2,
         'is_published' => false,
-        'type' => BannerType::POPUP->value,
+        'cta_type' => BannerType::NONE->value,
 
     ];
 

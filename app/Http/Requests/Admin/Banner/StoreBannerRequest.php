@@ -34,7 +34,7 @@ class StoreBannerRequest extends FormRequest
             'sort_order'     => ['nullable', 'integer', 'min:0'],
             'is_published'      => ['required', 'boolean'],
 
-            'type' => ['required', 'in:' . implode(',', array_column(BannerType::cases(), 'value'))],
+            'cta_type' => ['required', 'in:' . implode(',', array_column(BannerType::cases(), 'value'))],
         ];
     }
 
@@ -67,8 +67,8 @@ class StoreBannerRequest extends FormRequest
             'is_published.required'  => 'Published status is required.',
             'is_published.boolean'   => 'Published status must be a boolean value.',
 
-            'type.required' => 'Banner type is required.',
-            'type.in' => 'Banner type must be one of the allowed values.',
+            'cta_type.required' => 'Banner type is required.',
+            'cta_type.in' => 'Banner type must be one of the allowed values.',
         ];
     }
 }

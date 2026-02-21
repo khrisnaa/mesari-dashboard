@@ -10,7 +10,7 @@ export interface Banner {
     cta_link: string | null;
     sort_order: number;
     is_published: boolean;
-    type: BannerType;
+    cta_type: BannerType;
     created_at: string;
     updated_at: string;
     deleted_at: string | null;

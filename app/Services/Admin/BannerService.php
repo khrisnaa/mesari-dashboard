@@ -51,7 +51,7 @@ class BannerService
             'cta_link' => $data['cta_link'] ?? null,
             'sort_order' => $data['sort_order'] ?? 0,
             'is_published' => $data['is_published'],
-            'type' => $data['type'],
+            'cta_type' => $data['cta_type'],
         ]);
     }
 
@@ -89,7 +89,7 @@ class BannerService
             'cta_link' => $data['cta_link'] ?? $banner->cta_link,
             'sort_order' => $data['sort_order'] ?? $banner->sort_order,
             'is_published' => $data['is_published'],
-            'type' => $data['type'],
+            'cta_type' => $data['cta_type'],
         ]);
 
         $banner->save();

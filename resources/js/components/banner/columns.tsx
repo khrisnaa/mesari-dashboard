@@ -54,7 +54,7 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
         meta: { width: { type: 'flex', fr: 1 } },
     },
     {
-        accessorKey: 'type',
+        accessorKey: 'cta_type',
         header: () => (
             <Button
                 variant="ghost"
@@ -65,7 +65,7 @@ export const getColumns = (onDelete: (banner: Banner) => void): ColumnDef<Banner
             </Button>
         ),
         cell: ({ row }) => {
-            const type = row.original.type;
+            const type = row.original.cta_type;
             return <div className="truncate font-medium capitalize">{type}</div>;
         },
         meta: { width: { type: 'flex', fr: 1 } },
