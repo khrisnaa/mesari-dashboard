@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\DiscountType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,6 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->unsignedInteger('weight')->default(0);
             $table->boolean('is_published')->default(false)->index();
+            $table->boolean('is_highlighted')->default(false);
             $table->boolean('is_customizable')->default(false);
             $table->decimal('custom_additional_price', 12, 2)->nullable();
             $table->string('discount_type')->nullable();

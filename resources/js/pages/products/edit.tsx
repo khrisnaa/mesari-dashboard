@@ -29,12 +29,14 @@ import { SubmitButton } from '@/components/buttons/submit-button';
 import { DateTimePicker } from '@/components/date-time-picker';
 import { PageHeader } from '@/components/page-header';
 import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
+import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useDialog } from '@/hooks/use-dialog';
 import { UpdateProductInput, updateProductSchema } from '@/schemas/product/updateProductSchema';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
 import { Product, VariantAttribute } from '@/types/product';
+import { cleanFlashMessage } from '@/utils/cleanFlashMessage';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
@@ -99,6 +101,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
             base_stock: 0,
             selected_sizes: [],
             is_customizable: product.is_customizable,
+            is_highlighted: product.is_highlighted,
             custom_additional_price: product.custom_additional_price
                 ? Number(product.custom_additional_price)
                 : 0,
@@ -242,6 +245,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
     // form submit handler
     const [loading, setLoading] = useState(false);
     const onSubmit = (data: UpdateProductInput) => {
+        console.log(data);
         setLoading(true);
         const formData = new FormData();
 
@@ -251,7 +255,8 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         formData.append('category_id', data.category_id);
         formData.append('description', data.description || '');
         formData.append('is_published', data.is_published ? '1' : '0');
-        formData.append('is_customizable', data.is_published ? '1' : '0');
+        formData.append('is_customizable', data.is_customizable ? '1' : '0');
+        formData.append('is_highlighted', data.is_highlighted ? '1' : '0');
         formData.append('discount_type', data.discount_type || '');
         formData.append('discount_value', data.discount_value ? String(data.discount_value) : '');
         formData.append('discount_start_at', data.discount_start_at || '');
@@ -283,7 +288,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
             forceFormData: true,
             onError: (errors) => {
                 const errorMessage = Object.values(errors)[0];
-                toast.error(errorMessage);
+                toast.error(cleanFlashMessage(errorMessage));
             },
             onFinish: () => setLoading(false),
         });
@@ -659,7 +664,6 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                                                         'discount_value',
                                                                     ) ?? 0;
 
-                                                                // auto clamp if changing to %
                                                                 if (
                                                                     value === 'percentage' &&
                                                                     current > 100
@@ -751,7 +755,6 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h4 className="font-semibold">Customization Settings</h4>
 
-                                {/* Toggle is_customizable */}
                                 <FormField
                                     control={form.control}
                                     name="is_customizable"
@@ -784,7 +787,6 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                     )}
                                 />
 
-                                {/* Additional price only if customizable */}
                                 {form.watch('is_customizable') && (
                                     <div className="pt-2">
                                         <FormField
@@ -839,7 +841,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                 </div>
                             </div>
 
-                            <div className="space-y-4 rounded-lg border p-4">
+                            <Card className="space-y-4 rounded-lg border p-4">
                                 <h4 className="font-semibold">Category</h4>
                                 <FormField
                                     control={form.control}
@@ -879,9 +881,9 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                         Add category
                                     </Button>
                                 </div>
-                            </div>
+                            </Card>
 
-                            <div className="space-y-4 rounded-lg border p-4">
+                            <Card className="space-y-4 p-4">
                                 <h4 className="font-semibold">Publish Settings</h4>
 
                                 <FormField
@@ -917,7 +919,42 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                         </FormItem>
                                     )}
                                 />
-                            </div>
+                            </Card>
+
+                            <Card className="space-y-4 p-4">
+                                <h4 className="font-semibold">Highlight Settings</h4>
+
+                                <FormField
+                                    control={form.control}
+                                    name="is_highlighted"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-3">
+                                            <div className="space-y-1">
+                                                <FormLabel>Highlight Product</FormLabel>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Toggle to feature this product prominently on
+                                                    the store.
+                                                </p>
+                                            </div>
+
+                                            <FormControl>
+                                                <div className="flex items-center justify-between px-3 py-2">
+                                                    <span className="text-sm font-medium">
+                                                        {field.value ? 'Highlighted' : 'Normal'}
+                                                    </span>
+
+                                                    <Switch
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </div>
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </Card>
                         </section>
                     </section>
                 </form>

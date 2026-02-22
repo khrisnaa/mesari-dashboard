@@ -29,6 +29,7 @@ class StoreProductRequest extends FormRequest
             'weight' => ['nullable', 'integer'],
             'is_published' => ['required', 'boolean'],
             'is_customizable' => ['nullable', 'boolean'],
+            'is_highlighted' => ['nullable', 'boolean'],
 
             'custom_additional_price' => ['nullable', 'numeric', 'min:0'],
 
@@ -80,7 +81,7 @@ class StoreProductRequest extends FormRequest
             'discount_end_at.after_or_equal' => 'End date must be on or after the start date.',
 
             'custom_additional_price.numeric' => 'Additional price must be a valid number.',
-            'custom_additional_price.min'     => 'Additional price cannot be less than 0.',
+            'custom_additional_price.min' => 'Additional price cannot be less than 0.',
         ];
     }
 }

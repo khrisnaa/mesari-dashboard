@@ -89,6 +89,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
             base_stock: 0,
             selected_sizes: [],
             is_customizable: false,
+            is_highlighted: false,
             custom_additional_price: 0,
             discount_type: '',
             discount_value: 0,
@@ -220,6 +221,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
         formData.append('description', data.description || '');
         formData.append('is_published', data.is_published ? '1' : '0');
         formData.append('is_customizable', data.is_customizable ? '1' : '0');
+        formData.append('is_highlighted', data.is_highlighted ? '1' : '0');
         formData.append('discount_type', data.discount_type || '');
         formData.append('discount_value', data.discount_value ? String(data.discount_value) : '');
         formData.append('discount_start_at', data.discount_start_at || '');
@@ -908,6 +910,41 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                                 <div className="flex items-center justify-between px-3 py-2">
                                                     <span className="text-sm font-medium">
                                                         {field.value ? 'Published' : 'Archived'}
+                                                    </span>
+
+                                                    <Switch
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                </div>
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </Card>
+
+                            <Card className="space-y-4 p-4">
+                                <h4 className="font-semibold">Highlight Settings</h4>
+
+                                <FormField
+                                    control={form.control}
+                                    name="is_highlighted"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-3">
+                                            <div className="space-y-1">
+                                                <FormLabel>Highlight Product</FormLabel>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Toggle to feature this product prominently on
+                                                    the store.
+                                                </p>
+                                            </div>
+
+                                            <FormControl>
+                                                <div className="flex items-center justify-between px-3 py-2">
+                                                    <span className="text-sm font-medium">
+                                                        {field.value ? 'Highlighted' : 'Normal'}
                                                     </span>
 
                                                     <Switch

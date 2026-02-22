@@ -8,7 +8,7 @@
         "cta_link": "/shop",
         "sort_order": 1,
         "is_published": true,
-        "type": "banner"
+        "cta_type": "banner"
     },
     {
         "title": "New Arrivals",
@@ -19,7 +19,7 @@
         "cta_link": "/new",
         "sort_order": 2,
         "is_published": true,
-        "type": "marquee"
+        "cta_type": "marquee"
     },
     {
         "title": "Exclusive Offer",
@@ -30,7 +30,7 @@
         "cta_link": "/register",
         "sort_order": 3,
         "is_published": false,
-        "type": "popup"
+        "cta_type": "popup"
     },
     {
         "title": "Holiday Promo",
@@ -41,7 +41,7 @@
         "cta_link": "/promo",
         "sort_order": 4,
         "is_published": true,
-        "type": "banner"
+        "cta_type": "banner"
     },
     {
         "title": "Flash Deal",
@@ -52,6 +52,6 @@
         "cta_link": "/flash",
         "sort_order": 5,
         "is_published": false,
-        "type": "marquee"
+        "cta_type": "marquee"
     }
 ]

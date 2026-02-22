@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Product\StoreProductRequest;
 use App\Http\Requests\Admin\Product\UpdateProductRequest;
-use App\Models\VariantAttribute;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\VariantAttribute;
 use App\Services\Admin\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +27,7 @@ class ProductController extends Controller
 
         return Inertia::render('products/index', [
             'products' => $products,
-            'params'  => $request->only(['search', 'sort', 'direction', 'per_page']),
+            'params' => $request->only(['search', 'sort', 'direction', 'per_page']),
         ]);
     }
 
@@ -38,10 +38,8 @@ class ProductController extends Controller
         $sizes = VariantAttribute::where('type', 'size')
             ->when(
                 DB::getDriverName() === 'mysql',
-                fn($q) =>
-                $q->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'ALL')"),
-                fn($q) =>
-                $q->orderBy('name')
+                fn ($q) => $q->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'ALL')"),
+                fn ($q) => $q->orderBy('name')
             )
             ->get();
 
@@ -56,13 +54,10 @@ class ProductController extends Controller
             })
             ->when(
                 DB::getDriverName() === 'mysql',
-                fn($q) =>
-                $q->orderByRaw("FIELD(name, 'White', 'Black') DESC"),
-                fn($q) =>
-                $q->orderBy('name')
+                fn ($q) => $q->orderByRaw("FIELD(name, 'White', 'Black') DESC"),
+                fn ($q) => $q->orderBy('name')
             )
             ->get();
-
 
         return Inertia::render('products/create', [
             'categories' => $categories,
@@ -70,7 +65,6 @@ class ProductController extends Controller
             'sizes' => $sizes,
         ]);
     }
-
 
     public function store(StoreProductRequest $request)
     {
@@ -84,11 +78,10 @@ class ProductController extends Controller
             Log::error($e);
 
             return back()->withErrors([
-                'error' => FlashHelper::stamp('Failed to create product.')
+                'error' => FlashHelper::stamp('Failed to create product.'),
             ]);
         }
     }
-
 
     public function edit(Product $product)
     {
@@ -97,10 +90,8 @@ class ProductController extends Controller
         $sizes = VariantAttribute::where('type', 'size')
             ->when(
                 DB::getDriverName() === 'mysql',
-                fn($q) =>
-                $q->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'ALL')"),
-                fn($q) =>
-                $q->orderBy('name')
+                fn ($q) => $q->orderByRaw("FIELD(name, 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'ALL')"),
+                fn ($q) => $q->orderBy('name')
             )
             ->get();
 
@@ -115,10 +106,8 @@ class ProductController extends Controller
             })
             ->when(
                 DB::getDriverName() === 'mysql',
-                fn($q) =>
-                $q->orderByRaw("FIELD(name, 'White', 'Black') DESC"),
-                fn($q) =>
-                $q->orderBy('name')
+                fn ($q) => $q->orderByRaw("FIELD(name, 'White', 'Black') DESC"),
+                fn ($q) => $q->orderBy('name')
             )
             ->get();
 
@@ -134,17 +123,16 @@ class ProductController extends Controller
         ]);
     }
 
-
     public function update(UpdateProductRequest $request, Product $product)
     {
 
         try {
             $validated = $request->validated();
 
-            Log::info('REQUEST VARIANTS:', [
-                'variants_raw' => $validated['variants'] ?? null,
-                'variants_decoded' => json_decode($validated['variants'] ?? '[]', true),
-            ]);
+            // Log::info('REQUEST VARIANTS:', [
+            //     'variants_raw' => $validated['variants'] ?? null,
+            //     'variants_decoded' => json_decode($validated['variants'] ?? '[]', true),
+            // ]);
 
             $this->productService->update($product, $validated);
 
@@ -155,11 +143,10 @@ class ProductController extends Controller
             Log::error($e);
 
             return back()->withErrors([
-                'error' => FlashHelper::stamp('Failed to update product.')
+                'error' => FlashHelper::stamp('Failed to update product.'),
             ]);
         }
     }
-
 
     public function destroy(Product $product)
     {

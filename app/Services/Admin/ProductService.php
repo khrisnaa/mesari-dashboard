@@ -2,10 +2,10 @@
 
 namespace App\Services\Admin;
 
-use App\Models\VariantAttribute;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use App\Models\VariantAttribute;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -18,32 +18,28 @@ class ProductService
     // paginate products with optional search, filters, and sorting
     public function paginate(array $params): LengthAwarePaginator
     {
-        $perPage   = $params['per_page'] ?? 10;
-        $sort      = $params['sort'] ?? 'created_at';
+        $perPage = $params['per_page'] ?? 10;
+        $sort = $params['sort'] ?? 'created_at';
         $direction = ($params['direction'] ?? '') === 'asc' ? 'asc' : 'desc';
-        $search    = $params['search'] ?? null;
+        $search = $params['search'] ?? null;
 
         return Product::query()
             ->withSum('variants as total_stock', 'stock')
             ->with([
                 'category',
-                'variants' => fn($query) =>
-                $query->with('attributes')->orderBy('price', 'asc')
+                'variants' => fn ($query) => $query->with('attributes')->orderBy('price', 'asc'),
             ])
             ->when(
                 $search,
-                fn($q) =>
-                $q->where('name', 'like', "%{$search}%")
+                fn ($q) => $q->where('name', 'like', "%{$search}%")
             )
             ->when(
                 $sort === 'stock',
-                fn($q) =>
-                $q->orderBy('total_stock', $direction)
+                fn ($q) => $q->orderBy('total_stock', $direction)
             )
             ->when(
                 $sort === 'price',
-                fn($q) =>
-                $q->orderBy(
+                fn ($q) => $q->orderBy(
                     ProductVariant::select('price')
                         ->whereColumn('product_id', 'products.id')
                         ->orderBy('price', 'asc')
@@ -51,7 +47,7 @@ class ProductService
                     $direction
                 )
             )
-            ->when(!in_array($sort, ['price', 'stock']), function ($q) use ($sort, $direction) {
+            ->when(! in_array($sort, ['price', 'stock']), function ($q) use ($sort, $direction) {
                 if ($sort) {
                     $q->orderBy($sort, $direction)->orderBy('id');
                 } else {
@@ -73,19 +69,19 @@ class ProductService
                 $data['slug'] = Str::slug($data['name']);
 
                 $product = Product::create([
-                    'name'        => $data['name'],
-                    'slug'        => $data['slug'],
+                    'name' => $data['name'],
+                    'slug' => $data['slug'],
                     'description' => $data['description'],
                     'category_id' => $data['category_id'],
                     'is_published' => $data['is_published'],
-                    'is_customizable'    => $data['is_customizable'] ?? false,
-                    'custom_additional_price'   => $data['custom_additional_price'] ?? null,
-                    'discount_type'      => $data['discount_type'] ?? null,
-                    'discount_value'     => $data['discount_value'] ?? null,
-                    'discount_start_at'  => $data['discount_start_at'] ?? null,
-                    'discount_end_at'    => $data['discount_end_at'] ?? null,
+                    'is_customizable' => $data['is_customizable'] ?? false,
+                    'is_highlighted' => $data['is_highlighted'] ?? false,
+                    'custom_additional_price' => $data['custom_additional_price'] ?? null,
+                    'discount_type' => $data['discount_type'] ?? null,
+                    'discount_value' => $data['discount_value'] ?? null,
+                    'discount_start_at' => $data['discount_start_at'] ?? null,
+                    'discount_end_at' => $data['discount_end_at'] ?? null,
                 ]);
-
 
                 $variants = json_decode($data['variants'], true) ?? [];
 
@@ -93,10 +89,10 @@ class ProductService
 
                     $colorId = null;
 
-                    if (!empty($variant['color']['name'])) {
+                    if (! empty($variant['color']['name'])) {
                         $color = VariantAttribute::firstOrCreate([
                             'name' => $variant['color']['name'],
-                            'hex'  => $variant['color']['hex'],
+                            'hex' => $variant['color']['hex'],
                             'type' => 'color',
                         ]);
 
@@ -105,8 +101,8 @@ class ProductService
 
                     $productVariant = ProductVariant::create([
                         'product_id' => $product->id,
-                        'price'      => $variant['price'],
-                        'stock'      => $variant['stock'],
+                        'price' => $variant['price'],
+                        'stock' => $variant['stock'],
                     ]);
 
                     $attributeIds = collect([
@@ -117,9 +113,7 @@ class ProductService
                     $productVariant->attributes()->sync($attributeIds);
                 }
 
-
                 // if (!empty($data['discount']) && is_array($data['discount'])) {
-
 
                 //     $discount = [
                 //         'type'      => $data['discount']['type'] ?? null,
@@ -132,16 +126,14 @@ class ProductService
                 //             : null,
                 //     ];
 
-
                 //     if (!empty($discount['type'])) {
                 //         $product->discount()->create($discount);
                 //     }
                 // }
 
+                if (! empty($data['images'])) {
 
-                if (!empty($data['images'])) {
-
-                    $basePath = 'product-images/' . $product->slug . '/' . now()->format('Y/m/d');
+                    $basePath = 'product-images/'.$product->slug.'/'.now()->format('Y/m/d');
 
                     $thumbnail = collect($data['images'])
                         ->firstWhere('type', 'thumbnail');
@@ -155,8 +147,8 @@ class ProductService
 
                         ProductImage::create([
                             'product_id' => $product->id,
-                            'path'       => $path,
-                            'type'       => 'thumbnail',
+                            'path' => $path,
+                            'type' => 'thumbnail',
                         ]);
                     }
 
@@ -165,8 +157,8 @@ class ProductService
 
                         ProductImage::create([
                             'product_id' => $product->id,
-                            'path'       => $path,
-                            'type'       => 'gallery',
+                            'path' => $path,
+                            'type' => 'gallery',
                             'sort_order' => $index,
                         ]);
                     }
@@ -194,25 +186,26 @@ class ProductService
 
                 // update basic product fields
                 $product->update([
-                    'name'        => $data['name'],
+                    'name' => $data['name'],
                     'description' => $data['description'],
                     'category_id' => $data['category_id'],
                     'is_published' => $data['is_published'],
-                    'is_customizable'    => $data['is_customizable'] ?? false,
-                    'custom_additional_price'   => $data['custom_additional_price'] ?? null,
-                    'discount_type'      => $data['discount_type'] ?? null,
-                    'discount_value'     => $data['discount_value'] ?? null,
-                    'discount_start_at'  => $data['discount_start_at'] ?? null,
-                    'discount_end_at'    => $data['discount_end_at'] ?? null,
-                    'weight'    => $data['weight'] ?? 0,
+                    'is_customizable' => $data['is_customizable'] ?? false,
+                    'is_highlighted' => $data['is_highlighted'] ?? false,
+                    'custom_additional_price' => $data['custom_additional_price'] ?? null,
+                    'discount_type' => $data['discount_type'] ?? null,
+                    'discount_value' => $data['discount_value'] ?? null,
+                    'discount_start_at' => $data['discount_start_at'] ?? null,
+                    'discount_end_at' => $data['discount_end_at'] ?? null,
+                    'weight' => $data['weight'] ?? 0,
                 ]);
 
                 // decode variants from request
                 $variants = json_decode($data['variants'], true) ?? [];
 
-                // normalize color id 
+                // normalize color id
                 foreach ($variants as $idx => $variant) {
-                    if (!empty($variant['color']['name'])) {
+                    if (! empty($variant['color']['name'])) {
                         $color = VariantAttribute::firstOrCreate(
                             ['type' => 'color', 'name' => $variant['color']['name']],
                             ['hex' => $variant['color']['hex']]
@@ -221,7 +214,6 @@ class ProductService
                         $variants[$idx]['color']['id'] = $color->id;
                     }
                 }
-
 
                 // active ids for final deletion
                 $activeVariantIds = [];
@@ -245,16 +237,17 @@ class ProductService
                     // matching (size+color)
                     $matchedVariant = $existingVariants->first(function ($v) use ($incomingAttrIds) {
                         $existingAttrIds = $v->attributes->pluck('id')->sort()->values()->all();
+
                         return $existingAttrIds === $incomingAttrIds;
                     });
 
                     // save
                     if ($matchedVariant) {
 
-                        Log::info('✔ MATCH FOUND', [
-                            'variant_id' => $matchedVariant->id,
-                            'incoming_attrs' => $incomingAttrIds
-                        ]);
+                        // Log::info('MATCH FOUND', [
+                        //     'variant_id' => $matchedVariant->id,
+                        //     'incoming_attrs' => $incomingAttrIds,
+                        // ]);
 
                         if ($matchedVariant->trashed()) {
                             $matchedVariant->restore();
@@ -268,14 +261,14 @@ class ProductService
                         $productVariant = $matchedVariant;
                     } else {
 
-                        Log::info('✘ MATCH NOT FOUND → CREATE NEW', [
-                            'incoming_attrs' => $incomingAttrIds
-                        ]);
+                        // Log::info('✘ MATCH NOT FOUND → CREATE NEW', [
+                        //     'incoming_attrs' => $incomingAttrIds,
+                        // ]);
 
                         $productVariant = ProductVariant::create([
                             'product_id' => $product->id,
-                            'price'      => $variant['price'],
-                            'stock'      => $variant['stock'],
+                            'price' => $variant['price'],
+                            'stock' => $variant['stock'],
                         ]);
                     }
 
@@ -285,14 +278,14 @@ class ProductService
                     // push fresh id
                     $activeVariantIds[] = $productVariant->id;
 
-                    Log::info("ACTIVE IDS NOW", $activeVariantIds);
+                    // Log::info('ACTIVE IDS NOW', $activeVariantIds);
                 }
 
                 // remove variants not included
                 ProductVariant::withTrashed()
                     ->where('product_id', $product->id)
                     ->whereNotIn('id', $activeVariantIds)
-                    ->each(fn($v) => $v->delete());
+                    ->each(fn ($v) => $v->delete());
 
                 // discount handling
                 // if (!empty($data['discount']) && is_array($data['discount'])) {
@@ -363,13 +356,13 @@ class ProductService
         array $uploads,
         ?string &$basePath
     ): void {
-        $state   = collect($imageState);
+        $state = collect($imageState);
         $uploads = collect($uploads);
 
-        $basePath = 'product-images/' . $product->slug . '/' . now()->format('Y/m/d');
+        $basePath = 'product-images/'.$product->slug.'/'.now()->format('Y/m/d');
 
         $existing = ProductImage::where('product_id', $product->id)->get();
-        $keepIds  = $state->pluck('id')->filter()->all();
+        $keepIds = $state->pluck('id')->filter()->all();
 
         // delete removed images
         $existing->whereNotIn('id', $keepIds)->each(function ($image) {
@@ -380,22 +373,24 @@ class ProductService
         });
 
         // update existing images
-        $state->filter(fn($s) => isset($s['id']))->each(function ($s) {
+        $state->filter(fn ($s) => isset($s['id']))->each(function ($s) {
             ProductImage::where('id', $s['id'])->update([
-                'type'       => $s['type'],
+                'type' => $s['type'],
                 'sort_order' => $s['sort_order'] ?? 0,
             ]);
         });
 
         // create new images from state
-        $state->filter(fn($s) => !isset($s['id']))->each(function ($s) use ($uploads, $product, $basePath) {
+        $state->filter(fn ($s) => ! isset($s['id']))->each(function ($s) use ($uploads, $product, $basePath) {
             $file = $uploads->shift();
-            if (! $file) return;
+            if (! $file) {
+                return;
+            }
 
             ProductImage::create([
                 'product_id' => $product->id,
-                'path'       => $file->store($basePath, 'public'),
-                'type'       => $s['type'] ?? 'gallery',
+                'path' => $file->store($basePath, 'public'),
+                'type' => $s['type'] ?? 'gallery',
                 'sort_order' => $s['sort_order'] ?? 0,
             ]);
         });
@@ -408,8 +403,8 @@ class ProductService
         $uploads->each(function ($file) use ($product, $basePath, &$nextSort) {
             ProductImage::create([
                 'product_id' => $product->id,
-                'path'       => $file->store($basePath, 'public'),
-                'type'       => 'gallery',
+                'path' => $file->store($basePath, 'public'),
+                'type' => 'gallery',
                 'sort_order' => ++$nextSort,
             ]);
         });

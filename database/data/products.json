@@ -7,8 +7,8 @@
         "price": 129000,
         "colors": ["Black", "White", "Red"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     },
     {
         "category": "T-Shirt",
@@ -18,8 +18,8 @@
         "price": 189000,
         "colors": ["White", "Navy", "Blue"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     },
     {
         "category": "T-Shirt",
@@ -29,8 +29,8 @@
         "price": 159000,
         "colors": ["Black", "White", "Blue"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     },
     {
         "category": "T-Shirt",
@@ -40,8 +40,8 @@
         "price": 149000,
         "colors": ["Red", "Black", "White"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     },
     {
         "category": "Long Sleeves",
@@ -51,8 +51,8 @@
         "price": 159000,
         "colors": ["Navy", "White", "Black"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     },
     {
         "category": "Long Sleeves",
@@ -62,8 +62,8 @@
         "price": 199000,
         "colors": ["Blue", "Black", "White"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     },
     {
         "category": "Long Sleeves",
@@ -73,8 +73,8 @@
         "price": 169000,
         "colors": ["Black", "Green", "White"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     },
     {
         "category": "Tanktop",
@@ -84,8 +84,8 @@
         "price": 99000,
         "colors": ["Green", "Black", "Blue"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     },
     {
         "category": "Tanktop",
@@ -95,8 +95,8 @@
         "price": 89000,
         "colors": ["White", "Black", "Red"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     },
     {
         "category": "Tanktop",
@@ -106,7 +106,7 @@
         "price": 119000,
         "colors": ["Blue", "Black", "Green"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "/default-thumbnail.jpg",
-        "gallery": ["/gallery-1.jpg", "/gallery-2.jpg", "/gallery-3.jpg"]
+        "thumbnail": "default-thumbnail.jpg",
+        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
     }
 ]

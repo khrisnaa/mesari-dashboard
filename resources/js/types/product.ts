@@ -9,6 +9,7 @@ export interface Product {
     weight: number;
     is_published: boolean;
     is_customizable: boolean;
+    is_highlighted: boolean;
     custom_additional_price?: number;
     discount_type?: string;
     discount_value?: number;

@@ -15,7 +15,6 @@ use App\Http\Controllers\Api\UserAddressController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
-
 // auth routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -26,7 +25,6 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
-
 
 // public routes
 Route::get('/faqs', [FaqController::class, 'index']);
@@ -40,14 +38,13 @@ Route::get('/categories', [CategoryController::class, 'index']);
 // midtrans notification
 Route::post('/midtrans/notification', [PaymentController::class, 'notification']);
 
-
 // protected routes
 Route::middleware('auth:sanctum')->group(function () {
 
     // user profile
-    Route::get('/me', [UserController::class, 'edit']);
-    Route::put('/me', [UserController::class, 'update']);
-    Route::put('/me/password', [UserController::class, 'updatePassword']);
+    Route::get('/user', [UserController::class, 'edit']);
+    Route::put('/user', [UserController::class, 'update']);
+    Route::put('/user/password', [UserController::class, 'updatePassword']);
 
     // cart
     Route::get('/cart', [CartController::class, 'index']);
