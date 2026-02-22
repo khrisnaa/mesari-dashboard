@@ -24,16 +24,16 @@ class UpdateBannerRequest extends FormRequest
     {
         return [
 
-            'title' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:255'],
+            'title' => ['required', 'string'],
+            'description' => ['required', 'string'],
 
             'backdrop' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
 
             'cta_type' => ['nullable', 'string', 'in:'.implode(',', array_column(BannerType::cases(), 'value'))],
-            'cta_text' => ['nullable', 'string', 'max:255'],
+            'cta_text' => ['nullable', 'string'],
             'cta_target_id' => ['nullable', 'uuid'],
-            'cta_link' => ['nullable', 'string', 'max:255'],
+            'cta_link' => ['nullable', 'string'],
 
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_published' => ['required', 'boolean'],
@@ -46,9 +46,11 @@ class UpdateBannerRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'title.required' => 'Title is required.',
             'title.string' => 'Title must be a valid string.',
             'title.max' => 'Title cannot exceed 255 characters.',
 
+            'description.required' => 'Description is required.',
             'description.string' => 'Description must be a valid string.',
             'description.max' => 'Description cannot exceed 255 characters.',
 

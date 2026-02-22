@@ -2,56 +2,56 @@
     {
         "title": "Big Sale Weekend",
         "description": "Get up to 50% off selected items.",
-        "backdrop_path": "/dummy-backdrop-1.jpg",
-        "image_path": "/dummy-banner-1.jpg",
+        "backdrop_path": "dummies/image (7).jpeg",
+        "image_path": "dummies/image (14).jpeg",
         "cta_text": "Shop Now",
         "cta_link": "/shop",
         "sort_order": 1,
         "is_published": true,
-        "cta_type": "banner"
+        "cta_type": "none"
     },
     {
         "title": "New Arrivals",
         "description": "Fresh new styles now available.",
-        "backdrop_path": "/dummy-backdrop-2.jpg",
-        "image_path": "/dummy-banner-2.jpg",
+        "backdrop_path": "dummies/image (3).jpeg",
+        "image_path": "dummies/image (18).jpeg",
         "cta_text": "Explore",
         "cta_link": "/new",
         "sort_order": 2,
         "is_published": true,
-        "cta_type": "marquee"
+        "cta_type": "none"
     },
     {
         "title": "Exclusive Offer",
         "description": "Special discount for new members.",
-        "backdrop_path": "/dummy-backdrop-3.jpg",
-        "image_path": "/dummy-banner-3.jpg",
+        "backdrop_path": "dummies/image (12).jpeg",
+        "image_path": "dummies/image (5).jpeg",
         "cta_text": "Join Now",
         "cta_link": "/register",
         "sort_order": 3,
         "is_published": false,
-        "cta_type": "popup"
+        "cta_type": "none"
     },
     {
         "title": "Holiday Promo",
         "description": "Celebrate with our limited-time deals.",
-        "backdrop_path": "/dummy-backdrop-4.jpg",
-        "image_path": "/dummy-banner-4.jpg",
+        "backdrop_path": "dummies/image (19).jpeg",
+        "image_path": "dummies/image (9).jpeg",
         "cta_text": "See Details",
         "cta_link": "/promo",
         "sort_order": 4,
         "is_published": true,
-        "cta_type": "banner"
+        "cta_type": "none"
     },
     {
         "title": "Flash Deal",
         "description": "Deals end in a few hours. Don't miss it!",
-        "backdrop_path": "/dummy-backdrop-5.jpg",
-        "image_path": "/dummy-banner-5.jpg",
+        "backdrop_path": "dummies/image (2).jpeg",
+        "image_path": "dummies/image (16).jpeg",
         "cta_text": "Grab Now",
         "cta_link": "/flash",
         "sort_order": 5,
         "is_published": false,
-        "cta_type": "marquee"
+        "cta_type": "none"
     }
 ]

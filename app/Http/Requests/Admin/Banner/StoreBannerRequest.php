@@ -23,16 +23,16 @@ class StoreBannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:255'],
+            'title' => ['required', 'string'],
+            'description' => ['required', 'string'],
 
-            'backdrop' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'backdrop' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
 
             'cta_type' => ['required', 'string', 'in:'.implode(',', array_column(BannerType::cases(), 'value'))],
-            'cta_text' => ['nullable', 'string', 'max:255'],
+            'cta_text' => ['nullable', 'string'],
             'cta_target_id' => ['nullable', 'uuid'],
-            'cta_link' => ['nullable', 'string', 'max:255'],
+            'cta_link' => ['nullable', 'string'],
 
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_published' => ['required', 'boolean'],
@@ -50,16 +50,19 @@ class StoreBannerRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'title.required' => 'Title is required.',
             'title.string' => 'Title must be a valid string.',
-            'title.max' => 'Title cannot exceed 255 characters.',
 
+            'description.required' => 'Description is required.',
             'description.string' => 'Description must be a valid string.',
             'description.max' => 'Description cannot exceed 255 characters.',
 
+            'backdrop.required' => 'Backdrop is required.',
             'backdrop.image' => 'Backdrop must be a valid image.',
             'backdrop.mimes' => 'Backdrop must be JPEG, PNG, JPG, or WEBP.',
             'backdrop.max' => 'Backdrop file cannot exceed 2MB.',
 
+            'image.required' => 'Image is required.',
             'image.image' => 'Image must be a valid image.',
             'image.mimes' => 'Image must be JPEG, PNG, JPG, or WEBP.',
             'image.max' => 'Image file cannot exceed 2MB.',

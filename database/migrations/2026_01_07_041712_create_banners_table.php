@@ -14,10 +14,10 @@ return new class extends Migration
     {
         Schema::create('banners', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('title')->nullable();
-            $table->string('description')->nullable();
-            $table->string('backdrop_path')->nullable();
-            $table->string('image_path')->nullable();
+            $table->string('title');
+            $table->string('description');
+            $table->string('backdrop_path');
+            $table->string('image_path');
             $table->enum('cta_type', array_column(BannerType::cases(), 'value'))->default(BannerType::NONE->value);
             $table->string('cta_text')->nullable();
             $table->uuid('cta_target_id')->nullable();

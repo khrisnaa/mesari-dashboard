@@ -29,9 +29,9 @@ export enum PaymentStatus {
 }
 
 export enum BannerType {
-    NONE = 'marquee',
-    PRODUCT = 'popup',
-    CATEGORY = 'banner',
+    NONE = 'none',
+    PRODUCT = 'product',
+    CATEGORY = 'category',
     PRODUCTS = 'products',
     EXTERNAL = 'external',
 }

@@ -2,8 +2,8 @@ import { BannerType } from './enum';
 
 export interface Banner {
     id: string;
-    title: string | null;
-    description: string | null;
+    title: string;
+    description: string;
     backdrop_path: string;
     image_path: string;
     cta_text: string | null;

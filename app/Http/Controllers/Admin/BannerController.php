@@ -70,6 +70,7 @@ class BannerController extends Controller
 
     public function update(UpdateBannerRequest $request, Banner $banner)
     {
+
         $this->bannerService->update($banner, $request->validated());
 
         return redirect()->route('banners.index')
