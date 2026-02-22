@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum BannerType: string
 {
-    case NONE = 'marquee';
+    case NONE = 'none';
     case PRODUCT = 'popup';
     case CATEGORY = 'banner';
     case PRODUCTS = 'products';

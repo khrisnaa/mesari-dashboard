@@ -2,6 +2,7 @@
 
 namespace App\Services\Admin;
 
+use App\Enums\BannerType;
 use App\Models\Banner;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
@@ -29,10 +30,9 @@ class BannerService
             ->withQueryString();
     }
 
-    // store a new banner
     public function store(array $data): Banner
     {
-        $basePath = 'banners/' . now()->format('Y/m/d');
+        $basePath = 'banners/'.now()->format('Y/m/d');
 
         $backdropPath = isset($data['backdrop']) && $data['backdrop']
             ? $data['backdrop']->store($basePath, 'public')
@@ -42,63 +42,96 @@ class BannerService
             ? $data['image']->store($basePath, 'public')
             : null;
 
-        return Banner::create([
+        $ctaType = $data['cta_type'];
+        $ctaLink = null;
+        $ctaTargetId = null;
+
+        if ($ctaType === BannerType::EXTERNAL->value) {
+
+            $ctaLink = $data['cta_link'] ?? null;
+        } elseif (in_array($ctaType, [BannerType::PRODUCT->value, BannerType::CATEGORY->value])) {
+
+            $ctaTargetId = $data['cta_target_id'] ?? null;
+        }
+
+        $banner = Banner::create([
             'title' => $data['title'] ?? null,
             'description' => $data['description'] ?? null,
             'backdrop_path' => $backdropPath,
             'image_path' => $imagePath,
             'cta_text' => $data['cta_text'] ?? null,
-            'cta_link' => $data['cta_link'] ?? null,
+            'cta_link' => $ctaLink,
+            'cta_target_id' => $ctaTargetId,
             'sort_order' => $data['sort_order'] ?? 0,
-            'is_published' => $data['is_published'],
-            'cta_type' => $data['cta_type'],
+            'is_published' => $data['is_published'] ?? false,
+            'cta_type' => $ctaType,
         ]);
+
+        if ($ctaType === BannerType::PRODUCTS->value && ! empty($data['product_ids'])) {
+            $banner->products()->sync($data['product_ids']);
+        }
+
+        return $banner;
     }
 
     // update existing banner
     public function update(Banner $banner, array $data): Banner
     {
-        $basePath = 'banners/' . now()->format('Y/m/d');
+        $basePath = 'banners/'.now()->format('Y/m/d');
 
-        // handle backdrop image upload (delete old file if exists)
-        if (!empty($data['backdrop'])) {
+        if (! empty($data['backdrop'])) {
             if ($banner->backdrop_path) {
                 Storage::disk('public')->delete($banner->backdrop_path);
             }
-
-            $path = $data['backdrop']->store($basePath, 'public');
-
-            $banner->backdrop_path = $path;
+            $banner->backdrop_path = $data['backdrop']->store($basePath, 'public');
         }
 
-        // handle main image upload (delete old file if exists)
-        if (!empty($data['image'])) {
+        if (! empty($data['image'])) {
             if ($banner->image_path) {
                 Storage::disk('public')->delete($banner->image_path);
             }
+            $banner->image_path = $data['image']->store($basePath, 'public');
+        }
 
-            $path = $data['image']->store($basePath, 'public');
+        $ctaType = $data['cta_type'] ?? $banner->cta_type;
+        $ctaLink = null;
+        $ctaTargetId = null;
 
-            $banner->image_path = $path;
+        if ($ctaType === BannerType::EXTERNAL->value) {
+
+            $ctaLink = array_key_exists('cta_link', $data) ? $data['cta_link'] : $banner->cta_link;
+        } elseif (in_array($ctaType, [BannerType::PRODUCT->value, BannerType::CATEGORY->value])) {
+            $ctaTargetId = array_key_exists('cta_target_id', $data) ? $data['cta_target_id'] : $banner->cta_target_id;
         }
 
         $banner->fill([
-            'title' => $data['title'] ?? $banner->title,
-            'description' => $data['description'] ?? $banner->description,
-            'cta_text' => $data['cta_text'] ?? $banner->cta_text,
-            'cta_link' => $data['cta_link'] ?? $banner->cta_link,
+            'title' => array_key_exists('title', $data) ? $data['title'] : $banner->title,
+            'description' => array_key_exists('description', $data) ? $data['description'] : $banner->description,
+            'cta_text' => array_key_exists('cta_text', $data) ? $data['cta_text'] : $banner->cta_text,
+            'cta_link' => $ctaLink,
+            'cta_target_id' => $ctaTargetId,
             'sort_order' => $data['sort_order'] ?? $banner->sort_order,
-            'is_published' => $data['is_published'],
-            'cta_type' => $data['cta_type'],
+            'is_published' => $data['is_published'] ?? $banner->is_published,
+            'cta_type' => $ctaType,
         ]);
 
         $banner->save();
+
+        if ($ctaType === BannerType::PRODUCTS->value) {
+
+            if (isset($data['product_ids'])) {
+                $banner->products()->sync($data['product_ids']);
+            }
+        } else {
+
+            $banner->products()->detach();
+        }
 
         return $banner;
     }
 
     // delete banner
-    public function delete(Banner $banner): bool|null
+    public function delete(Banner $banner): ?bool
     {
         return $banner->delete();
     }
