@@ -7,8 +7,9 @@
         "price": 129000,
         "colors": ["Black", "White", "Red"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (12).jpeg",
+        "gallery": ["dummies/image (5).jpeg", "dummies/image (18).jpeg", "dummies/image (2).jpeg"],
+        "weight": 247
     },
     {
         "category": "T-Shirt",
@@ -18,8 +19,9 @@
         "price": 189000,
         "colors": ["White", "Navy", "Blue"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (7).jpeg",
+        "gallery": ["dummies/image (14).jpeg", "dummies/image (1).jpeg", "dummies/image (20).jpeg"],
+        "weight": 398
     },
     {
         "category": "T-Shirt",
@@ -29,8 +31,9 @@
         "price": 159000,
         "colors": ["Black", "White", "Blue"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (3).jpeg",
+        "gallery": ["dummies/image (17).jpeg", "dummies/image (10).jpeg", "dummies/image (6).jpeg"],
+        "weight": 312
     },
     {
         "category": "T-Shirt",
@@ -40,8 +43,9 @@
         "price": 149000,
         "colors": ["Red", "Black", "White"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (13).jpeg",
+        "gallery": ["dummies/image (11).jpeg", "dummies/image (9).jpeg", "dummies/image (21).jpeg"],
+        "weight": 284
     },
     {
         "category": "Long Sleeves",
@@ -51,8 +55,9 @@
         "price": 159000,
         "colors": ["Navy", "White", "Black"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (4).jpeg",
+        "gallery": ["dummies/image (8).jpeg", "dummies/image (19).jpeg", "dummies/image (16).jpeg"],
+        "weight": 459
     },
     {
         "category": "Long Sleeves",
@@ -62,8 +67,9 @@
         "price": 199000,
         "colors": ["Blue", "Black", "White"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (15).jpeg",
+        "gallery": ["dummies/image (5).jpeg", "dummies/image (2).jpeg", "dummies/image (14).jpeg"],
+        "weight": 421
     },
     {
         "category": "Long Sleeves",
@@ -73,8 +79,9 @@
         "price": 169000,
         "colors": ["Black", "Green", "White"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (9).jpeg",
+        "gallery": ["dummies/image (1).jpeg", "dummies/image (6).jpeg", "dummies/image (20).jpeg"],
+        "weight": 367
     },
     {
         "category": "Tanktop",
@@ -84,8 +91,9 @@
         "price": 99000,
         "colors": ["Green", "Black", "Blue"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (18).jpeg",
+        "gallery": ["dummies/image (11).jpeg", "dummies/image (4).jpeg", "dummies/image (7).jpeg"],
+        "weight": 198
     },
     {
         "category": "Tanktop",
@@ -95,8 +103,9 @@
         "price": 89000,
         "colors": ["White", "Black", "Red"],
         "sizes": ["M", "L", "XL"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (10).jpeg",
+        "gallery": ["dummies/image (3).jpeg", "dummies/image (12).jpeg", "dummies/image (19).jpeg"],
+        "weight": 256
     },
     {
         "category": "Tanktop",
@@ -106,7 +115,8 @@
         "price": 119000,
         "colors": ["Blue", "Black", "Green"],
         "sizes": ["S", "M", "L"],
-        "thumbnail": "default-thumbnail.jpg",
-        "gallery": ["gallery-1.jpg", "gallery-2.jpg", "gallery-3.jpg"]
+        "thumbnail": "dummies/image (6).jpeg",
+        "gallery": ["dummies/image (17).jpeg", "dummies/image (21).jpeg", "dummies/image (8).jpeg"],
+        "weight": 334
     }
 ]

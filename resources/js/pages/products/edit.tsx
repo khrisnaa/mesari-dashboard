@@ -944,6 +944,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                                     </span>
 
                                                     <Switch
+                                                        id="is_highlighted"
                                                         checked={field.value}
                                                         onCheckedChange={field.onChange}
                                                     />

@@ -6,8 +6,10 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Product\ProductFilterRequest;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProductReviewResource;
 use App\Services\Api\ProductService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -44,6 +46,33 @@ class ProductController extends Controller
             return ApiResponse::error('Product not found.', null, 404);
         } catch (Throwable $e) {
             return ApiResponse::error('Something went wrong.', $e->getMessage(), 500);
+        }
+    }
+
+    public function reviews(Request $request, string $slug)
+    {
+        try {
+            $perPage = $request->integer('per_page', 10);
+
+            $reviews = $this->productService->getReviews($slug, $perPage);
+
+            return ApiResponse::success(
+                'List of product reviews',
+                ProductReviewResource::collection($reviews),
+                200,
+                [
+
+                    'current_page' => $reviews->currentPage(),
+                    'last_page' => $reviews->lastPage(),
+                    'per_page' => $reviews->perPage(),
+                    'total' => $reviews->total(),
+                    'has_more' => $reviews->hasMorePages(),
+                ]
+            );
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::error('Product not found.', null, 404);
+        } catch (Throwable $e) {
+            return ApiResponse::error('Failed to load product reviews.', $e->getMessage(), 500);
         }
     }
 }

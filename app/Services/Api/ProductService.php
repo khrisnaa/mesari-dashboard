@@ -2,10 +2,10 @@
 
 namespace App\Services\Api;
 
-use App\Models\Product;
-use Illuminate\Http\Request;
 use App\Http\Resources\ProductResource;
-use App\Http\Resources\ProductReviewResource;
+use App\Models\Product;
+use App\Models\ProductReview;
+use Illuminate\Http\Request;
 
 class ProductService
 {
@@ -21,7 +21,7 @@ class ProductService
                 'variants' => function ($q) {
                     $q->where('price', '>', 0);
                 },
-                'variants.attributes'
+                'variants.attributes',
             ]);
 
         if ($request->filled('search')) {
@@ -80,24 +80,26 @@ class ProductService
             'images',
             'reviews.user',
             'variants' => function ($query) {
-                $query->where('price', '>', 0);
+                $query->where('price', '>', 0)
+                    ->orderBy('price', 'asc');
             },
-            'variants.attributes'
+            'variants.attributes',
         ])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return [
-            'item' => new ProductResource($product),
+        return new ProductResource($product);
+    }
 
-            // reviews sebagai resource
-            'reviews' => ProductReviewResource::collection($product->reviews()->where('is_published', true)->latest()->get()),
+    public function getReviews(string $slug, int $perPage = 10)
+    {
+        $product = Product::where('slug', $slug)->firstOrFail(['id']);
 
-            // simple stats
-            'review_stats' => [
-                'count' => $product->reviews()->count(),
-                'avg' => round($product->reviews()->avg('rating'), 1),
-            ],
-        ];
+        return ProductReview::with('user')
+            ->where('product_id', $product->id)
+            ->latest()
+            ->paginate($perPage);
     }
 }

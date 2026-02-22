@@ -24,7 +24,17 @@ class ProductResource extends JsonResource
             ],
             'category' => new CategoryResource($this->whenLoaded('category')),
             'images' => ProductImageResource::collection($this->whenLoaded('images')),
+            'thumbnail' => new ProductImageResource(
+                $this->whenLoaded('images')
+                    ->firstWhere('type', 'thumbnail')
+            ),
             'variants' => ProductVariantResource::collection($this->whenLoaded('variants')),
+            'review_stats' => [
+                'count' => $this->reviews_count ?? 0,
+                'avg' => round($this->reviews_avg_rating ?? 0, 1),
+            ],
+            'created_at' => $this->created_at,
+
         ];
     }
 }

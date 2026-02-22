@@ -10,9 +10,9 @@ class ProductImageResource extends JsonResource
     public function toArray(Request $request)
     {
         return [
-            'id'    => $this->id,
-            'path'   => $this->path,
-            'type'  => $this->type,
+            'id' => $this->id,
+            'url' => $this->path ? asset('storage/'.$this->path) : null,
+            'type' => $this->type,
             'sort_order' => $this->sort_order,
         ];
     }

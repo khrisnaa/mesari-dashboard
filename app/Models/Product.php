@@ -9,9 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasUuids, SoftDeletes, HasFactory;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
@@ -19,8 +20,9 @@ class Product extends Model
     protected $casts = [
         'is_published' => 'boolean',
         'is_customizable' => 'boolean',
+        'is_highlighted' => 'boolean',
         'discount_start_at' => 'datetime',
-        'discount_end_at'   => 'datetime',
+        'discount_end_at' => 'datetime',
     ];
 
     public function category()
