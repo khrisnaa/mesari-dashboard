@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
@@ -30,8 +31,8 @@ class OrderItem extends Model
         return $this->belongsTo(ProductVariant::class, 'product_variant_id', 'id');
     }
 
-    public function reviews()
+    public function review()
     {
-        return $this->hasMany(ProductReview::class);
+        return $this->hasOne(ProductReview::class);
     }
 }

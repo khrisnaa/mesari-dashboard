@@ -11,12 +11,13 @@ class ProductReview extends Model
     use HasUuids, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
 
     protected $casts = [
-        'is_published' => 'boolean'
+        'is_published' => 'boolean',
     ];
 
     public function product()
@@ -24,7 +25,7 @@ class ProductReview extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function item()
+    public function orderItem()
     {
         return $this->belongsTo(OrderItem::class);
     }

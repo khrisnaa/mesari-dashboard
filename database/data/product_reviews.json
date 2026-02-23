@@ -1,0 +1,243 @@
+[
+    {
+        "product_slug": "basic-cotton-t-shirt",
+        "reviews": [
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Kualitas bagus!",
+                "content": "Bahannya lembut dan nyaman dipakai seharian."
+            },
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Worth it",
+                "content": "Harganya cocok dan kualitasnya oke."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 4,
+                "title": "Lumayan",
+                "content": "Warnanya sesuai foto."
+            }
+        ]
+    },
+
+    {
+        "product_slug": "premium-oversize-tee",
+        "reviews": [
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Nyaman banget",
+                "content": "Oversize-nya keren dan kainnya adem."
+            },
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Bagus tapi agak mahal",
+                "content": "Kualitas oke, harga lumayan tapi sebanding."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Mantap",
+                "content": "Lebih bagus dari foto."
+            }
+        ]
+    },
+
+    {
+        "product_slug": "urban-graphic-t-shirt",
+        "reviews": [
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Keren motifnya",
+                "content": "Grafisnya modern banget."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Suka!",
+                "content": "Pas dipakai nongkrong."
+            },
+
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Bagus banget",
+                "content": "Motif tidak mudah luntur."
+            }
+        ]
+    },
+
+    {
+        "product_slug": "retro-print-t-shirt",
+        "reviews": [
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Retro vibes!",
+                "content": "Print retro-nya bagus."
+            },
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Keren",
+                "content": "Suka modelnya."
+            },
+
+            {
+                "user_email": "member@example.com",
+                "rating": 4,
+                "title": "Oke",
+                "content": "Pengiriman cepat."
+            }
+        ]
+    },
+
+    {
+        "product_slug": "casual-long-sleeve-tee",
+        "reviews": [
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Nyaman",
+                "content": "Lengan panjangnya enak dipakai."
+            },
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Cocok cuaca dingin",
+                "content": "Bahannya tebal tapi ga gerah."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 4,
+                "title": "Good",
+                "content": "Ukuran pas."
+            }
+        ]
+    },
+
+    {
+        "product_slug": "premium-long-sleeve-shirt",
+        "reviews": [
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Keren banget",
+                "content": "Material premium terasa breathable."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Puas!",
+                "content": "Sesuai ekspektasi."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 4,
+                "title": "Good",
+                "content": "Modelnya rapi."
+            }
+        ]
+    },
+
+    {
+        "product_slug": "urban-long-sleeve-tee",
+        "reviews": [
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Mantap",
+                "content": "Urban look banget."
+            },
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Bagus",
+                "content": "Cukup nyaman dipakai."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Suka!",
+                "content": "Bahan lembut."
+            }
+        ]
+    },
+
+    {
+        "product_slug": "sportfit-tanktop",
+        "reviews": [
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Sporty!",
+                "content": "Bagus banget buat gym."
+            },
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Ringan",
+                "content": "Ringan dan breathable."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Recommended",
+                "content": "Nyaman untuk olahraga."
+            }
+        ]
+    },
+
+    {
+        "product_slug": "casual-daily-tanktop",
+        "reviews": [
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Simpel bagus",
+                "content": "Cocok buat harian."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Mantap!",
+                "content": "Sangat nyaman dipakai."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 4,
+                "title": "Bagus",
+                "content": "Ukuran sesuai chart."
+            }
+        ]
+    },
+
+    {
+        "product_slug": "training-performance-tanktop",
+        "reviews": [
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Kualitas bagus",
+                "content": "Pas banget buat workout."
+            },
+            {
+                "user_email": "guest@example.com",
+                "rating": 4,
+                "title": "Ringan",
+                "content": "Nggak bikin gerah."
+            },
+            {
+                "user_email": "member@example.com",
+                "rating": 5,
+                "title": "Suka!",
+                "content": "Bahan cepat kering."
+            }
+        ]
+    }
+]

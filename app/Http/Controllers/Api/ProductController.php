@@ -54,14 +54,19 @@ class ProductController extends Controller
         try {
             $perPage = $request->integer('per_page', 10);
 
-            $reviews = $this->productService->getReviews($slug, $perPage);
+            $result = $this->productService->getReviews($slug, $perPage);
+
+            $reviews = $result['reviews'];
+            $stats = $result['stats'];
 
             return ApiResponse::success(
                 'List of product reviews',
-                ProductReviewResource::collection($reviews),
+                [
+                    'reviews' => ProductReviewResource::collection($reviews),
+                    'review_stats' => $stats,
+                ],
                 200,
                 [
-
                     'current_page' => $reviews->currentPage(),
                     'last_page' => $reviews->lastPage(),
                     'per_page' => $reviews->perPage(),
@@ -69,8 +74,10 @@ class ProductController extends Controller
                     'has_more' => $reviews->hasMorePages(),
                 ]
             );
+
         } catch (ModelNotFoundException $e) {
             return ApiResponse::error('Product not found.', null, 404);
+
         } catch (Throwable $e) {
             return ApiResponse::error('Failed to load product reviews.', $e->getMessage(), 500);
         }

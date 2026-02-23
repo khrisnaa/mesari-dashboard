@@ -1,0 +1,46 @@
+[
+    {
+        "user_email": "member@example.com",
+        "orders": [
+            {
+                "products": [
+                    { "slug": "basic-cotton-t-shirt", "quantity": 2 },
+                    { "slug": "urban-graphic-t-shirt", "quantity": 1 }
+                ]
+            },
+            {
+                "products": [{ "slug": "premium-oversize-tee", "quantity": 1 }]
+            },
+            {
+                "products": [{ "slug": "retro-print-t-shirt", "quantity": 2 }]
+            },
+            {
+                "products": [{ "slug": "casual-long-sleeve-tee", "quantity": 1 }]
+            },
+            {
+                "products": [{ "slug": "sportfit-tanktop", "quantity": 1 }]
+            }
+        ]
+    },
+
+    {
+        "user_email": "guest@example.com",
+        "orders": [
+            {
+                "products": [{ "slug": "basic-cotton-t-shirt", "quantity": 1 }]
+            },
+            {
+                "products": [{ "slug": "premium-oversize-tee", "quantity": 2 }]
+            },
+            {
+                "products": [{ "slug": "urban-graphic-t-shirt", "quantity": 1 }]
+            },
+            {
+                "products": [{ "slug": "premium-long-sleeve-shirt", "quantity": 2 }]
+            },
+            {
+                "products": [{ "slug": "casual-daily-tanktop", "quantity": 1 }]
+            }
+        ]
+    }
+]

@@ -97,9 +97,24 @@ class ProductService
     {
         $product = Product::where('slug', $slug)->firstOrFail(['id']);
 
-        return ProductReview::with('user')
+        $reviews = ProductReview::with([
+            'orderItem',
+            'orderItem.order.user',
+            'orderItem.variant.product',
+        ])
             ->where('product_id', $product->id)
             ->latest()
             ->paginate($perPage);
+
+        $reviewsCount = ProductReview::where('product_id', $product->id)->count();
+        $reviewsAvg = ProductReview::where('product_id', $product->id)->avg('rating');
+
+        return [
+            'reviews' => $reviews,
+            'stats' => [
+                'count' => $reviewsCount,
+                'avg' => round($reviewsAvg ?? 0, 1),
+            ],
+        ];
     }
 }
