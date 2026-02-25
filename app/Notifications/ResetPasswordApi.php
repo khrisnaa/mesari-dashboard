@@ -25,12 +25,16 @@ class ResetPasswordApi extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
-        $url = env('FRONTEND_URL') . "/reset-password?token={$this->token}&email={$notifiable->email}";
+        $url = config('app.frontend_url')."/reset-password?token={$this->token}&email={$notifiable->email}";
 
         return (new MailMessage)
-            ->subject('Reset Password Request')
-            ->line('Click the button below to reset your password.')
-            ->action('Reset Password', $url)
-            ->line('If you did not request this, please ignore this email.');
+            ->subject('Security: Password Reset Request')
+            ->greeting('HELLO, '.strtoupper($notifiable->name))
+            ->line('You are receiving this email because we received a password reset request for your account.')
+            ->line('To proceed with the password reset, please click the secure link below:')
+            ->action('RESET PASSWORD', $url)
+            ->line('This password reset link will expire in 60 minutes.')
+            ->line('If you did not request a password reset, no further action is required. Your account remains secure.')
+            ->salutation('WARM REGARDS, '.strtoupper(config('app.name')));
     }
 }

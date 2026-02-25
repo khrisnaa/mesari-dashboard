@@ -4,8 +4,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class VerifyEmailApi extends Notification implements ShouldQueue
 {
@@ -18,12 +18,16 @@ class VerifyEmailApi extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
-        $verifyUrl = env('APP_URL') . "/api/email/verify/" .
-            $notifiable->id . "/" . sha1($notifiable->email);
+        $verifyUrl = config('app.url').'/api/email/verify/'.
+            $notifiable->id.'/'.sha1($notifiable->email);
 
         return (new MailMessage)
-            ->subject('Verify Your Email')
-            ->line('Click the button below to verify your email.')
-            ->action('Verify Email', $verifyUrl);
+            ->subject('Complete Your Registration')
+            ->greeting('Hello, '.$notifiable->name.'!')
+            ->line('Thank you for joining us. We’re excited to have you as part of our community.')
+            ->line('Before we get started, please confirm your email address by clicking the button below.')
+            ->action('Confirm Email', $verifyUrl)
+            ->line('If you didn’t create an account, you can safely ignore this email.')
+            ->salutation('Warm regards, '.config('app.name'));
     }
 }

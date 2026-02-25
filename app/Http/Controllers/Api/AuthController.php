@@ -111,6 +111,14 @@ class AuthController extends Controller
             return ApiResponse::error('Email not found.', null, 404);
         }
 
+        if (! $user->hasVerifiedEmail()) {
+            return ApiResponse::error(
+                'Your email address is not verified. Please verify your email before resetting password.',
+                null,
+                403
+            );
+        }
+
         $tokenRepo = app('auth.password.broker')->getRepository();
         $token = $tokenRepo->create($user);
 
