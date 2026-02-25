@@ -2,17 +2,18 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CartItemResource extends JsonResource
+class VariantDetailResource extends JsonResource
 {
-    public function toArray($request): array
+    public function toArray(Request $request): array
     {
-        $variant = $this->variant;
-        $product = $variant?->product;
+        $product = $this->product;
 
         return [
             'id' => $this->id,
+            'price' => (float) $this->price,
             'product' => [
                 'id' => $product?->id,
                 'name' => $product?->name,
@@ -20,18 +21,17 @@ class CartItemResource extends JsonResource
                     ?->firstWhere('type', 'thumbnail')
                     ?->path
                         ? asset('storage/'.$product->images->firstWhere('type', 'thumbnail')->path)
-        : null,
+                        : null,
             ],
             'variant' => [
-                'id' => $variant?->id,
-                'attributes' => $variant?->attributes?->map(function ($attr) {
+                'id' => $this->id,
+                'attributes' => $this->attributes?->map(function ($attr) {
                     return $attr->name;
                 })->values(),
-                'stock' => $variant?->stock,
+                'stock' => $this->stock,
             ],
-            'price' => (float) $this->price,
-            'quantity' => (int) $this->quantity,
-            'subtotal' => (float) $this->subtotal,
+            // Opsional: Jika frontend butuh data stock di luar objek variant juga
+            'stock' => (int) $this->stock,
         ];
     }
 }

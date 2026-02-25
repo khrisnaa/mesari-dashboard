@@ -32,6 +32,7 @@ Route::get('/testimonials', [TestimonialController::class, 'index']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products/{slug}/reviews', [ProductController::class, 'reviews']);
+Route::get('/products/variant/{id}', [ProductController::class, 'variant']);
 Route::get('/company-detail', [CompanyProfileController::class, 'index']);
 Route::get('/banners', [BannerController::class, 'index']);
 Route::get('/categories', [CategoryController::class, 'index']);
@@ -48,10 +49,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/password', [UserController::class, 'updatePassword']);
 
     // cart
-    Route::get('/cart', [CartController::class, 'index']);
-    Route::post('/cart/add', [CartController::class, 'addItem']);
-    Route::put('/cart/{id}', [CartController::class, 'updateItem']);
-    Route::delete('/cart/{id}', [CartController::class, 'deleteItem']);
+    Route::get('/carts', [CartController::class, 'index']);
+    Route::post('/carts', [CartController::class, 'addItem']);
+    Route::put('/carts/{id}', [CartController::class, 'updateItem']);
+    Route::delete('/carts/{id}', [CartController::class, 'deleteItem']);
 
     // user addresses
     Route::get('/addresses', [UserAddressController::class, 'index']);
@@ -62,7 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // checkout
     Route::post('/checkout', [OrderController::class, 'checkout']);
-    Route::post('/checkout/buy-now', [OrderController::class, 'directCheckout']);
+    Route::post('/checkout/direct', [OrderController::class, 'directCheckout']);
 
     // orders
     Route::get('/orders', [OrderController::class, 'index']);
@@ -76,4 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // payment
     Route::post('/payment', [PaymentController::class, 'store']);
+    Route::get('/payment/check/{id}', [PaymentController::class, 'checkStatus']);
+    Route::get('/payment-methods', [PaymentController::class, 'getMethods']);
+    Route::post('/payment/manual', [PaymentController::class, 'storeManual']);
 });

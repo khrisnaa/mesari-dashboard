@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Product\ProductFilterRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductReviewResource;
+use App\Http\Resources\VariantDetailResource;
+use App\Models\ProductVariant;
 use App\Services\Api\ProductService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -80,6 +82,20 @@ class ProductController extends Controller
 
         } catch (Throwable $e) {
             return ApiResponse::error('Failed to load product reviews.', $e->getMessage(), 500);
+        }
+    }
+
+    public function variant(string $id)
+    {
+        try {
+
+            $result = ProductVariant::with(['product.images', 'attributes'])->findOrFail($id);
+
+            return ApiResponse::success('Product variant detail', new VariantDetailResource($result));
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::error('Product variant not found.', null, 404);
+        } catch (Throwable $e) {
+            return ApiResponse::error('Something went wrong.', $e->getMessage(), 500);
         }
     }
 }

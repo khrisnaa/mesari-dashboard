@@ -15,7 +15,7 @@ class OrderItemResource extends JsonResource
             'id' => $this->id,
             'product' => [
                 'name' => $this->product_name,
-                'image' => $product?->images?->firstWhere('type', 'thumbnail')?->path,
+                'image' => $product?->images?->firstWhere('type', 'thumbnail')?->path ? asset('storage/'.$product->images->firstWhere('type', 'thumbnail')->path) : null,
             ],
             'variant' => [
                 'name' => $this->variant_name,

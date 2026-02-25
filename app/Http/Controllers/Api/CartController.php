@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CartItemResource;
 use App\Http\Resources\CartResource;
-use App\Models\CartItem;
 use App\Services\Api\CartService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
@@ -41,19 +40,24 @@ class CartController extends Controller
 
         $cart = $this->cartService->getCart($request->user()->id);
 
-        $this->cartService->addItem($cart, $request->only([
+        $result = $this->cartService->addItem($cart, $request->only([
             'product_variant_id',
             'quantity',
         ]));
 
-        $cart->load([
-            'items.variant.product.images',
-            'items.variant.attributes',
+        // $cart->load([
+        //     'items.variant.product.images',
+        //     'items.variant.attributes',
+        // ]);
+
+        $result->load([
+            'variant.product.images',
+            'variant.attributes',
         ]);
 
         return ApiResponse::success(
             'Item added to cart',
-            new CartResource($cart)
+            new CartItemResource($result)
         );
     }
 
@@ -70,16 +74,16 @@ class CartController extends Controller
             ->where('id', $itemId)
             ->firstOrFail();
 
-        $this->cartService->updateItem($item, $request->quantity);
+        $result = $this->cartService->updateItem($item, $request->quantity);
 
-        $cart->load([
-            'items.variant.product.images',
-            'items.variant.attributes',
+        $result->load([
+            'variant.product.images',
+            'variant.attributes',
         ]);
 
         return ApiResponse::success(
             'Cart item updated',
-            new CartResource($cart)
+            new CartItemResource($result)
         );
     }
 
@@ -94,14 +98,13 @@ class CartController extends Controller
 
         $this->cartService->deleteItem($item);
 
-        $cart->load([
-            'items.variant.product.images',
-            'items.variant.attributes',
-        ]);
+        // $cart->load([
+        //     'items.variant.product.images',
+        //     'items.variant.attributes',
+        // ]);
 
         return ApiResponse::success(
             'Cart item removed',
-            new CartResource($cart)
         );
     }
 }

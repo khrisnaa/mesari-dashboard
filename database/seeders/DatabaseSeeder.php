@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             FaqSeeder::class,
             CompanyProfileSeeder::class,
             ProductReviewSeeder::class,
+            PaymentMethodSeeder::class,
         ]);
     }
 }

@@ -4,13 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Payment\ManualPaymentRequest;
+use App\Http\Resources\PaymentMethodResource;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Midtrans\Config;
 use Midtrans\Notification;
 use Midtrans\Snap;
@@ -42,12 +46,10 @@ class PaymentController extends Controller
             if ($existingPayment) {
                 $isExpired = $existingPayment->created_at->diffInHours(now()) >= 23;
 
-                if (!$isExpired) {
-                    return response()->json([
-                        'status' => 'success',
+                if (! $isExpired) {
+                    return ApiResponse::success('Continue previous transaction', [
                         'snap_token' => $existingPayment->snap_token,
-                        'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v4/redirection/' . $existingPayment->snap_token,
-                        'message' => 'Continue previous transaction',
+                        'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v4/redirection/'.$existingPayment->snap_token,
                     ]);
                 }
 
@@ -55,7 +57,7 @@ class PaymentController extends Controller
             }
 
             return DB::transaction(function () use ($order) {
-                $midtransOrderId = 'TRX-' . $order->id . '-' . now()->timestamp;
+                $midtransOrderId = 'TRX-'.explode('-', $order->id)[0].'-'.now()->timestamp;
 
                 $itemDetails = $order->items
                     ->map(function ($item) {
@@ -63,7 +65,7 @@ class PaymentController extends Controller
                             'id' => $item->product_variant_id,
                             'price' => (int) $item->price,
                             'quantity' => (int) $item->quantity,
-                            'name' => substr($item->product_name . ' - ' . $item->variant_name, 0, 50),
+                            'name' => substr($item->product_name.' - '.$item->variant_name, 0, 50),
                         ];
                     })
                     ->toArray();
@@ -106,41 +108,51 @@ class PaymentController extends Controller
                     'transaction_status' => PaymentStatus::PENDING->value,
                 ]);
 
-                return response()->json([
-                    'status' => 'success',
+                return ApiResponse::success('Payment initiated successfully', [
                     'snap_token' => $transaction->token,
                     'redirect_url' => $transaction->redirect_url,
                     'payment' => $payment,
                 ]);
             });
         } catch (\Exception $e) {
-            Log::error('Payment Store Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to process payment'], 500);
+            Log::error('Payment Store Error: '.$e->getMessage());
+
+            return ApiResponse::error('Failed to process payment', $e->getMessage(), 500);
         }
     }
 
     public function notification(Request $request)
     {
+        Log::info('--- INCOMING MIDTRANS WEBHOOK ---');
+        Log::info('Payload Midtrans: ', $request->all() ?? []);
+
+        if (! $request->isMethod('post') || empty($request->all())) {
+            Log::warning('Webhook declined: Method is not POST or Payload is empty');
+
+            return response()->json(['message' => 'Invalid request'], 400);
+        }
+
         try {
-            // DB Transaction to ensure data consistency
-            return DB::transaction(function () use ($request) {
+            $notif = new Notification;
+            Log::info('Successfully created instance Midtrans Notification');
 
-                // receive notification from midtrans
-                $notif = new Notification();
-                // $notif = (object) $request->all(); // For Postman Test
+            $transaction = $notif->transaction_status;
+            $type = $notif->payment_type;
+            $orderId = $notif->order_id;
+            $fraud = $notif->fraud_status;
 
-                $transaction = $notif->transaction_status;
-                $type = $notif->payment_type;
-                $orderId = $notif->order_id;
-                $fraud = $notif->fraud_status;
+            Log::info("Data -> OrderID: {$orderId}, Status: {$transaction}");
 
-                // Fix for Postman: getResponse() only works with Notification object
-                $payload = method_exists($notif, 'getResponse') ? $notif->getResponse() : json_encode($request->all());
+            return DB::transaction(function () use ($notif, $transaction, $type, $orderId, $fraud, $request) {
 
-                // Use lockForUpdate to prevent race conditions from duplicate notifications
+                // $payload = method_exists($notif, 'getResponse') ? $notif->getResponse() : json_encode($request->all());
+                $payload = json_encode($request->all());
+
                 $payment = Payment::where('midtrans_order_id', $orderId)->lockForUpdate()->first();
 
-                if (!$payment) {
+                if (! $payment) {
+                    Log::error("FAILED: Payment with midtrans_order_id '{$orderId}' NOT FOUND in database!");
+
                     return response()->json(['message' => 'payment not found'], 404);
                 }
 
@@ -168,10 +180,12 @@ class PaymentController extends Controller
                     $orderStatus = OrderStatus::CANCELLED->value;
                 }
 
-                // update payment record
+                Log::info("Update DB -> Payment Status: {$paymentStatus}, Order Status: {$orderStatus}");
+
                 $payment->update([
                     'transaction_status' => $paymentStatus,
-                    'midtrans_transaction_id' => $notif->transaction_id,
+                    // 'midtrans_transaction_id' => $notif->transaction_id,
+                    'midtrans_transaction_id' => $request->transaction_id,
                     'payment_type' => $type,
                     'fraud_status' => $fraud,
                     'transaction_time' => $notif->transaction_time,
@@ -179,21 +193,137 @@ class PaymentController extends Controller
                     'payload' => $payload,
                 ]);
 
-                // update related order status
                 $payment->order->update([
                     'order_status' => $orderStatus,
                     'payment_status' => $paymentStatus,
                 ]);
 
+                Log::info("SUKSES: Webhook selesai diproses untuk OrderID: {$orderId}");
+
                 return response()->json(['message' => 'notification processed'], 200);
             });
         } catch (\Exception $e) {
-            Log::error('midtrans error: ' . $e->getMessage());
+            Log::error('MIDTRANS WEBHOOK ERROR: '.$e->getMessage());
+            Log::error($e->getTraceAsString());
 
             return response()->json([
                 'message' => 'error processing notification',
                 'error_detail' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    public function checkStatus($id)
+    {
+        try {
+            // 1. Cari data payment di database kita dulu
+            $payment = Payment::where('order_id', $id)
+                ->orWhere('midtrans_order_id', $id)
+                ->firstOrFail();
+
+            // 2. Tanya ke Midtrans menggunakan midtrans_order_id
+            // Kita cast ke (object) untuk menghindari error "Found mixed[]"
+            $status = (object) \Midtrans\Transaction::status($payment->midtrans_order_id);
+
+            $midtransStatus = $status->transaction_status;
+            $paymentStatus = $payment->transaction_status;
+
+            // 3. Jika di database kita masih pending, tapi di Midtrans sudah Settlement/Capture
+            if ($paymentStatus !== PaymentStatus::PAID->value &&
+               ($midtransStatus === 'settlement' || $midtransStatus === 'capture')) {
+
+                DB::transaction(function () use ($payment, $status) {
+                    // Update tabel Payment
+                    $payment->update([
+                        'transaction_status' => PaymentStatus::PAID->value,
+                        'midtrans_transaction_id' => $status->transaction_id,
+                        'payload' => json_encode($status),
+                    ]);
+
+                    // Update tabel Order
+                    $payment->order->update([
+                        'order_status' => OrderStatus::PAID->value,
+                        'payment_status' => PaymentStatus::PAID->value,
+                    ]);
+                });
+
+                return ApiResponse::success('Payment status synchronized successfully', [
+                    'current_status' => 'paid',
+                ]);
+            }
+
+            return ApiResponse::success('Status is up to date', [
+                'current_status' => $paymentStatus,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Check Status Error: '.$e->getMessage());
+
+            return ApiResponse::error('Transaction not found or connection failed', $e->getMessage(), 404);
+        }
+    }
+
+    public function getMethods()
+    {
+        $methods = PaymentMethod::where('is_active', true)->get();
+
+        return ApiResponse::success('Payment methods retrieved', PaymentMethodResource::collection($methods));
+    }
+
+    public function storeManual(ManualPaymentRequest $request)
+    {
+        try {
+            return DB::transaction(function () use ($request) {
+                $order = Order::findOrFail($request->order_id);
+                $method = PaymentMethod::findOrFail($request->payment_method_id);
+
+                // Tentukan status berdasarkan keberadaan file bukti transfer
+                $paymentStatus = $request->hasFile('payment_proof')
+                    ? PaymentStatus::WAITING_APPROVAL->value
+                    : PaymentStatus::PENDING->value;
+
+                $orderStatus = $request->hasFile('payment_proof')
+                    ? OrderStatus::WAITING_APPROVAL->value
+                    : OrderStatus::PENDING->value;
+
+                // 1. Snapshot data dari Master ke Tabel Payment
+                $payment = Payment::updateOrCreate(
+                    ['order_id' => $order->id],
+                    [
+                        'payment_method_info' => "{$method->bank_name} - {$method->account_number}",
+                        'payment_type' => 'manual',
+                        'gross_amount' => $order->grand_total,
+                        'transaction_status' => $paymentStatus, // Gunakan variabel enum di sini
+                        // Simpan info rekening di payload agar FE bisa baca
+                        'payload' => json_encode([
+                            'bank' => $method->bank_name,
+                            'number' => $method->account_number,
+                            'holder' => $method->account_owner,
+                        ]),
+                    ]
+                );
+
+                // 2. Handle Upload Proof jika ada
+                if ($request->hasFile('payment_proof')) {
+                    // Hapus foto lama jika sebelumnya user sudah pernah upload
+                    if ($payment->payment_proof) {
+                        Storage::disk('public')->delete($payment->payment_proof);
+                    }
+
+                    $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+                    $payment->update(['payment_proof' => $path]);
+                }
+
+                // 3. Sync status ke Order
+                $order->update([
+                    'payment_status' => $paymentStatus,
+                    'order_status' => $orderStatus, // Opsional: Samakan status ordernya juga
+                ]);
+
+                return ApiResponse::success('Manual payment proof submitted successfully', $payment);
+            });
+        } catch (\Exception $e) {
+            return ApiResponse::error('Failed to process manual payment', $e->getMessage());
         }
     }
 }

@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use App\Http\Controllers\Controller;
 
 class LocationController extends Controller
 {
     public function index(Request $request)
     {
         $request->validate([
-            'search' => ['required', 'string'],
-            'limit'  => ['nullable', 'integer'],
+            'search' => ['nullable', 'string'],
+            'limit' => ['nullable', 'integer'],
             'offset' => ['nullable', 'integer'],
         ]);
+
+        if (empty(trim($request->search))) {
+            return response()->json([
+                'data' => [],
+            ]);
+        }
 
         $response = Http::timeout(10)
             ->withHeaders([
@@ -23,13 +29,13 @@ class LocationController extends Controller
             ])
             ->get(config('rajaongkir.destination_api_url'), [
                 'search' => $request->search,
-                'limit'  => $request->limit ?? 10,
+                'limit' => $request->limit ?? 10,
                 'offset' => $request->offset ?? 0,
             ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return response()->json([
-                'message' => 'Failed to fetch destination.'
+                'message' => 'Failed to fetch destination.',
             ], 500);
         }
 

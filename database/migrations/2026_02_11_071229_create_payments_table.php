@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('order_id')->constrained()->cascadeOnDelete();
-            $table->string('midtrans_order_id')->index();
+            $table->string('midtrans_order_id')->nullable()->index();
             $table->string('midtrans_transaction_id')->nullable()->index();
             $table->string('snap_token')->nullable();
             $table->string('payment_type')->nullable();
@@ -26,6 +26,9 @@ return new class extends Migration
             $table->timestamp('settlement_time')->nullable();
             $table->string('signature_key')->nullable();
             $table->json('payload')->nullable();
+            $table->text('payment_method_info')->nullable();
+            $table->string('payment_proof')->nullable();
+            $table->text('admin_note')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

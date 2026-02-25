@@ -8,9 +8,10 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
-use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class OrderService
 {
@@ -68,7 +69,7 @@ class OrderService
                 $variant = $variants[$item->product_variant_id];
 
                 if ($variant->stock < $item->quantity) {
-                    throw new Exception("Stock not enough.");
+                    throw new Exception('Stock not enough.');
                 }
 
                 $variant->decrement('stock', $item->quantity);
@@ -152,8 +153,6 @@ class OrderService
         });
     }
 
-
-
     private function calculateShipping(
         int $weight,
         int $destination,
@@ -166,7 +165,7 @@ class OrderService
         $response = Http::asForm()
             ->timeout(10)
             ->withHeaders([
-                'key' => config('rajaongkir.key'),
+                'key' => config('rajaongkir.api_key'),
                 'Accept' => 'application/json',
             ])
             ->post(config('rajaongkir.cost_api_url'), [
@@ -177,13 +176,13 @@ class OrderService
                 'price' => 'lowest',
             ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw new \Exception('Failed to calculate shipping cost.');
         }
 
         $data = $response->json();
 
-        if (!isset($data['data']) || empty($data['data'])) {
+        if (! isset($data['data']) || empty($data['data'])) {
             throw new \Exception('Shipping services not found.');
         }
 
@@ -194,13 +193,13 @@ class OrderService
                 && $service['service'] === $courierService;
         });
 
-        if (!$selected) {
+        if (! $selected) {
             throw new \Exception('Selected courier service not available.');
         }
 
         return [
             'cost' => (int) $selected['cost'],
-            'etd'  => $selected['etd'] ?? null,
+            'etd' => $selected['etd'] ?? null,
         ];
     }
 
@@ -223,8 +222,6 @@ class OrderService
         return sprintf('ORD-%s-%03d', $date, $nextNumber);
     }
 
-
-
     // get order list
     public function getOrderHistory($user, int $perPage = 10)
     {
@@ -236,7 +233,6 @@ class OrderService
             ->paginate($perPage);
     }
 
-
     // get order detail
     public function getOrderDetail($user, $orderId)
     {
@@ -246,7 +242,6 @@ class OrderService
             ])
             ->findOrFail($orderId);
     }
-
 
     public function previewShipping(
         int $weight,
@@ -259,7 +254,7 @@ class OrderService
         $response = Http::asForm()
             ->timeout(10)
             ->withHeaders([
-                'key' => config('rajaongkir.key'),
+                'key' => config('rajaongkir.api_key'),
                 'Accept' => 'application/json',
             ])
             ->post(config('rajaongkir.cost_api_url'), [
@@ -270,7 +265,16 @@ class OrderService
                 'price' => 'lowest',
             ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
+            Log::error('RajaOngkir cost API error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            throw new \Exception('Failed to fetch shipping cost.');
+        }
+
+        if (! $response->successful()) {
             throw new \Exception('Failed to fetch shipping cost.');
         }
 
