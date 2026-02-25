@@ -13,7 +13,7 @@ class OrderDetailResource extends JsonResource
             'order_status' => $this->order_status,
             'payment_status' => $this->payment_status,
             'payment_method' => $this->payment_method,
-
+            'note' => $this->note,
             'items' => OrderItemResource::collection($this->items),
 
             'subtotal' => (float) $this->subtotal,
