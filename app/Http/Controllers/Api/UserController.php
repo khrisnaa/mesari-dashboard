@@ -12,12 +12,11 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-
     public function __construct(
         protected UserService $userService
     ) {}
 
-    public function edit()
+    public function show()
     {
         $user = Auth::user();
 

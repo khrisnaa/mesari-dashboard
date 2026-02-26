@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ProductReviewController;
 use App\Http\Controllers\Api\TestimonialController;
 use App\Http\Controllers\Api\UserAddressController;
 use App\Http\Controllers\Api\UserController;
@@ -44,7 +45,7 @@ Route::post('/midtrans/notification', [PaymentController::class, 'notification']
 Route::middleware('auth:sanctum')->group(function () {
 
     // user profile
-    Route::get('/user', [UserController::class, 'edit']);
+    Route::get('/user', [UserController::class, 'show']);
     Route::put('/user', [UserController::class, 'update']);
     Route::put('/user/password', [UserController::class, 'updatePassword']);
 
@@ -80,4 +81,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/payment/check/{id}', [PaymentController::class, 'checkStatus']);
     Route::get('/payment-methods', [PaymentController::class, 'getMethods']);
     Route::post('/payment/manual', [PaymentController::class, 'storeManual']);
+
+    // reviews
+    Route::post('/reviews', [ProductReviewController::class, 'store']);
+    Route::put('/reviews/{id}', [ProductReviewController::class, 'update']);
 });

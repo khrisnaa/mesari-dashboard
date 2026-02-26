@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class OrderService
 {
@@ -207,19 +208,9 @@ class OrderService
     {
         $date = now()->format('Ymd');
 
-        $lastOrder = Order::whereDate('created_at', now())
-            ->orderByDesc('created_at')
-            ->lockForUpdate()
-            ->first();
+        $random = strtoupper(Str::random(4));
 
-        if ($lastOrder) {
-            $lastNumber = (int) substr($lastOrder->order_number, -3);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1;
-        }
-
-        return sprintf('ORD-%s-%03d', $date, $nextNumber);
+        return sprintf('ORD-%s-%s', $date, $random);
     }
 
     // get order list
@@ -228,6 +219,7 @@ class OrderService
         return Order::where('user_id', $user->id)
             ->with([
                 'items.variant.product.images',
+                'items.review',
             ])
             ->latest()
             ->paginate($perPage);
