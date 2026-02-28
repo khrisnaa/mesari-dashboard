@@ -1,4 +1,5 @@
 import { Category } from './category';
+import { ImageType } from './enum';
 
 export interface Product {
     id: string;
@@ -53,7 +54,7 @@ export interface VariantAttribute {
 export interface ProductImage {
     id: string;
     path: string;
-    type: 'gallery' | 'thumbnail';
+    type: ImageType;
     sort_order: number;
     created_at?: string;
     updated_at?: string;

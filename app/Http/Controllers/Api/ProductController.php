@@ -22,6 +22,7 @@ class ProductController extends Controller
     public function index(ProductFilterRequest $request)
     {
         try {
+            $request->merge(['is_customizable' => false]);
             $products = $this->productService->paginate($request);
 
             return ApiResponse::success('List of products', ProductResource::collection($products), 200, [
@@ -96,6 +97,29 @@ class ProductController extends Controller
             return ApiResponse::error('Product variant not found.', null, 404);
         } catch (Throwable $e) {
             return ApiResponse::error('Something went wrong.', $e->getMessage(), 500);
+        }
+    }
+
+    public function customizables(ProductFilterRequest $request)
+    {
+        try {
+            // Memaksa parameter 'is_customizable' menjadi true sebelum masuk ke Service
+            $request->merge(['is_customizable' => true]);
+
+            // Gunakan fungsi paginate yang sudah ada
+            $products = $this->productService->paginate($request);
+
+            return ApiResponse::success('List of customizable products', ProductResource::collection($products), 200, [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'has_more' => $products->hasMorePages(),
+            ]);
+        } catch (ValidationException $e) {
+            return ApiResponse::error('Invalid filter parameters.', $e->errors(), 422);
+        } catch (\Throwable $e) {
+            return ApiResponse::error('Failed to load customizable products.', $e->getMessage(), 500);
         }
     }
 }

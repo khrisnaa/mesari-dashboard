@@ -81,6 +81,7 @@ class ProductService
                     'discount_value' => $data['discount_value'] ?? null,
                     'discount_start_at' => $data['discount_start_at'] ?? null,
                     'discount_end_at' => $data['discount_end_at'] ?? null,
+                    'weight' => $data['weight'] ?? 0,
                 ]);
 
                 $variants = json_decode($data['variants'], true) ?? [];
@@ -113,24 +114,6 @@ class ProductService
                     $productVariant->attributes()->sync($attributeIds);
                 }
 
-                // if (!empty($data['discount']) && is_array($data['discount'])) {
-
-                //     $discount = [
-                //         'type'      => $data['discount']['type'] ?? null,
-                //         'value'     => $data['discount']['value'] ?? 0,
-                //         'start_at'  => !empty($data['discount']['start_at'])
-                //             ? Carbon::parse($data['discount']['start_at'])
-                //             : null,
-                //         'end_at'    => !empty($data['discount']['end_at'])
-                //             ? Carbon::parse($data['discount']['end_at'])
-                //             : null,
-                //     ];
-
-                //     if (!empty($discount['type'])) {
-                //         $product->discount()->create($discount);
-                //     }
-                // }
-
                 if (! empty($data['images'])) {
 
                     $basePath = 'product-images/'.$product->slug.'/'.now()->format('Y/m/d');
@@ -141,6 +124,11 @@ class ProductService
                     $gallery = collect($data['images'])
                         ->where('type', 'gallery')
                         ->values();
+
+                    $front = collect($data['images'])->firstWhere('type', 'front');
+                    $back = collect($data['images'])->firstWhere('type', 'back');
+                    $left = collect($data['images'])->firstWhere('type', 'left');
+                    $right = collect($data['images'])->firstWhere('type', 'right');
 
                     if ($thumbnail) {
                         $path = $thumbnail['file']->store($basePath, 'public');
@@ -161,6 +149,25 @@ class ProductService
                             'type' => 'gallery',
                             'sort_order' => $index,
                         ]);
+                    }
+
+                    $singleTypes = [
+                        'front' => $front,
+                        'back' => $back,
+                        'left' => $left,
+                        'right' => $right,
+                    ];
+
+                    foreach ($singleTypes as $type => $item) {
+                        if ($item) {
+                            $path = $item['file']->store($basePath, 'public');
+
+                            ProductImage::create([
+                                'product_id' => $product->id,
+                                'path' => $path,
+                                'type' => $type,
+                            ]);
+                        }
                     }
                 }
 

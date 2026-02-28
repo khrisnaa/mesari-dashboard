@@ -34,7 +34,9 @@ import products from '@/routes/products';
 import { CreateProductInput, createProductSchema } from '@/schemas/product/createProductSchema';
 import { BreadcrumbItem } from '@/types';
 import { Category } from '@/types/category';
+import { ImageType } from '@/types/enum';
 import { VariantAttribute } from '@/types/product';
+import { cleanFlashMessage } from '@/utils/cleanFlashMessage';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
@@ -69,7 +71,7 @@ export interface ImageState {
     id?: string;
     tempId: string;
     file?: File;
-    type: 'thumbnail' | 'gallery';
+    type: ImageType;
     preview: string;
     sort_order?: number;
 }
@@ -243,12 +245,15 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
             forceFormData: true,
             onError: (errors) => {
                 const errorMessage = Object.values(errors)[0];
-                toast.error(errorMessage);
+                toast.error(cleanFlashMessage(errorMessage));
             },
             onFinish: () => setLoading(false),
         });
     };
 
+    const isCustomizable = form.watch('is_customizable');
+    const variant = form.watch('variants');
+    console.log('VARIANT', variant);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
@@ -842,6 +847,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                                         />
                                     </div>
                                     <GalleryUploader
+                                        isCustomizable={isCustomizable}
                                         onChange={(files) => handleGalleryChange(files)}
                                         onRemove={handleRemoveImage}
                                         onSortOrder={handleSortOrder}

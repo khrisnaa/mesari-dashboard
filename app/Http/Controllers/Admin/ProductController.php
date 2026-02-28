@@ -68,6 +68,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
+
         try {
             $this->productService->store($request->validated());
 
@@ -126,6 +127,7 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
 
+        dd($request->all());
         try {
             $validated = $request->validated();
 

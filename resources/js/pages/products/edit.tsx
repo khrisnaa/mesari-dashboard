@@ -243,6 +243,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
     const discountType = form.watch('discount_type');
 
     // form submit handler
+
     const [loading, setLoading] = useState(false);
     const onSubmit = (data: UpdateProductInput) => {
         console.log(data);
@@ -294,10 +295,12 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
         });
     };
 
-    // useEffect(() => {
-    //     console.log('variants => ', form.watch('variants'));
-    //     console.log('ERRORS => ', form.formState.errors);
-    // }, [form.formState.errors]);
+    const isCustomizable = form.watch('is_customizable');
+    const variant = form.watch('variants');
+    console.log('VARIANT', variant);
+
+    const [isDifferentPricing, setIsDifferentPricing] = useState(false);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Product" />
@@ -833,6 +836,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                         />
                                     </div>
                                     <GalleryUploader
+                                        isCustomizable={isCustomizable}
                                         onChange={(files) => handleGalleryChange(files)}
                                         onRemove={handleRemoveImage}
                                         existingImages={galleryImages}
@@ -967,7 +971,11 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                 />
 
                 <PricingForm
-                    differentPricing
+                    isEdit
+                    autoGenerateVariant
+                    // differentPricing
+                    // differentPricing={isDifferentPricing}
+                    // onDifferentPricing={setIsDifferentPricing}
                     open={pricesDialog.isOpen}
                     onOpenChange={pricesDialog.onOpenChange}
                     colors={selectedColors}
@@ -975,6 +983,16 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                     setSelectedColors={setSelectedColors}
                     setSelectedSizes={setSelectedSizes}
                 />
+
+                {/* <PricingForm
+                    isEdit
+                    open={pricesDialog.isOpen}
+                    onOpenChange={pricesDialog.onOpenChange}
+                    colors={selectedColors}
+                    sizes={selectedSizes}
+                    setSelectedColors={setSelectedColors}
+                    setSelectedSizes={setSelectedSizes}
+                /> */}
 
                 <NewCategoryDialog
                     open={categoryDialog.isOpen}

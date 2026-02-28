@@ -1,11 +1,31 @@
-import { Button } from '@/components/ui/button';
+'useclient';
+
+import { Button } from '@/components/ui/button'; // Sesuaikan path
 import { cn } from '@/lib/utils';
-import { ImageState } from '@/pages/products/create';
 import { GripVertical, Plus, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
+export enum ImageType {
+    THUMBNAIL = 'thumbnail',
+    GALLERY = 'gallery',
+    FRONT = 'front',
+    BACK = 'back',
+    LEFT = 'left',
+    RIGHT = 'right',
+}
+
+export interface ImageState {
+    id?: string;
+    tempId: string;
+    file?: File;
+    type: ImageType;
+    preview: string;
+    sort_order?: number;
+}
+
 interface GalleryUploaderProps {
+    isCustomizable: boolean; // 👈 Props baru
     existingImages?: ImageState[] | [];
     onChange: (files: ImageState[]) => void;
     onRemove: (tempId: string) => void;
@@ -13,6 +33,7 @@ interface GalleryUploaderProps {
 }
 
 export const GalleryUploader = ({
+    isCustomizable,
     existingImages,
     onChange,
     onRemove,
@@ -25,6 +46,35 @@ export const GalleryUploader = ({
     const dragItem = useRef<number | null>(null);
     const dragOverItem = useRef<number | null>(null);
 
+    // --- FUNGSI SAKTI PENENTU TIPE ---
+    // Mengubah tipe berdasarkan urutan (index) jika isCustomizable = true
+    const assignTypes = (imgList: ImageState[], custom: boolean): ImageState[] => {
+        return imgList.map((img, index) => {
+            if (!custom) return { ...img, type: ImageType.GALLERY };
+            if (index === 0) return { ...img, type: ImageType.FRONT };
+            if (index === 1) return { ...img, type: ImageType.BACK };
+            if (index === 2) return { ...img, type: ImageType.LEFT };
+            if (index === 3) return { ...img, type: ImageType.RIGHT };
+            return { ...img, type: ImageType.GALLERY };
+        });
+    };
+
+    // Pantau perubahan toggle Customizable dari Parent
+    useEffect(() => {
+        setImages((prev) => {
+            const updated = assignTypes(prev, isCustomizable);
+            // Cek apakah ada perubahan tipe untuk mencegah re-render berlebih
+            const hasChanged = updated.some((img, i) => img.type !== prev[i].type);
+
+            if (hasChanged) {
+                // Beritahu parent secara asinkron (mencegah warning React state update)
+                setTimeout(() => onSortOrder(updated), 0);
+                return updated;
+            }
+            return prev;
+        });
+    }, [isCustomizable]); // eslint-disable-line react-hooks/exhaustive-deps
+
     // processing new images
     const processFiles = (fileList: File[]) => {
         const validFiles = fileList.filter((file) => file.type.startsWith('image/'));
@@ -33,13 +83,25 @@ export const GalleryUploader = ({
 
         const formattedFiles: ImageState[] = validFiles.map((file) => ({
             tempId: uuid(),
-            type: 'gallery',
+            type: ImageType.GALLERY, // Sementara, akan dioverride assignTypes di bawah
             file: file,
             preview: URL.createObjectURL(file),
         }));
 
-        setImages((prev) => [...prev, ...formattedFiles]);
-        onChange(formattedFiles);
+        setImages((prev) => {
+            const newImages = [...prev, ...formattedFiles];
+            const typedImages = assignTypes(newImages, isCustomizable);
+
+            // Ambil file yang baru saja diformat tapi dengan tipe yang sudah benar
+            const newlyTyped = typedImages.slice(prev.length);
+
+            setTimeout(() => {
+                onChange(newlyTyped); // Kirim file baru ke parent
+                onSortOrder(typedImages); // Sinkronisasi ulang semua urutan & tipe ke parent
+            }, 0);
+
+            return typedImages;
+        });
     };
 
     // handle upload new image
@@ -50,12 +112,10 @@ export const GalleryUploader = ({
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    // handle drag for sorting
+    // ... (Fungsi handle Drag & Drop untuk container tetap sama) ...
     const handleContainerDragOver = (e: React.DragEvent) => {
         e.preventDefault();
-        if (dragItem.current === null) {
-            setIsDraggingOver(true);
-        }
+        if (dragItem.current === null) setIsDraggingOver(true);
     };
 
     const handleContainerDragLeave = (e: React.DragEvent) => {
@@ -85,13 +145,15 @@ export const GalleryUploader = ({
             copyListItems.splice(position, 0, dragItemContent);
 
             dragItem.current = position;
-            setImages(copyListItems);
+
+            // Re-assign type setiap kali posisinya bertukar
+            const typedImages = assignTypes(copyListItems, isCustomizable);
+            setImages(typedImages);
         }
-        if (dragItem.current === null) return;
     };
 
     const handleSortEnd = () => {
-        onSortOrder(images);
+        onSortOrder(images); // Beri tahu parent karena susunan akhir sudah selesai
         dragItem.current = null;
         dragOverItem.current = null;
     };
@@ -100,11 +162,23 @@ export const GalleryUploader = ({
         setImages((prev) => {
             const removed = prev.find((img) => img.tempId === tempId);
             if (removed) URL.revokeObjectURL(removed.preview);
-            return prev.filter((img) => img.tempId !== tempId);
-        });
 
-        onRemove(tempId);
+            const filtered = prev.filter((img) => img.tempId !== tempId);
+            // Re-assign karena urutannya pasti bergeser ke depan
+            const typedImages = assignTypes(filtered, isCustomizable);
+
+            setTimeout(() => {
+                onRemove(tempId);
+                onSortOrder(typedImages); // Sinkronisasi karena tipenya ikut bergeser
+            }, 0);
+
+            return typedImages;
+        });
     };
+
+    // Dinamis: Jika custom, butuh minimal 4 kotak. Jika tidak, 3 cukup.
+    const minSlots = isCustomizable ? 4 : 3;
+    const placeholderLabels = ['Front', 'Back', 'Left', 'Right'];
 
     return (
         <div
@@ -147,6 +221,13 @@ export const GalleryUploader = ({
                                     className="pointer-events-none h-full w-full object-cover"
                                 />
 
+                                {/* 👈 LABEL TIPE GAMBAR (Hanya muncul jika isCustomizable ON atau tipe bukan gallery) */}
+                                {image.type !== 'gallery' && (
+                                    <div className="absolute top-1 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/80 px-2 py-0.5 text-[9px] font-bold tracking-wider text-white uppercase backdrop-blur-sm">
+                                        {image.type}
+                                    </div>
+                                )}
+
                                 <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
 
                                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 opacity-0 transition-opacity group-hover:opacity-70">
@@ -156,7 +237,6 @@ export const GalleryUploader = ({
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-
                                         handleRemoveImage(image.tempId);
                                     }}
                                     className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 hover:bg-red-600"
@@ -165,21 +245,31 @@ export const GalleryUploader = ({
                                     <X className="h-3 w-3" />
                                 </button>
 
-                                <div className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/50 text-[10px] text-white backdrop-blur-sm">
+                                <div className="absolute right-1 bottom-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/50 text-[9px] text-white backdrop-blur-sm">
                                     {index + 1}
                                 </div>
                             </div>
                         </div>
                     ))}
 
-                    {images.length <= 3 && (
+                    {/* Placeholder Kotak Kosong */}
+                    {images.length < minSlots && (
                         <>
-                            {Array.from({ length: 3 - images.length }).map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="aspect-square h-18 rounded-md bg-gray-100"
-                                />
-                            ))}
+                            {Array.from({ length: minSlots - images.length }).map((_, i) => {
+                                const slotIndex = images.length + i;
+                                return (
+                                    <div
+                                        key={i}
+                                        className="relative flex aspect-square h-18 flex-shrink-0 items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50"
+                                    >
+                                        {isCustomizable && slotIndex < 4 && (
+                                            <span className="text-[10px] font-semibold text-gray-400 uppercase">
+                                                {placeholderLabels[slotIndex]}
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </>
                     )}
                 </div>
@@ -189,7 +279,11 @@ export const GalleryUploader = ({
                         className="flex aspect-square h-18 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-gray-400 hover:bg-gray-100"
                         onClick={() => fileInputRef.current?.click()}
                     >
-                        <Button variant="outline" size="icon" className="rounded-full">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="pointer-events-none rounded-full"
+                        >
                             <Plus />
                         </Button>
                     </div>

@@ -9,15 +9,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customization extends Model
 {
-    use HasUuids, SoftDeletes, HasFactory;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
 
     protected $casts = [
         'is_draft' => 'boolean',
+        'custom_details' => 'array',
     ];
 
     public function user()
@@ -30,8 +32,13 @@ class Customization extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function orderItem()
+    public function orderItems()
     {
-        return $this->hasOne(OrderItem::class);
+        return $this->hasMany(OrderItem::class, 'customization_id');
+    }
+
+    public function productVariant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 }

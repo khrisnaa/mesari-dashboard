@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CompanyProfileController;
+use App\Http\Controllers\Api\CustomizationController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\OrderController;
@@ -30,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // public routes
 Route::get('/faqs', [FaqController::class, 'index']);
 Route::get('/testimonials', [TestimonialController::class, 'index']);
+Route::get('/products/customizables', [ProductController::class, 'customizables']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products/{slug}/reviews', [ProductController::class, 'reviews']);
@@ -85,4 +87,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // reviews
     Route::post('/reviews', [ProductReviewController::class, 'store']);
     Route::put('/reviews/{id}', [ProductReviewController::class, 'update']);
+
+    // customizations
+    Route::post('/customizations', [CustomizationController::class, 'store']);
+    Route::post('/customizations/checkout', [CustomizationController::class, 'checkout']);
 });

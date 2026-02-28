@@ -5,6 +5,7 @@ namespace App\Services\Api;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Cart;
+use App\Models\Customization;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
@@ -134,6 +135,7 @@ class OrderService
 
                 OrderItem::create([
                     'order_id' => $order->id,
+                    'customization_id' => $item->customization_id ?? null,
                     'product_variant_id' => $variant->id,
                     'product_name' => $variant->product->name,
                     'variant_name' => $variant->attributes->pluck('name')->implode(' / '),
@@ -282,5 +284,44 @@ class OrderService
                 'etd' => $service['etd'] ?? null,
             ];
         })->values()->toArray();
+    }
+
+    public function customizationCheckout($user, array $data)
+    {
+        // 1. Ambil data kustomisasi yang valid (milik user dan masih draft)
+        $customization = Customization::where('user_id', $user->id)
+            ->where('id', $data['customization_id'])
+            ->where('is_draft', true)
+            ->firstOrFail();
+
+        // 2. Ambil data varian baju dasarnya
+        $variant = ProductVariant::with(['product', 'attributes'])->findOrFail($customization->variant_id);
+
+        // 3. Kalkulasi Harga: (Harga Baju + Harga Sablon)
+        $pricePerItem = $variant->price + $customization->additional_price;
+
+        // 4. Siapkan item untuk di-passing ke processOrder
+        $items = collect([
+            (object) [
+                'product_id' => $variant->product_id,
+                'product_variant_id' => $variant->id,
+                'customization_id' => $customization->id, // Kirim ID custom
+                'price' => $pricePerItem, // Gunakan harga yang sudah ditotal
+                'quantity' => $data['quantity'],
+                'subtotal' => $pricePerItem * $data['quantity'],
+                'product_name' => $variant->product->name.' (Custom Design)',
+                'variant_name' => $variant->attributes->pluck('name')->implode(' / '),
+            ],
+        ]);
+
+        return DB::transaction(function () use ($user, $data, $items, $customization) {
+            // Panggil shared logic yang sudah kamu buat
+            $order = $this->processOrder($user, $data, $items, false);
+
+            // Ubah status kustomisasi menjadi fix (bukan draft lagi)
+            $customization->update(['is_draft' => false]);
+
+            return $order;
+        });
     }
 }

@@ -36,7 +36,7 @@ class StoreProductRequest extends FormRequest
             'variants' => ['required', 'string'],
 
             'images' => ['sometimes', 'array'],
-            'images.*.type' => ['required', 'in:thumbnail,gallery'],
+            'images.*.type' => ['required', 'in:thumbnail,gallery,front,back,left,right'],
             'images.*.file' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
 
             'discount_type' => ['nullable', 'in:percentage,fixed'],

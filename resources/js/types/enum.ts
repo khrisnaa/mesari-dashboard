@@ -18,8 +18,12 @@ export enum DiscountType {
 }
 
 export enum ImageType {
-    GALLERY = 'gallery',
     THUMBNAIL = 'thumbnail',
+    GALLERY = 'gallery',
+    FRONT = 'front',
+    BACK = 'back',
+    LEFT = 'left',
+    RIGHT = 'right',
 }
 
 export enum PaymentStatus {

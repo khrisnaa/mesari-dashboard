@@ -12,12 +12,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class ProductVariant extends Model
 {
-    use HasUuids, SoftDeletes, HasFactory;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
+
     protected $casts = [
         'price' => 'float',
     ];
@@ -40,5 +42,10 @@ class ProductVariant extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function customizations()
+    {
+        return $this->hasMany(Customization::class, 'product_variant_id');
     }
 }

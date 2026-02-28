@@ -28,7 +28,7 @@ const FlashToast = () => {
         }
 
         if (flash?.error && flash.error !== shownRef.current.error) {
-            toast.error(flash.error);
+            toast.error(cleanFlashMessage(flash.error));
             shownRef.current.error = flash.error;
         }
     }, [flash]);
