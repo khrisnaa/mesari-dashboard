@@ -16,7 +16,7 @@ class CustomizationCheckoutRequest extends FormRequest
         return [
             'customization_id' => ['required', 'uuid', 'exists:customizations,id'],
             'quantity' => ['required', 'integer', 'min:1'], // FE bisa mengirim ulang quantity di sini
-            'address_id' => ['required', 'uuid', 'exists:addresses,id'],
+            'address_id' => ['required', 'uuid', 'exists:user_addresses,id'],
             'shipping_courier_code' => ['required', 'string'],
             'shipping_courier_service' => ['required', 'string'],
             'note' => ['nullable', 'string', 'max:255'],

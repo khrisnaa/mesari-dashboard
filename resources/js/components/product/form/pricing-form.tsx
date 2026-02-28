@@ -1,13 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -16,7 +9,7 @@ import { VariantAttribute } from '@/types/product';
 import { formatNumber, parseNumber } from '@/utils/formatNumber';
 import { TrashIcon } from 'lucide-react';
 
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 export interface Variant {
@@ -30,39 +23,21 @@ export interface Variant {
 }
 
 interface PricingFormProps {
-    open: boolean;
-    onOpenChange: (value: boolean) => void;
     sizes: VariantAttribute[];
     colors: VariantAttribute[];
-    setSelectedColors?: Dispatch<SetStateAction<VariantAttribute[]>>;
-    setSelectedSizes?: Dispatch<SetStateAction<VariantAttribute[]>>;
-    differentPricing?: boolean;
-    onDifferentPricing?: (value: boolean) => void;
 }
 
 // helper
 const namesMatch = (a?: string, b?: string) => a?.trim().toLowerCase() === b?.trim().toLowerCase();
-
 const normalize = (v?: string) => v?.trim().toLowerCase() ?? '';
-
 const getKey = (v: Variant) => `${normalize(v.size?.name)}::${normalize(v.color?.name)}`;
-
 const dedupe = (list: Variant[]) => {
     const map = new Map<string, Variant>();
     list.forEach((v) => map.set(getKey(v), v));
     return Array.from(map.values());
 };
 
-const PricingForm = ({
-    open,
-    onOpenChange,
-    colors,
-    sizes,
-    setSelectedColors,
-    setSelectedSizes,
-    differentPricing,
-    onDifferentPricing,
-}: PricingFormProps) => {
+const PricingForm = ({ colors, sizes }: PricingFormProps) => {
     const form = useFormContext();
 
     // base states
@@ -70,8 +45,14 @@ const PricingForm = ({
     const [variants, setVariants] = useState<Variant[]>([]);
     const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
 
-    const [basePrice, setBasePrice] = useState<number | null>(null);
-    const [baseStock, setBaseStock] = useState<number | null>(null);
+    // MEMORI BLACKLIST: Mencatat kombinasi yang dihapus/tidak ada di DB
+    const [deletedKeys, setDeletedKeys] = useState<string[]>([]);
+    const [hasInitializedBlacklist, setHasInitializedBlacklist] = useState(false);
+
+    // Convert arrays to string to prevent infinite loops
+    const sizesStr = JSON.stringify(sizes);
+    const colorsStr = JSON.stringify(colors);
+    const variantsStr = JSON.stringify(variants);
 
     // generate combinations
     const generateCombinations = (): Variant[] => {
@@ -93,280 +74,236 @@ const PricingForm = ({
         );
     };
 
-    // load snapshot
+    // GENERATE & RECONCILE LOGIC
     useEffect(() => {
-        // if (open) {
-        //     const snapshot = form.getValues('variants') ?? [];
-
-        //     const unique = dedupe(snapshot);
-        //     setInitialVariants(unique);
-        //     setVariants(unique);
-        //     setSelectedVariants([]);
-        // }
-
-        if (open) {
-            const snapshot = form.getValues('variants') ?? [];
-
-            // Reset variant price & stock ke 0
-            const reset = snapshot.map((v: Variant) => ({
-                ...v,
-                price: v.isBaseParentAuto ? 0 : v.price,
-                stock: v.isBaseParentAuto ? 0 : v.stock,
-                isBaseParentAuto: false,
-            }));
-
-            const unique = dedupe(reset);
-            setInitialVariants(unique);
-            setVariants(unique);
-            setSelectedVariants([]);
-        }
-    }, [open]);
-
-    // update variants
-    useEffect(() => {
-        if (!open) return;
-
         const combinations = generateCombinations();
+        const possibleKeys = combinations.map(getKey);
+        const formVariants = form.getValues('variants') ?? [];
+
+        let currentBlacklist = deletedKeys;
+        let dbData = initialVariants;
+
+        // 1. INISIALISASI BLACKLIST (Hanya jalan sekali saat load data API)
+        if (!hasInitializedBlacklist && formVariants.length > 0) {
+            const dbKeys = formVariants.map(getKey);
+            // Cari kombinasi yang harusnya ada tapi ga ada di DB (berarti dulu dihapus)
+            const missingFromDb = possibleKeys.filter((k) => !dbKeys.includes(k));
+
+            currentBlacklist = missingFromDb;
+            setDeletedKeys(currentBlacklist);
+
+            dbData = formVariants;
+            setInitialVariants(formVariants);
+            setHasInitializedBlacklist(true);
+        }
+
+        // 2. CLEANSING BLACKLIST (Syarat: Kalau tombol color/size di-uncheck lalu dicheck lagi)
+        // Kita hanya menyimpan deletedKey yang masih mungkin dibuat (ada di possibleKeys)
+        const activeDeletedKeys = currentBlacklist.filter((k) => possibleKeys.includes(k));
+        if (hasInitializedBlacklist && activeDeletedKeys.length !== deletedKeys.length) {
+            setDeletedKeys(activeDeletedKeys);
+        }
 
         setVariants((prev) => {
-            // const valid = prev.filter((v) => {
-            //     const sizeExists = sizes.some((s) => namesMatch(s.name, v.size?.name));
-
-            //     if (!sizeExists) return false;
-
-            //     if (colors.length === 0) return !v.color;
-
-            //     const colorExists = colors.some((c) => namesMatch(c.name, v.color?.name));
-
-            //     return colorExists;
-            // });
-
-            const valid = prev.filter((v) => {
-                const sizeExists = sizes.some((s) => namesMatch(s.name, v.size?.name));
-                const colorExists = v.color
-                    ? colors.some((c) => namesMatch(c.name, v.color?.name))
-                    : true;
-
-                return sizeExists && colorExists;
-            });
-
-            const map = new Map<string, Variant>();
-            valid.forEach((v) => map.set(getKey(v), v));
+            const newVariants: Variant[] = [];
 
             combinations.forEach((co) => {
                 const key = getKey(co);
-                if (!map.has(key)) {
-                    map.set(key, {
-                        ...co,
-                        price: basePrice ?? 0,
-                        stock: baseStock ?? 0,
-                        isPriceAuto: true,
-                        isStockAuto: true,
-                    });
+
+                const inPrev = prev.find((v) => getKey(v) === key);
+                const inDb = dbData.find((v: Variant) => getKey(v) === key);
+
+                // --- LOGIKA UTAMA: CEK BLACKLIST ---
+                // Jika varian ini tidak sedang tampil (inPrev) DAN ada di daftar blacklist, SKIP!
+                if (!inPrev && activeDeletedKeys.includes(key)) {
+                    return;
                 }
+
+                // Recovery data DB jika sempat ter-reset karena delay render
+                if (
+                    inDb &&
+                    inPrev &&
+                    inPrev.price === 0 &&
+                    inPrev.stock === 0 &&
+                    (inDb.price > 0 || inDb.stock > 0)
+                ) {
+                    newVariants.push(inDb);
+                    return;
+                }
+
+                // Pakai data Database
+                if (inDb && !inPrev) {
+                    newVariants.push(inDb);
+                    return;
+                }
+
+                // Pertahankan ketikan aktif form
+                if (inPrev) {
+                    newVariants.push(inPrev);
+                    return;
+                }
+
+                // Varian benar-benar baru digenerate
+                newVariants.push({
+                    ...co,
+                    price: form.getValues('base_price') ?? 0,
+                    stock: form.getValues('base_stock') ?? 0,
+                    isPriceAuto: true,
+                    isStockAuto: true,
+                });
             });
 
-            return dedupe(Array.from(map.values()));
+            return dedupe(newVariants);
         });
-    }, [sizes, colors, open]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sizesStr, colorsStr]);
 
-    // bulk apply
+    // AUTO-SAVE EFFECT
+    useEffect(() => {
+        const currentVariants: Variant[] = JSON.parse(variantsStr);
+
+        // Guard mencegah wipeout data saat initial load
+        if (sizes.length === 0 && colors.length === 0 && currentVariants.length === 0) {
+            return;
+        }
+
+        const unique = dedupe(currentVariants);
+        form.setValue('variants', unique, { shouldDirty: true });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [variantsStr]);
+
+    // bulk apply functions
     const handleBulkApplyPrice = () => {
+        const currentBasePrice = form.getValues('base_price') ?? 0;
         const updated = variants.map((v) => {
             const key = getKey(v);
             const allow = selectedVariants.length === 0 || selectedVariants.includes(key);
-
-            return allow ? { ...v, price: basePrice ?? 0, isPriceAuto: true } : v;
+            return allow ? { ...v, price: currentBasePrice, isPriceAuto: true } : v;
         });
-
         setVariants(updated);
     };
 
     const handleBulkApplyStock = () => {
+        const currentBaseStock = form.getValues('base_stock') ?? 0;
         const updated = variants.map((v) => {
             const key = getKey(v);
             const allow = selectedVariants.length === 0 || selectedVariants.includes(key);
-
-            return allow ? { ...v, stock: baseStock ?? 0, isStockAuto: true } : v;
+            return allow ? { ...v, stock: currentBaseStock, isStockAuto: true } : v;
         });
-
         setVariants(updated);
     };
 
-    // reset handler (reset price & stock only)
-    const handleReset = () => {
-        setVariants((prev) =>
-            prev.map((v) => {
-                const match = initialVariants.find(
-                    (iv) =>
-                        namesMatch(iv.size?.name, v.size?.name) &&
-                        namesMatch(iv.color?.name, v.color?.name),
-                );
-
-                return {
-                    ...v,
-                    price: match?.price ?? 0,
-                    stock: match?.stock ?? 0,
-                    isPriceAuto: true,
-                    isStockAuto: true,
-                };
-            }),
-        );
-
-        setSelectedVariants([]);
-    };
-
-    // save
-    const handleSave = () => {
-        const unique = dedupe(variants);
-
-        const uniqueColors: VariantAttribute[] = Array.from(
-            new Map(
-                unique
-                    .filter((v): v is typeof v & { color: VariantAttribute } => !!v.color)
-                    .map((v) => [v.color.id, v.color]),
-            ).values(),
-        );
-
-        const uniqueSizes: VariantAttribute[] = Array.from(
-            new Map(
-                unique
-                    .filter((v): v is typeof v & { size: VariantAttribute } => !!v.size)
-                    .map((v) => [v.size.id, v.size]),
-            ).values(),
-        );
-
-        if (setSelectedColors && setSelectedSizes) {
-            setSelectedColors(uniqueColors);
-            setSelectedSizes(uniqueSizes);
-        }
-
-        form.setValue('variants', unique, { shouldDirty: true });
-        handleClose();
-        onDifferentPricing?.(true);
-    };
-
+    // FUNGSI HAPUS: Hapus baris DAN masukkan ke Blacklist
     const handleRemove = (variant: Variant) => {
         const keyToRemove = getKey(variant);
+
         setVariants((prev) => prev.filter((v) => getKey(v) !== keyToRemove));
+
+        // Ingat key ini agar tidak digenerate ulang
+        setDeletedKeys((prev) => {
+            if (!prev.includes(keyToRemove)) {
+                return [...prev, keyToRemove];
+            }
+            return prev;
+        });
     };
 
-    const handleClose = () => {
-        onOpenChange(false);
-        setBasePrice(null);
-        setBaseStock(null);
-    };
-
-    const baseParentPrice = form.watch('base_price');
-    const baseParentStock = form.watch('base_stock');
-
-    const handleSimplePricing = () => {
-        const combinations = generateCombinations();
-
-        const finalData: Variant[] = combinations.map((v) => ({
-            size: {
-                id: v.size?.id ?? '',
-                name: v.size?.name ?? '',
-                hex: v.size?.hex ?? null,
-            },
-            color: v.color ? { ...v.color } : undefined,
-            price: baseParentPrice ?? 0,
-            stock: baseParentStock ?? 0,
-            isPriceAuto: true,
-            isStockAuto: true,
-            isBaseParentAuto: true,
-        }));
-
-        form.setValue('variants', finalData, { shouldDirty: true });
-    };
-
-    useEffect(() => {
-        if (!differentPricing && !open) {
-            handleSimplePricing();
-        }
-    }, [baseParentPrice, baseParentStock, sizes, colors]);
+    const hasVariants = variants.length > 0;
 
     return (
-        <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="sm:max-w-xl">
-                <DialogHeader>
-                    <DialogTitle>Pricing and Stock</DialogTitle>
-                </DialogHeader>
-                <DialogDescription hidden>
-                    Dialog for adding price and stock to product variants
-                </DialogDescription>
-                <div className="flex flex-col gap-4 py-6">
-                    <div>
-                        <div className="grid h-fit grid-cols-2 gap-4">
-                            <FormItem>
-                                <FormLabel>Base Price</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        placeholder="0"
-                                        inputMode="numeric"
-                                        value={formatNumber(basePrice?.toString())}
-                                        onChange={(e) => {
-                                            const numericValue = parseNumber(e.target.value);
-                                            setBasePrice(numericValue);
-                                        }}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
+        <div className="flex flex-col gap-4">
+            {/* Base Price & Base Stock */}
+            <div className="grid h-fit grid-cols-2 gap-4">
+                <FormField
+                    control={form.control}
+                    name="base_price"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Base Price</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="0"
+                                    inputMode="numeric"
+                                    {...field}
+                                    value={formatNumber(field.value?.toString())}
+                                    onChange={(e) => {
+                                        const numericValue = parseNumber(e.target.value);
+                                        field.onChange(numericValue);
+                                    }}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-                            <FormItem>
-                                <FormLabel>Base Stock</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        placeholder="0"
-                                        inputMode="numeric"
-                                        value={formatNumber(baseStock?.toString())}
-                                        onChange={(e) => {
-                                            const numericValue = parseNumber(e.target.value);
-                                            setBaseStock(numericValue);
-                                        }}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        </div>
+                <FormField
+                    control={form.control}
+                    name="base_stock"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Base Stock</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="0"
+                                    inputMode="numeric"
+                                    {...field}
+                                    value={formatNumber(field.value?.toString())}
+                                    onChange={(e) => {
+                                        const numericValue = parseNumber(e.target.value);
+                                        field.onChange(numericValue);
+                                    }}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
 
-                        <div className="mt-4 flex justify-end gap-4">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="rounded-full text-xs"
-                                onClick={handleBulkApplyPrice}
-                            >
-                                Apply Price
-                            </Button>
+            {/* Variants Section */}
+            {hasVariants && (
+                <>
+                    <div className="flex justify-end gap-4">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            type="button"
+                            className="rounded-full text-xs"
+                            onClick={handleBulkApplyPrice}
+                        >
+                            Apply Price
+                        </Button>
 
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="rounded-full text-xs"
-                                onClick={handleBulkApplyStock}
-                            >
-                                Apply Stock
-                            </Button>
-                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            type="button"
+                            className="rounded-full text-xs"
+                            onClick={handleBulkApplyStock}
+                        >
+                            Apply Stock
+                        </Button>
                     </div>
+
                     <Separator />
-                    <div className="custom-scrollbar flex h-[50dvh] flex-col justify-between gap-4 overflow-y-auto pr-4">
+
+                    <div className="custom-scrollbar flex max-h-[50dvh] flex-col justify-between gap-4 overflow-y-auto pr-2">
                         <div className="grid gap-4">
-                            <div className="grid h-fit grid-cols-11 gap-4">
+                            <div className="grid h-fit grid-cols-11 items-center gap-4">
                                 <Label>#</Label>
                                 <Label className="col-span-3">Variant</Label>
                                 <Label className="col-span-3">Pricing</Label>
                                 <Label className="col-span-3">Stock</Label>
-                                <Label className="col-span-3"></Label>
+                                <Label className="col-span-1"></Label>
                             </div>
-                            {/* Variants mapp */}
+
+                            {/* Variants map */}
                             {variants.map((variant, i) => {
                                 return (
                                     <div
                                         key={getKey(variant)}
-                                        className="grid h-fit grid-cols-11 gap-4"
+                                        className="grid h-fit grid-cols-11 items-center gap-4"
                                     >
                                         <div>
                                             <Checkbox
@@ -405,7 +342,7 @@ const PricingForm = ({
                                                 inputMode="numeric"
                                                 className="h-9 pr-3 text-right text-neutral-900"
                                                 value={formatNumber(
-                                                    (variant.price ?? basePrice ?? 0).toString(),
+                                                    (variant.price ?? 0).toString(),
                                                 )}
                                                 onChange={(e) => {
                                                     const numericValue = parseNumber(
@@ -436,7 +373,7 @@ const PricingForm = ({
                                                     'h-9 pr-3 text-right text-neutral-900',
                                                 )}
                                                 value={formatNumber(
-                                                    (variant.stock ?? baseStock ?? 0).toString(),
+                                                    (variant.stock ?? 0).toString(),
                                                 )}
                                                 onChange={(e) => {
                                                     const numericValue = parseNumber(
@@ -459,38 +396,25 @@ const PricingForm = ({
                                                 }}
                                             />
                                         </div>
-                                        <div>
+                                        <div className="col-span-1 flex justify-end">
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
-                                                className="text-neutral-600"
+                                                type="button"
+                                                className="h-8 w-8 text-neutral-600"
                                                 onClick={() => handleRemove(variant)}
                                             >
-                                                <TrashIcon />
+                                                <TrashIcon className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     </div>
                                 );
                             })}
                         </div>
-
-                        <div className="flex justify-end gap-4">
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className="rounded-full"
-                                onClick={handleReset}
-                            >
-                                Reset
-                            </Button>
-                            <Button size="lg" className="rounded-full" onClick={handleSave}>
-                                Save
-                            </Button>
-                        </div>
                     </div>
-                </div>
-            </DialogContent>
-        </Dialog>
+                </>
+            )}
+        </div>
     );
 };
 export default PricingForm;

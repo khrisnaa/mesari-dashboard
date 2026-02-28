@@ -1,7 +1,7 @@
 import { ColorPickerDialog } from '@/components/color-picker';
 import { GalleryUploader } from '@/components/product/form/gallery-uploader';
 import { NewCategoryDialog } from '@/components/product/form/new-category';
-import PricingForm, { Variant } from '@/components/product/form/pricing-form';
+import { Variant } from '@/components/product/form/pricing-form-modal';
 import { Button } from '@/components/ui/button';
 import {
     Form,
@@ -28,6 +28,7 @@ import products from '@/routes/products';
 import { SubmitButton } from '@/components/buttons/submit-button';
 import { DateTimePicker } from '@/components/date-time-picker';
 import { PageHeader } from '@/components/page-header';
+import PricingForm from '@/components/product/form/pricing-form';
 import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -246,7 +247,6 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
 
     const [loading, setLoading] = useState(false);
     const onSubmit = (data: UpdateProductInput) => {
-        console.log(data);
         setLoading(true);
         const formData = new FormData();
 
@@ -296,10 +296,6 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
     };
 
     const isCustomizable = form.watch('is_customizable');
-    const variant = form.watch('variants');
-    console.log('VARIANT', variant);
-
-    const [isDifferentPricing, setIsDifferentPricing] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -537,36 +533,19 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                             <div className="space-y-4 rounded-lg border p-4">
                                 <h4 className="font-semibold">Pricing and Stock</h4>
                                 <div className="grid gap-4">
-                                    <VariantSummaryList />
-
-                                    <div className="flex justify-end">
-                                        <Button
-                                            onClick={() => {
-                                                if (selectedSizes.length === 0) {
-                                                    form.setError('selected_sizes', {
-                                                        type: 'manual',
-                                                        message: 'Select at least one size',
-                                                    });
-                                                    return;
-                                                }
-                                                form.clearErrors('selected_sizes');
-                                                pricesDialog.open();
-                                            }}
-                                            size="lg"
-                                            className="w-fit rounded-full"
-                                        >
-                                            Edit prices
-                                        </Button>
-                                    </div>
+                                    <PricingForm
+                                        colors={selectedColors}
+                                        sizes={selectedSizes}
+                                        // setSelectedColors={setSelectedColors}
+                                        // setSelectedSizes={setSelectedSizes}
+                                    />
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
                                             name="discount_value"
                                             render={({ field }) => {
-                                                const isPercentage =
-                                                    form.getValues('discount_type') ===
-                                                    'percentage';
+                                                const isPercentage = discountType === 'percentage';
 
                                                 return (
                                                     <FormItem>
@@ -969,30 +948,6 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                     onOpenChange={colorPickerDialog.onOpenChange}
                     onColorSelect={handleAddColor}
                 />
-
-                <PricingForm
-                    isEdit
-                    autoGenerateVariant
-                    // differentPricing
-                    // differentPricing={isDifferentPricing}
-                    // onDifferentPricing={setIsDifferentPricing}
-                    open={pricesDialog.isOpen}
-                    onOpenChange={pricesDialog.onOpenChange}
-                    colors={selectedColors}
-                    sizes={selectedSizes}
-                    setSelectedColors={setSelectedColors}
-                    setSelectedSizes={setSelectedSizes}
-                />
-
-                {/* <PricingForm
-                    isEdit
-                    open={pricesDialog.isOpen}
-                    onOpenChange={pricesDialog.onOpenChange}
-                    colors={selectedColors}
-                    sizes={selectedSizes}
-                    setSelectedColors={setSelectedColors}
-                    setSelectedSizes={setSelectedSizes}
-                /> */}
 
                 <NewCategoryDialog
                     open={categoryDialog.isOpen}

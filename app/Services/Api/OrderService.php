@@ -76,7 +76,8 @@ class OrderService
 
                 $variant->decrement('stock', $item->quantity);
 
-                $lineSubtotal = $variant->price * $item->quantity;
+                // 🔥 PERBAIKAN 1: Gunakan $item->price yang dipassing dari fungsi sebelumnya
+                $lineSubtotal = $item->price * $item->quantity;
                 $totalItemPrice += $lineSubtotal;
 
                 $productWeight = $variant->product->weight ?? 0;
@@ -101,11 +102,9 @@ class OrderService
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_number' => $this->generateOrderNumber(),
-
                 'order_status' => OrderStatus::PENDING->value,
                 'payment_status' => PaymentStatus::PENDING->value,
-
-                'subtotal' => $totalItemPrice,
+                'subtotal' => $totalItemPrice, // Sekarang akan menyimpan total base + custom
                 'shipping_cost' => $shippingPrice,
                 'discount_amount' => 0,
                 'grand_total' => $grandTotal,
@@ -137,11 +136,15 @@ class OrderService
                     'order_id' => $order->id,
                     'customization_id' => $item->customization_id ?? null,
                     'product_variant_id' => $variant->id,
-                    'product_name' => $variant->product->name,
-                    'variant_name' => $variant->attributes->pluck('name')->implode(' / '),
-                    'price' => $variant->price,
+
+                    // 🔥 PERBAIKAN 2: Gunakan label "Custom Design" jika dikirim
+                    'product_name' => $item->product_name ?? $variant->product->name,
+                    'variant_name' => $item->variant_name ?? $variant->attributes->pluck('name')->implode(' / '),
+
+                    // 🔥 PERBAIKAN 3: Simpan harga gabungan ke database
+                    'price' => $item->price,
                     'quantity' => $item->quantity,
-                    'subtotal' => $variant->price * $item->quantity,
+                    'subtotal' => $item->subtotal, // Bisa juga pakai: $item->price * $item->quantity
                 ]);
             }
 
@@ -295,9 +298,10 @@ class OrderService
             ->firstOrFail();
 
         // 2. Ambil data varian baju dasarnya
-        $variant = ProductVariant::with(['product', 'attributes'])->findOrFail($customization->variant_id);
+        // 🔥 Perbaikan: Gunakan product_variant_id sesuai nama kolom di DB
+        $variant = ProductVariant::with(['product', 'attributes'])->findOrFail($customization->product_variant_id);
 
-        // 3. Kalkulasi Harga: (Harga Baju + Harga Sablon)
+        // 3. Kalkulasi Harga per Item: (Harga Baju + Total Harga Sablon 1 Pcs)
         $pricePerItem = $variant->price + $customization->additional_price;
 
         // 4. Siapkan item untuk di-passing ke processOrder
@@ -305,20 +309,20 @@ class OrderService
             (object) [
                 'product_id' => $variant->product_id,
                 'product_variant_id' => $variant->id,
-                'customization_id' => $customization->id, // Kirim ID custom
-                'price' => $pricePerItem, // Gunakan harga yang sudah ditotal
+                'customization_id' => $customization->id, // Kirim ID custom untuk disimpan ke order_items
+                'price' => $pricePerItem, // Harga satuan yang sudah digabung
                 'quantity' => $data['quantity'],
-                'subtotal' => $pricePerItem * $data['quantity'],
+                'subtotal' => $pricePerItem * $data['quantity'], // Subtotal = (Base + Custom) * Qty
                 'product_name' => $variant->product->name.' (Custom Design)',
                 'variant_name' => $variant->attributes->pluck('name')->implode(' / '),
             ],
         ]);
 
         return DB::transaction(function () use ($user, $data, $items, $customization) {
-            // Panggil shared logic yang sudah kamu buat
+            // Panggil shared logic untuk membuat Order & OrderItems
             $order = $this->processOrder($user, $data, $items, false);
 
-            // Ubah status kustomisasi menjadi fix (bukan draft lagi)
+            // Ubah status kustomisasi menjadi fix (bukan draft lagi) agar tidak bisa di-checkout ulang
             $customization->update(['is_draft' => false]);
 
             return $order;

@@ -91,4 +91,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // customizations
     Route::post('/customizations', [CustomizationController::class, 'store']);
     Route::post('/customizations/checkout', [CustomizationController::class, 'checkout']);
+    Route::get('/customizations/{id}', [CustomizationController::class, 'show']);
 });

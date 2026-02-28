@@ -8,6 +8,7 @@ use App\Http\Requests\Api\Customization\CustomizationCheckoutRequest;
 use App\Http\Requests\Api\Customization\StoreCustomizationRequest;
 use App\Http\Resources\CustomizationResource;
 use App\Http\Resources\OrderResource;
+use App\Models\Customization;
 use App\Services\Api\CustomizationService;
 use App\Services\Api\OrderService;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +42,7 @@ class CustomizationController extends Controller
     // API 2: Langsung Checkout dari Desain
     public function checkout(CustomizationCheckoutRequest $request)
     {
+
         $order = $this->orderService->customizationCheckout(
             Auth::user(),
             $request->validated()
@@ -49,6 +51,18 @@ class CustomizationController extends Controller
         return ApiResponse::success(
             'Custom order checkout successful',
             new OrderResource($order)
+        );
+    }
+
+    public function show($id)
+    {
+        $customization = Customization::with('product.images')
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
+
+        return ApiResponse::success(
+            'Customization details retrieved successfully',
+            new CustomizationResource($customization)
         );
     }
 }

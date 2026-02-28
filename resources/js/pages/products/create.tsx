@@ -4,7 +4,8 @@ import { DateTimePicker } from '@/components/date-time-picker';
 import { PageHeader } from '@/components/page-header';
 import { GalleryUploader } from '@/components/product/form/gallery-uploader';
 import { NewCategoryDialog } from '@/components/product/form/new-category';
-import PricingForm, { Variant } from '@/components/product/form/pricing-form';
+import PricingForm from '@/components/product/form/pricing-form';
+import { Variant } from '@/components/product/form/pricing-form-modal';
 import { ThumbnailUploader } from '@/components/product/form/thumbnail-uploader';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -102,7 +103,6 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
     });
 
     // dialog handler
-    const pricesDialog = useDialog();
     const categoryDialog = useDialog();
     const colorPickerDialog = useDialog();
 
@@ -208,9 +208,6 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
     const endValue = form.watch('discount_end_at');
     const discountType = form.watch('discount_type');
 
-    // handle variant pricing
-    const [isDifferentPricing, setIsDifferentPricing] = useState(false);
-
     // form submit handler
     const [loading, setLoading] = useState(false);
     const onSubmit = (data: CreateProductInput) => {
@@ -252,15 +249,21 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
     };
 
     const isCustomizable = form.watch('is_customizable');
-    const variant = form.watch('variants');
-    console.log('VARIANT', variant);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Product" />
 
             <Form {...form}>
                 <form
-                    onSubmit={form.handleSubmit(onSubmit)}
+                    onSubmit={form.handleSubmit(
+                        (data) => {
+                            console.log('SUBMIT SUCCESS:', data);
+                        },
+                        (errors) => {
+                            console.log('SUBMIT ERRORS:', errors);
+                        },
+                    )}
                     className="container mx-auto space-y-6 p-4"
                 >
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -491,86 +494,7 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                             <Card className="space-y-4 p-4">
                                 <h4 className="font-semibold">Pricing and Stock</h4>
                                 <div className="grid gap-4">
-                                    {isDifferentPricing ? (
-                                        <VariantSummaryList />
-                                    ) : (
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <FormField
-                                                control={form.control}
-                                                name="base_price"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Base Price</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                placeholder="0"
-                                                                inputMode="numeric"
-                                                                {...field}
-                                                                value={formatNumber(field.value)}
-                                                                onChange={(e) => {
-                                                                    const numericValue =
-                                                                        parseNumber(e.target.value);
-                                                                    field.onChange(numericValue);
-                                                                }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            <FormField
-                                                control={form.control}
-                                                name="base_stock"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Base Stock</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                placeholder="0"
-                                                                inputMode="numeric"
-                                                                {...field}
-                                                                value={formatNumber(field.value)}
-                                                                onChange={(e) => {
-                                                                    const numericValue =
-                                                                        parseNumber(e.target.value);
-                                                                    field.onChange(numericValue);
-                                                                }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                    )}
-
-                                    <div className="flex justify-end">
-                                        <Button
-                                            onClick={() => {
-                                                if (selectedSizes.length === 0) {
-                                                    form.setError('selected_sizes', {
-                                                        type: 'manual',
-                                                        message: 'Select at least one size',
-                                                    });
-                                                    return;
-                                                }
-                                                form.clearErrors('selected_sizes');
-                                                form.setValue('base_price', undefined, {
-                                                    shouldDirty: true,
-                                                });
-                                                form.setValue('base_stock', undefined, {
-                                                    shouldDirty: true,
-                                                });
-                                                pricesDialog.open();
-                                            }}
-                                            size="lg"
-                                            className="w-fit rounded-full"
-                                        >
-                                            Add more prices
-                                        </Button>
-                                    </div>
-
+                                    <PricingForm colors={selectedColors} sizes={selectedSizes} />
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
@@ -973,17 +897,6 @@ const Create = ({ colors, sizes, categories }: PageProps) => {
                     open={colorPickerDialog.isOpen}
                     onOpenChange={colorPickerDialog.onOpenChange}
                     onColorSelect={handleAddColor}
-                />
-
-                <PricingForm
-                    open={pricesDialog.isOpen}
-                    onOpenChange={pricesDialog.onOpenChange}
-                    colors={selectedColors}
-                    sizes={selectedSizes}
-                    differentPricing={isDifferentPricing}
-                    onDifferentPricing={setIsDifferentPricing}
-                    setSelectedColors={setSelectedColors}
-                    setSelectedSizes={setSelectedSizes}
                 />
 
                 <NewCategoryDialog
