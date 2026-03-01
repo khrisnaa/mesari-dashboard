@@ -235,7 +235,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
 
     const thumbnailImage = images.find((img) => img.type === 'thumbnail');
     const galleryImages = images
-        .filter((img) => img.type === 'gallery')
+        .filter((img) => img.type != 'thumbnail')
         .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
     // handle discount type, start and end date

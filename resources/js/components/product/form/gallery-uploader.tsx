@@ -46,8 +46,6 @@ export const GalleryUploader = ({
     const dragItem = useRef<number | null>(null);
     const dragOverItem = useRef<number | null>(null);
 
-    // --- FUNGSI SAKTI PENENTU TIPE ---
-    // Mengubah tipe berdasarkan urutan (index) jika isCustomizable = true
     const assignTypes = (imgList: ImageState[], custom: boolean): ImageState[] => {
         return imgList.map((img, index) => {
             if (!custom) return { ...img, type: ImageType.GALLERY };
@@ -59,15 +57,12 @@ export const GalleryUploader = ({
         });
     };
 
-    // Pantau perubahan toggle Customizable dari Parent
     useEffect(() => {
         setImages((prev) => {
             const updated = assignTypes(prev, isCustomizable);
-            // Cek apakah ada perubahan tipe untuk mencegah re-render berlebih
             const hasChanged = updated.some((img, i) => img.type !== prev[i].type);
 
             if (hasChanged) {
-                // Beritahu parent secara asinkron (mencegah warning React state update)
                 setTimeout(() => onSortOrder(updated), 0);
                 return updated;
             }
@@ -83,7 +78,7 @@ export const GalleryUploader = ({
 
         const formattedFiles: ImageState[] = validFiles.map((file) => ({
             tempId: uuid(),
-            type: ImageType.GALLERY, // Sementara, akan dioverride assignTypes di bawah
+            type: ImageType.GALLERY,
             file: file,
             preview: URL.createObjectURL(file),
         }));
@@ -92,12 +87,11 @@ export const GalleryUploader = ({
             const newImages = [...prev, ...formattedFiles];
             const typedImages = assignTypes(newImages, isCustomizable);
 
-            // Ambil file yang baru saja diformat tapi dengan tipe yang sudah benar
             const newlyTyped = typedImages.slice(prev.length);
 
             setTimeout(() => {
-                onChange(newlyTyped); // Kirim file baru ke parent
-                onSortOrder(typedImages); // Sinkronisasi ulang semua urutan & tipe ke parent
+                onChange(newlyTyped);
+                onSortOrder(typedImages);
             }, 0);
 
             return typedImages;
@@ -112,7 +106,6 @@ export const GalleryUploader = ({
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    // ... (Fungsi handle Drag & Drop untuk container tetap sama) ...
     const handleContainerDragOver = (e: React.DragEvent) => {
         e.preventDefault();
         if (dragItem.current === null) setIsDraggingOver(true);
@@ -153,7 +146,7 @@ export const GalleryUploader = ({
     };
 
     const handleSortEnd = () => {
-        onSortOrder(images); // Beri tahu parent karena susunan akhir sudah selesai
+        onSortOrder(images);
         dragItem.current = null;
         dragOverItem.current = null;
     };
@@ -164,19 +157,17 @@ export const GalleryUploader = ({
             if (removed) URL.revokeObjectURL(removed.preview);
 
             const filtered = prev.filter((img) => img.tempId !== tempId);
-            // Re-assign karena urutannya pasti bergeser ke depan
             const typedImages = assignTypes(filtered, isCustomizable);
 
             setTimeout(() => {
                 onRemove(tempId);
-                onSortOrder(typedImages); // Sinkronisasi karena tipenya ikut bergeser
+                onSortOrder(typedImages);
             }, 0);
 
             return typedImages;
         });
     };
 
-    // Dinamis: Jika custom, butuh minimal 4 kotak. Jika tidak, 3 cukup.
     const minSlots = isCustomizable ? 4 : 3;
     const placeholderLabels = ['Front', 'Back', 'Left', 'Right'];
 
@@ -221,7 +212,6 @@ export const GalleryUploader = ({
                                     className="pointer-events-none h-full w-full object-cover"
                                 />
 
-                                {/* 👈 LABEL TIPE GAMBAR (Hanya muncul jika isCustomizable ON atau tipe bukan gallery) */}
                                 {image.type !== 'gallery' && (
                                     <div className="absolute top-1 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/80 px-2 py-0.5 text-[9px] font-bold tracking-wider text-white uppercase backdrop-blur-sm">
                                         {image.type}
@@ -252,7 +242,6 @@ export const GalleryUploader = ({
                         </div>
                     ))}
 
-                    {/* Placeholder Kotak Kosong */}
                     {images.length < minSlots && (
                         <>
                             {Array.from({ length: minSlots - images.length }).map((_, i) => {
