@@ -14,6 +14,7 @@ import categories from '@/routes/categories';
 import companyProfile from '@/routes/company-profile';
 import faqs from '@/routes/faqs';
 import orders from '@/routes/orders';
+import productReviews from '@/routes/productReviews';
 import products from '@/routes/products';
 import testimonials from '@/routes/testimonials';
 import users from '@/routes/users';
@@ -28,6 +29,7 @@ import {
     LayoutGridIcon,
     MessageSquareIcon,
     PackageIcon,
+    QuoteIcon,
     ReceiptIcon,
     ScissorsIcon,
     TagIcon,
@@ -53,10 +55,11 @@ const mainNavItems: NavItemGroup[] = [
     {
         heading: 'Content Management',
         items: [
-            { title: 'Banners', href: banners.index(), icon: ImageIcon },
-            { title: 'Testimonials', href: testimonials.index(), icon: MessageSquareIcon },
-            { title: 'FAQs', href: faqs.index(), icon: HelpCircleIcon },
             { title: 'Company Profile', href: companyProfile.index(), icon: Building2Icon },
+            { title: 'Banners', href: banners.index(), icon: ImageIcon },
+            { title: 'Testimonials', href: testimonials.index(), icon: QuoteIcon },
+            { title: 'FAQs', href: faqs.index(), icon: HelpCircleIcon },
+            { title: 'Product Reviews', href: productReviews.index(), icon: MessageSquareIcon },
         ],
     },
 

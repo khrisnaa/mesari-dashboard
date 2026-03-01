@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CompanyProfileController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -51,6 +52,15 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('store.variant');
         Route::put('/products/{product}/status', [ProductController::class, 'updateStatus'])
             ->name('update.status');
+    });
+
+    Route::prefix('productReviews')->name('productReviews.')->group(function () {
+        Route::get('/', [ProductReviewController::class, 'index'])
+            ->name('index');
+        Route::put('/{productReview}', [ProductReviewController::class, 'update'])
+            ->name('update');
+        Route::delete('/{productReview}', [ProductReviewController::class, 'destroy'])
+            ->name('destroy');
     });
 
     // testimonials

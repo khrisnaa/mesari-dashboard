@@ -30,8 +30,8 @@ class ProductReview extends Model
         return $this->belongsTo(OrderItem::class);
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
 }
