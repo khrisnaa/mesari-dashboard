@@ -44,7 +44,7 @@ const Edit = ({ profile }: PageProps) => {
                         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                             <PageHeader
                                 title="Edit Company Profile"
-                                description="Perbarui informasi perusahaan Anda di sini."
+                                description="Update your company information here."
                             />
 
                             <div className="flex items-center gap-3">
@@ -72,19 +72,19 @@ const Edit = ({ profile }: PageProps) => {
                             <div className="space-y-8 lg:col-span-2">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Identitas Perusahaan</CardTitle>
+                                        <CardTitle>Company Identity</CardTitle>
                                         <CardDescription>
-                                            Informasi dasar mengenai brand perusahaan.
+                                            Basic information about your company brand.
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="grid gap-6">
                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             <div className="space-y-2">
-                                                <Label>Nama Perusahaan</Label>
+                                                <Label>Company Name</Label>
                                                 <Input
                                                     name="company_name"
                                                     defaultValue={profile.company_name}
-                                                    placeholder="PT Contoh Maju Jaya"
+                                                    placeholder="Example: PT Maju Jaya"
                                                 />
                                                 <InputError message={errors.company_name} />
                                             </div>
@@ -94,19 +94,19 @@ const Edit = ({ profile }: PageProps) => {
                                                 <Input
                                                     name="tagline"
                                                     defaultValue={profile.tagline ?? ''}
-                                                    placeholder="Solusi terbaik untuk..."
+                                                    placeholder="Your best solution for..."
                                                 />
                                                 <InputError message={errors.tagline} />
                                             </div>
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label>Deskripsi</Label>
+                                            <Label>Description</Label>
                                             <Textarea
                                                 name="description"
                                                 rows={5}
                                                 defaultValue={profile.description ?? ''}
-                                                placeholder="Jelaskan secara singkat tentang perusahaan Anda..."
+                                                placeholder="Describe your company briefly..."
                                                 className="resize-none"
                                             />
                                             <InputError message={errors.description} />
@@ -116,14 +116,14 @@ const Edit = ({ profile }: PageProps) => {
 
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Lokasi & Alamat</CardTitle>
+                                        <CardTitle>Location & Address</CardTitle>
                                         <CardDescription>
-                                            Dimana pelanggan dapat menemukan Anda.
+                                            Where customers can find you.
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="grid gap-6">
                                         <div className="space-y-2">
-                                            <Label>Alamat Lengkap</Label>
+                                            <Label>Full Address</Label>
                                             <Textarea
                                                 name="address"
                                                 rows={3}
@@ -136,12 +136,12 @@ const Edit = ({ profile }: PageProps) => {
 
                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                             <div className="space-y-2">
-                                                <Label>Kota / Kabupaten</Label>
+                                                <Label>City / Regency</Label>
                                                 <Input name="city" defaultValue={profile.city} />
                                                 <InputError message={errors.city} />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Provinsi</Label>
+                                                <Label>Province</Label>
                                                 <Input
                                                     name="province"
                                                     defaultValue={profile.province}
@@ -149,7 +149,7 @@ const Edit = ({ profile }: PageProps) => {
                                                 <InputError message={errors.province} />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Kode Pos</Label>
+                                                <Label>Postal Code</Label>
                                                 <Input
                                                     name="postal_code"
                                                     defaultValue={profile.postal_code}
@@ -159,7 +159,7 @@ const Edit = ({ profile }: PageProps) => {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label>Google Map URL (Embed Link)</Label>
+                                            <Label>Google Maps URL (Embed Link)</Label>
                                             <Input
                                                 name="google_map_url"
                                                 defaultValue={profile.google_map_url}
@@ -174,9 +174,9 @@ const Edit = ({ profile }: PageProps) => {
                             <div className="space-y-8">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Kontak</CardTitle>
+                                        <CardTitle>Contact</CardTitle>
                                         <CardDescription>
-                                            Saluran komunikasi publik.
+                                            Public communication channels.
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="grid gap-4">
@@ -191,7 +191,7 @@ const Edit = ({ profile }: PageProps) => {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label>No. Telepon</Label>
+                                            <Label>Phone Number</Label>
                                             <Input name="phone" defaultValue={profile.phone} />
                                             <InputError message={errors.phone} />
                                         </div>
@@ -206,20 +206,23 @@ const Edit = ({ profile }: PageProps) => {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label>Jam Operasional</Label>
+                                            <Label>Working Hours</Label>
                                             <Input
                                                 name="working_hours"
                                                 defaultValue={profile.working_hours}
-                                                placeholder="Senin - Jumat, 08:00 - 17:00"
+                                                placeholder="Monday - Friday, 08:00 - 17:00"
                                             />
                                             <InputError message={errors.working_hours} />
                                         </div>
                                     </CardContent>
                                 </Card>
+
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Media Sosial</CardTitle>
-                                        <CardDescription>Link profil media sosial.</CardDescription>
+                                        <CardTitle>Social Media</CardTitle>
+                                        <CardDescription>
+                                            Links to your social media profiles.
+                                        </CardDescription>
                                     </CardHeader>
                                     <CardContent className="grid gap-4">
                                         <div className="space-y-2">
