@@ -20,7 +20,7 @@ class StoreCustomizationRequest extends FormRequest
             'total_custom_sides' => ['required', 'integer', 'min:0', 'max:4'],
             'custom_details' => ['required', 'array'],
             'custom_details.*.has_design' => ['required', 'boolean'],
-            'custom_details.*.mockup_image_base64' => ['exclude_if:custom_details.*.has_design,false', 'required', 'string'],
+            'custom_details.*.mockup_image_base64' => ['required', 'string'],
             'custom_details.*.design_data' => ['nullable', 'array'],
         ];
     }
@@ -53,7 +53,6 @@ class StoreCustomizationRequest extends FormRequest
 
             'custom_details.*.mockup_image_base64.required' => 'The mockup image is required when a design is present.',
             'custom_details.*.mockup_image_base64.string' => 'The mockup image must be a valid base64 string.',
-            'custom_details.*.mockup_image_base64.exclude_if' => 'The mockup image is not required when has_design is false.',
 
             'custom_details.*.design_data.array' => 'The design data must be an array.',
         ];

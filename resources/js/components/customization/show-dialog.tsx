@@ -23,94 +23,7 @@ export const getSizeGuide = (size: string) => {
         return SIZE_GUIDE_LIST[normalized].max;
     }
 
-    return 0;
-};
-
-export const ShowDialog = ({
-    isOpen,
-    close,
-    onOpenChange,
-    payload: custom,
-}: DialogComponentProps<Customization>) => {
-    if (!custom) return null;
-    const size = custom.product_variant?.attributes.find((attr) => attr.type == 'size');
-    return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[950px]">
-                <DialogHeader>
-                    <DialogTitle>Customization Details</DialogTitle>
-                    <p className="text-sm text-muted-foreground">
-                        Customer:{' '}
-                        <span className="font-semibold text-foreground">{custom.user?.name}</span>
-                    </p>
-                </DialogHeader>
-
-                <Tabs defaultValue="front" className="mt-2 w-full">
-                    <TabsList className="grid w-full grid-cols-4">
-                        <TabsTrigger value="front" className="relative">
-                            Front
-                            {custom.custom_details.front.has_design && (
-                                <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
-                            )}
-                        </TabsTrigger>
-                        <TabsTrigger value="back" className="relative">
-                            Back
-                            {custom.custom_details.back.has_design && (
-                                <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
-                            )}
-                        </TabsTrigger>
-                        <TabsTrigger value="left" className="relative">
-                            Left Sleeve
-                            {custom.custom_details.leftSleeve.has_design && (
-                                <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
-                            )}
-                        </TabsTrigger>
-                        <TabsTrigger value="right" className="relative">
-                            Right Sleeve
-                            {custom.custom_details.rightSleeve.has_design && (
-                                <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
-                            )}
-                        </TabsTrigger>
-                    </TabsList>
-
-                    <div className="mt-6">
-                        <TabsContent value="front" className="m-0">
-                            <SideDetail
-                                side={custom.custom_details.front}
-                                name="Front"
-                                baseImageUrl={custom.base_images?.front}
-                                size={size?.name ?? null}
-                            />
-                        </TabsContent>
-                        <TabsContent value="back" className="m-0">
-                            <SideDetail
-                                side={custom.custom_details.back}
-                                name="Back"
-                                baseImageUrl={custom.base_images?.back}
-                                size={size?.name ?? null}
-                            />
-                        </TabsContent>
-                        <TabsContent value="left" className="m-0">
-                            <SideDetail
-                                side={custom.custom_details.leftSleeve}
-                                name="Left Sleeve"
-                                baseImageUrl={custom.base_images?.leftSleeve}
-                                size={size?.name ?? null}
-                            />
-                        </TabsContent>
-                        <TabsContent value="right" className="m-0">
-                            <SideDetail
-                                side={custom.custom_details.rightSleeve}
-                                name="Right Sleeve"
-                                baseImageUrl={custom.base_images?.rightSleeve}
-                                size={size?.name ?? null}
-                            />
-                        </TabsContent>
-                    </div>
-                </Tabs>
-            </DialogContent>
-        </Dialog>
-    );
+    return 70;
 };
 
 const LoadedImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
@@ -127,7 +40,7 @@ const LoadedImage = ({ src, alt, className }: { src: string; alt: string; classN
                 src={src}
                 alt={alt}
                 onLoad={() => setIsLoading(false)}
-                className={`${className} ${
+                className={`${className || ''} ${
                     isLoading ? 'opacity-0' : 'opacity-100'
                 } transition-opacity duration-300 ease-in-out`}
             />
@@ -148,16 +61,14 @@ const SideDetail = ({
 }) => (
     <div className="space-y-4">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* KIRI: Image / Mockup Section */}
             <div className="relative flex h-[380px] w-full items-center justify-center overflow-hidden rounded-lg border bg-muted/50 p-2">
-                {side.has_design && side.mockup_url ? (
+                {side.mockup_url ? (
                     <div className="relative flex h-full w-full items-center justify-center">
                         <LoadedImage
                             src={side.mockup_url}
                             alt={`${name} Custom Mockup`}
                             className="h-full w-full rounded-md object-contain drop-shadow-sm"
                         />
-                        {/* Tombol Download Mockup Utama */}
                         <a
                             href={side.mockup_url}
                             download={`mockup-${name.toLowerCase().replace(/\s+/g, '-')}.png`}
@@ -189,7 +100,6 @@ const SideDetail = ({
                 )}
             </div>
 
-            {/* KANAN: Design Elements List */}
             <div className="flex flex-col space-y-3">
                 <div className="flex items-center justify-between">
                     <h4 className="text-sm font-bold tracking-tight text-foreground">
@@ -204,23 +114,24 @@ const SideDetail = ({
                     <div className="custom-scrollbar max-h-[340px] space-y-3 overflow-y-auto pr-2">
                         {side.design_data.map((el, i) => {
                             const imgSrc = el.src || el.url;
-
-                            // --- LOGIKA ESTIMASI UKURAN CETAK ---
-                            // Sesuaikan MOCKUP_SHIRT_HEIGHT_PX dengan ukuran tinggi kanvas pada aplikasi customermu (misal 500px atau 600px)
                             const MOCKUP_SHIRT_HEIGHT_PX = 450;
                             const BASE_SHIRT_LENGTH_CM = size ? getSizeGuide(size) : 70;
-                            console.log('SIZE', BASE_SHIRT_LENGTH_CM);
-                            // Lebar & Tinggi asli elemen sebelum discaling.
-                            // Jika text, ambil fontSize. Jika gambar, ambil width/height. Fallback ke 100px.
-                            const baseWidthPx =
-                                el.width || (el.type === 'text' ? el.fontSize || 100 : 100);
-                            const baseHeightPx =
-                                el.height || (el.type === 'text' ? el.fontSize || 100 : 100);
+                            const currentScale = el.scale ?? 1;
 
-                            const actualWidthPx = baseWidthPx * el.scale;
-                            const actualHeightPx = baseHeightPx * el.scale;
+                            let baseWidthPx = 100;
+                            let baseHeightPx = 100;
 
-                            // Cm conversion
+                            if (el.type === 'text') {
+                                baseWidthPx = el.width ?? el.fontSize ?? 100;
+                                baseHeightPx = el.height ?? el.fontSize ?? 100;
+                            } else if (el.type === 'image') {
+                                baseWidthPx = el.width ?? 100;
+                                baseHeightPx = el.height ?? 100;
+                            }
+
+                            const actualWidthPx = baseWidthPx * currentScale;
+                            const actualHeightPx = baseHeightPx * currentScale;
+
                             const estWidthCm =
                                 (actualWidthPx / MOCKUP_SHIRT_HEIGHT_PX) * BASE_SHIRT_LENGTH_CM;
                             const estHeightCm =
@@ -248,7 +159,6 @@ const SideDetail = ({
                                     </div>
 
                                     <div className="space-y-2 text-xs">
-                                        {/* TEXT Element Detail */}
                                         {el.type === 'text' && (
                                             <>
                                                 <div className="flex items-start justify-between">
@@ -284,7 +194,6 @@ const SideDetail = ({
                                             </>
                                         )}
 
-                                        {/* IMAGE Element Detail */}
                                         {el.type === 'image' && (
                                             <>
                                                 <div className="flex items-center justify-between rounded-md border bg-muted/50 p-2">
@@ -334,8 +243,9 @@ const SideDetail = ({
                                                     Coord / Transform:
                                                 </span>
                                                 <span className="font-medium">
-                                                    X:{Math.round(el.x)} Y:{Math.round(el.y)} |{' '}
-                                                    {el.scale}x / {el.rotation}°
+                                                    X:{Math.round(el.x ?? 0)} Y:
+                                                    {Math.round(el.y ?? 0)} | {currentScale}x /{' '}
+                                                    {el.rotation ?? 0}°
                                                 </span>
                                             </div>
 
@@ -369,3 +279,92 @@ const SideDetail = ({
         </div>
     </div>
 );
+
+export const ShowDialog = ({
+    isOpen,
+    close,
+    onOpenChange,
+    payload: custom,
+}: DialogComponentProps<Customization>) => {
+    if (!custom) return null;
+    const sizeAttr = custom.product_variant?.attributes?.find((attr) => attr.type === 'size');
+    const size = sizeAttr?.name || null;
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[950px]">
+                <DialogHeader>
+                    <DialogTitle>Customization Details</DialogTitle>
+                    <p className="text-sm text-muted-foreground">
+                        Customer:{' '}
+                        <span className="font-semibold text-foreground">{custom.user?.name}</span>
+                    </p>
+                </DialogHeader>
+
+                <Tabs defaultValue="front" className="mt-2 w-full">
+                    <TabsList className="grid w-full grid-cols-4">
+                        <TabsTrigger value="front" className="relative">
+                            Front
+                            {custom.custom_details?.front?.has_design && (
+                                <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
+                            )}
+                        </TabsTrigger>
+                        <TabsTrigger value="back" className="relative">
+                            Back
+                            {custom.custom_details?.back?.has_design && (
+                                <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
+                            )}
+                        </TabsTrigger>
+                        <TabsTrigger value="left" className="relative">
+                            Left Sleeve
+                            {custom.custom_details?.leftSleeve?.has_design && (
+                                <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
+                            )}
+                        </TabsTrigger>
+                        <TabsTrigger value="right" className="relative">
+                            Right Sleeve
+                            {custom.custom_details?.rightSleeve?.has_design && (
+                                <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]" />
+                            )}
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <div className="mt-6">
+                        <TabsContent value="front" className="m-0">
+                            <SideDetail
+                                side={custom.custom_details?.front}
+                                name="Front"
+                                baseImageUrl={custom.base_images?.front}
+                                size={size}
+                            />
+                        </TabsContent>
+                        <TabsContent value="back" className="m-0">
+                            <SideDetail
+                                side={custom.custom_details?.back}
+                                name="Back"
+                                baseImageUrl={custom.base_images?.back}
+                                size={size}
+                            />
+                        </TabsContent>
+                        <TabsContent value="left" className="m-0">
+                            <SideDetail
+                                side={custom.custom_details?.leftSleeve}
+                                name="Left Sleeve"
+                                baseImageUrl={custom.base_images?.leftSleeve}
+                                size={size}
+                            />
+                        </TabsContent>
+                        <TabsContent value="right" className="m-0">
+                            <SideDetail
+                                side={custom.custom_details?.rightSleeve}
+                                name="Right Sleeve"
+                                baseImageUrl={custom.base_images?.rightSleeve}
+                                size={size}
+                            />
+                        </TabsContent>
+                    </div>
+                </Tabs>
+            </DialogContent>
+        </Dialog>
+    );
+};

@@ -23,10 +23,9 @@ class CustomizationController extends Controller
 
     public function edit(Customization $customization)
     {
-        // Load relasi yang dibutuhkan untuk preview
+
         $customization->load(['user', 'product.images', 'productVariant']);
 
-        // Ekstrak base images sesuai logika di API
         $baseImages = [];
         if ($customization->product && $customization->product->images) {
             foreach ($customization->product->images as $img) {
@@ -42,12 +41,10 @@ class CustomizationController extends Controller
             }
         }
 
-        // Parse custom details
         $details = is_string($customization->custom_details)
             ? json_decode($customization->custom_details, true)
             : $customization->custom_details;
 
-        // Gabungkan data untuk dikirim ke Inertia
         $customizationData = array_merge($customization->toArray(), [
             'custom_details' => $details,
             'base_images' => $baseImages,

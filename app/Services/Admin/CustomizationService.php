@@ -7,7 +7,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class CustomizationService
 {
-    // Paginate customizations with search and sorting
     public function paginate(array $params): LengthAwarePaginator
     {
         $perPage = $params['per_page'] ?? 10;
@@ -78,7 +77,7 @@ class CustomizationService
     {
         return $customization->update([
             'additional_price' => $data['additional_price'],
-            'is_draft' => $data['is_draft'],
+            // 'is_draft' => $data['is_draft'],
         ]);
     }
 }

@@ -16,7 +16,6 @@ import {
 } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 export const EditDialog = ({
     isOpen,
@@ -38,7 +37,7 @@ export const EditDialog = ({
 
                 <Form
                     {...customizations.update.form(customization)}
-                    resetOnSuccess={['additional_price', 'is_draft']}
+                    resetOnSuccess={['additional_price']}
                     disableWhileProcessing
                     className="space-y-6"
                     onSuccess={close}
@@ -85,7 +84,7 @@ export const EditDialog = ({
                                     </div>
 
                                     {/* Draft / Ready Status (Using Select to match pattern) */}
-                                    <div className="space-y-2">
+                                    {/* <div className="space-y-2">
                                         <Label htmlFor="is_draft">Status</Label>
                                         <Select
                                             defaultValue={customization.is_draft ? '1' : '0'}
@@ -111,7 +110,7 @@ export const EditDialog = ({
                                             defaultValue={customization.is_draft ? '1' : '0'}
                                         />
                                         <InputError message={errors.is_draft} />
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
 

@@ -1,3 +1,5 @@
+import { OrderStatus, PaymentStatus } from './enum';
+
 export interface DesignElement {
     id: string;
     type: 'text' | 'image';
@@ -72,5 +74,19 @@ export interface Customization {
             name: string;
             type: string;
         }[];
+    };
+    order_item?: {
+        id: string;
+        order_id: string;
+        price: number;
+        quantity: number;
+        subtotal: number;
+        order: {
+            id: string;
+            order_number: string;
+            order_status: OrderStatus;
+            payment_status: PaymentStatus;
+            created_at: string;
+        };
     };
 }

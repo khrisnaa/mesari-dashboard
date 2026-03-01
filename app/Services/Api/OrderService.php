@@ -163,6 +163,10 @@ class OrderService
         string $courierService
     ): array {
 
+        if ($courierCode === 'flat') {
+            return $this->calculateFlatShipping($weight, $courierService);
+        }
+
         $origin = config('rajaongkir.origin');
 
         $response = Http::asForm()
@@ -203,6 +207,28 @@ class OrderService
         return [
             'cost' => (int) $selected['cost'],
             'etd' => $selected['etd'] ?? null,
+        ];
+    }
+
+    private function calculateFlatShipping(int $weight, string $courierService): array
+    {
+
+        $weightInKg = ceil($weight / 1000);
+        $costPerKg = 0;
+        $etd = '';
+
+        if ($courierService === 'EXP') {
+            $costPerKg = 25000;
+            $etd = '1-2 days';
+        } else {
+
+            $costPerKg = 15000;
+            $etd = '3-5 days';
+        }
+
+        return [
+            'cost' => (int) ($costPerKg * $weightInKg),
+            'etd' => $etd,
         ];
     }
 
@@ -288,38 +314,31 @@ class OrderService
 
     public function customizationCheckout($user, array $data)
     {
-        // 1. Ambil data kustomisasi yang valid (milik user dan masih draft)
+
         $customization = Customization::where('user_id', $user->id)
             ->where('id', $data['customization_id'])
             ->where('is_draft', true)
             ->firstOrFail();
 
-        // 2. Ambil data varian baju dasarnya
-        // 🔥 Perbaikan: Gunakan product_variant_id sesuai nama kolom di DB
         $variant = ProductVariant::with(['product', 'attributes'])->findOrFail($customization->product_variant_id);
 
-        // 3. Kalkulasi Harga per Item: (Harga Baju + Total Harga Sablon 1 Pcs)
         $pricePerItem = $variant->price + $customization->additional_price;
 
-        // 4. Siapkan item untuk di-passing ke processOrder
         $items = collect([
             (object) [
                 'product_id' => $variant->product_id,
                 'product_variant_id' => $variant->id,
-                'customization_id' => $customization->id, // Kirim ID custom untuk disimpan ke order_items
-                'price' => $pricePerItem, // Harga satuan yang sudah digabung
+                'customization_id' => $customization->id,
+                'price' => $pricePerItem,
                 'quantity' => $data['quantity'],
-                'subtotal' => $pricePerItem * $data['quantity'], // Subtotal = (Base + Custom) * Qty
+                'subtotal' => $pricePerItem * $data['quantity'],
                 'product_name' => $variant->product->name.' (Custom Design)',
                 'variant_name' => $variant->attributes->pluck('name')->implode(' / '),
             ],
         ]);
 
         return DB::transaction(function () use ($user, $data, $items, $customization) {
-            // Panggil shared logic untuk membuat Order & OrderItems
             $order = $this->processOrder($user, $data, $items, false);
-
-            // Ubah status kustomisasi menjadi fix (bukan draft lagi) agar tidak bisa di-checkout ulang
             $customization->update(['is_draft' => false]);
 
             return $order;

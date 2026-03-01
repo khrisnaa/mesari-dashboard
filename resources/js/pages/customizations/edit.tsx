@@ -3,14 +3,13 @@ import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Customization } from '@/types/customization';
 import { useForm } from '@inertiajs/react';
 
 const Edit = ({ customization }: { customization: Customization }) => {
     const { data, setData, post, processing } = useForm({
         additional_price: customization.additional_price,
-        is_draft: customization.is_draft,
+        // is_draft: customization.is_draft,
         _method: 'put',
     });
 
@@ -42,7 +41,7 @@ const Edit = ({ customization }: { customization: Customization }) => {
                                 }
                             />
                         </div>
-                        <div className="flex items-center justify-between rounded-lg border p-4">
+                        {/* <div className="flex items-center justify-between rounded-lg border p-4">
                             <div>
                                 <Label>Production Ready</Label>
                                 <p className="text-xs text-muted-foreground">
@@ -53,7 +52,7 @@ const Edit = ({ customization }: { customization: Customization }) => {
                                 checked={!data.is_draft}
                                 onCheckedChange={(val) => setData('is_draft', !val)}
                             />
-                        </div>
+                        </div> */}
                     </CardContent>
                 </Card>
 
