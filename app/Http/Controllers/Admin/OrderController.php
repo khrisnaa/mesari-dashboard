@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Order\UpdateOrderRequest as OrderUpdateOrderRequest;
 use App\Http\Requests\Admin\Order\UpdateOrderStatusRequest;
+use App\Models\CompanyProfile;
 use App\Models\Order;
 use App\Services\Admin\OrderService;
 use Illuminate\Http\Request;
@@ -56,5 +57,27 @@ class OrderController extends Controller
 
         return redirect()->route('orders.index')
             ->with('success', "Order #{$order->order_number} updated successfully.");
+    }
+
+    public function printInvoice(Order $order)
+    {
+        $order->load(['user', 'items', 'payment']);
+        $company = CompanyProfile::first();
+
+        return Inertia::render('orders/print/invoice', [
+            'order' => $order,
+            'company' => $company,
+        ]);
+    }
+
+    public function printLabel(Order $order)
+    {
+        $order->load(['user', 'items']);
+        $company = CompanyProfile::first();
+
+        return Inertia::render('orders/print/label', [
+            'order' => $order,
+            'company' => $company,
+        ]);
     }
 }

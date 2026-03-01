@@ -2,9 +2,18 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Order } from '@/types/order';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpIcon, EditIcon, EyeIcon } from 'lucide-react';
+import { ArrowUpIcon, Edit, EyeIcon, FileText, MoreHorizontal, Printer } from 'lucide-react';
 import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 import { TooltipProvider } from '../ui/tooltip';
 
 export const getColumns = (
@@ -302,13 +311,66 @@ export const getColumns = (
                         variant="ghost"
                         className="h-8 w-8 hover:bg-muted"
                     />
-                    <ActionIconButton
+                    {/* <ActionIconButton
                         icon={<EditIcon className="h-4 w-4" />}
                         tooltip="Edit Order"
                         onClick={() => onEdit(row.original)}
                         variant="ghost"
                         className="h-8 w-8 hover:bg-muted"
-                    />
+                    /> */}
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                            >
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
+                                Order Actions
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem
+                                    onClick={() => onEdit(row.original)}
+                                    className="cursor-pointer"
+                                >
+                                    <Edit className="mr-2 h-4 w-4 text-muted-foreground" />
+                                    <span>Edit Order</span>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem asChild>
+                                    <a
+                                        href={`/orders/${row.original.id}/print/label`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex w-full cursor-pointer items-center"
+                                    >
+                                        <Printer className="mr-2 h-4 w-4 text-muted-foreground" />
+                                        <span>Print Label</span>
+                                    </a>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem asChild>
+                                    <a
+                                        href={`/orders/${row.original.id}/print/invoice`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex w-full cursor-pointer items-center"
+                                    >
+                                        <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+                                        <span>Print Invoice</span>
+                                    </a>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </TooltipProvider>
         ),

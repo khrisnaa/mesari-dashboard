@@ -153,6 +153,10 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('update');
         Route::put('/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('update.status');
+
+        Route::get('/{order}/print/invoice', [OrderController::class, 'printInvoice'])->name('print.invoice');
+
+        Route::get('/{order}/print/label', [OrderController::class, 'printLabel'])->name('print.label');
     });
 
     // customizations
