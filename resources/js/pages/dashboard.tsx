@@ -2,115 +2,152 @@ import { ActionIconButton } from '@/components/buttons/action-icon-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     DollarSign,
     Download,
     Eye,
-    Filter,
-    MoreHorizontal,
-    MoreVertical,
     Package,
-    Palette,
     Scissors,
-    Search,
     ShoppingBag,
     TrendingDown,
     TrendingUp,
     Users,
 } from 'lucide-react';
 
-export default function Dashboard() {
+// --- Interfaces ---
+interface OrderData {
+    id: string;
+    order_number: string;
+    name: string;
+    email: string;
+    avatar: string | null;
+    product: string;
+    type: 'Custom' | 'Retail';
+    total: number;
+    status: string;
+}
+
+interface TopProduct {
+    name: string;
+    count: number;
+    percent: string;
+}
+
+interface DashboardProps {
+    metrics: {
+        revenue: number;
+        orders: number;
+        custom_orders: number;
+        users: number;
+    };
+    recent_orders: OrderData[];
+    top_products: TopProduct[];
+}
+
+// Helper Format Rupiah (Kept IDR formatting but named generically if needed)
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+    }).format(amount);
+};
+
+// Helper Initials (Budi Santoso -> BS)
+const getInitials = (name: string) => {
+    return (
+        name
+            .match(/(\b\S)?/g)
+            ?.join('')
+            .match(/(^\S|\S$)?/g)
+            ?.join('')
+            .toUpperCase() || 'U'
+    );
+};
+
+export default function Dashboard({ metrics, recent_orders, top_products }: DashboardProps) {
     return (
         <AppLayout>
             <Head title="Dashboard" />
 
-            <div className="container mx-auto flex max-w-[1600px] flex-col gap-8 p-4 md:p-8">
+            {/* Tightened outer padding and gaps */}
+            <div className="container mx-auto flex max-w-[1600px] flex-col gap-5 p-3 md:p-5">
                 {/* Header */}
-                <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+                <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">
                             Dashboard
                         </h1>
-                        <p className="text-muted-foreground">
-                            Ringkasan performa toko fashion & pesanan custom Anda.
+                        <p className="text-sm text-muted-foreground">
+                            Summary of your fashion store & custom orders performance.
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
                         <Button variant="outline" className="rounded-full">
-                            <Download className="mr-2 h-4 w-4" />
-                            Export Laporan
+                            <Download className="mr-1.5 size-3.5 md:size-4" />
+                            Export Report
                         </Button>
-                        <Button className="rounded-full">
-                            <ShoppingBag className="mr-2 h-4 w-4" />
-                            Pesanan Baru
-                        </Button>
+                        <Link href="/orders">
+                            <Button className="rounded-full">
+                                <ShoppingBag className="mr-1.5 size-3.5 md:size-4" />
+                                Manage Orders
+                            </Button>
+                        </Link>
                     </div>
                 </div>
 
-                {/* Top Metrics Cards */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {/* Top Metrics Cards - tighter gap */}
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
                     <MetricCard
-                        title="Total Penjualan"
-                        value="Rp 134.400.000"
-                        trend="+38%"
-                        trendUp={true}
-                        icon={<DollarSign className="h-5 w-5 text-emerald-600" />}
-                        badge="6 Bulan Terakhir"
-                    />
-                    <MetricCard
-                        title="Total Pesanan"
-                        value="1,255"
-                        trend="+22%"
-                        trendUp={true}
-                        icon={<ShoppingBag className="h-5 w-5 text-blue-600" />}
-                        badge="4 Bulan Terakhir"
-                    />
-                    <MetricCard
-                        title="Pesanan Custom"
-                        value="89 Project"
+                        title="Total Revenue"
+                        value={formatCurrency(metrics.revenue)}
                         trend="+12%"
                         trendUp={true}
-                        icon={<Scissors className="h-5 w-5 text-orange-600" />}
-                        badge="Sedang Proses"
+                        icon={<DollarSign className="h-4 w-4 text-emerald-600" />}
+                        badge="All Time"
                     />
                     <MetricCard
-                        title="Pelanggan Aktif"
-                        value="42.4k"
-                        trend="+9.2%"
+                        title="Total Orders"
+                        value={metrics.orders.toLocaleString('en-US')}
+                        trend="+5%"
                         trendUp={true}
-                        icon={<Users className="h-5 w-5 text-purple-600" />}
-                        badge="Total User"
+                        icon={<ShoppingBag className="h-4 w-4 text-blue-600" />}
+                        badge="All Time"
+                    />
+                    <MetricCard
+                        title="Custom Orders"
+                        value={`${metrics.custom_orders} Projects`}
+                        trend="+2%"
+                        trendUp={true}
+                        icon={<Scissors className="h-4 w-4 text-orange-600" />}
+                        badge="All Time"
+                    />
+                    <MetricCard
+                        title="Active Customers"
+                        value={metrics.users.toLocaleString('en-US')}
+                        trend="+8%"
+                        trendUp={true}
+                        icon={<Users className="h-4 w-4 text-purple-600" />}
+                        badge="Total Users"
                     />
                 </div>
 
                 {/* Middle Charts Section */}
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-                    {/* Main Chart - Total Income (Mirip gambar referensi) */}
-                    <Card className="col-span-1 border-none shadow-sm lg:col-span-6">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+                    {/* Main Chart - Revenue */}
+                    <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-6">
+                        <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-1">
                             <div>
-                                <CardTitle className="text-lg font-bold">
-                                    Pendapatan Custom & Retail
-                                </CardTitle>
-                                <CardDescription>Overview laporan mingguan</CardDescription>
+                                <CardTitle className="text-base font-bold">Revenue Chart</CardTitle>
+                                <CardDescription className="text-xs">
+                                    Weekly report simulation
+                                </CardDescription>
                             </div>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
-                                <MoreVertical className="h-4 w-4" />
-                            </Button>
                         </CardHeader>
-                        <CardContent className="pl-0">
-                            {/* Mock SVG Chart mimics the green wave in the image */}
-                            <div className="relative h-[250px] w-full overflow-hidden px-4">
+                        <CardContent className="pb-4 pl-0">
+                            <div className="relative mt-2 h-[200px] w-full overflow-hidden px-4">
                                 <svg
                                     viewBox="0 0 100 40"
                                     className="h-full w-full"
@@ -147,256 +184,203 @@ export default function Dashboard() {
                                         strokeWidth="0.5"
                                     />
                                 </svg>
-                                {/* Mock Axis Labels */}
-                                <div className="mt-2 flex justify-between text-xs text-muted-foreground">
-                                    <span>SEN</span>
-                                    <span>SEL</span>
-                                    <span>RAB</span>
-                                    <span>KAM</span>
-                                    <span>JUM</span>
-                                    <span>SAB</span>
-                                    <span>MIN</span>
+                                <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+                                    <span>MON</span>
+                                    <span>TUE</span>
+                                    <span>WED</span>
+                                    <span>THU</span>
+                                    <span>FRI</span>
+                                    <span>SAT</span>
+                                    <span>SUN</span>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    {/* Weekly Activity Report (Tengah) */}
-                    <Card className="col-span-1 border-none shadow-sm lg:col-span-3">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    {/* Weekly Activity Report */}
+                    <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-3">
+                        <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-2">
                             <div>
-                                <CardTitle className="text-lg font-bold">Laporan</CardTitle>
-                                <CardDescription>Aktivitas Mingguan</CardDescription>
+                                <CardTitle className="text-base font-bold">Report</CardTitle>
+                                <CardDescription className="text-xs">
+                                    Rough Cash Estimate
+                                </CardDescription>
                             </div>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
-                                <MoreVertical className="h-4 w-4" />
-                            </Button>
                         </CardHeader>
-                        <CardContent className="flex flex-col gap-4">
+                        <CardContent className="flex flex-col gap-3 px-4 pb-4">
                             <ReportItem
-                                icon={<DollarSign className="h-5 w-5 text-emerald-600" />}
-                                label="Pemasukan"
-                                value="Rp 5.550.000"
-                                trend="+2.34k"
+                                icon={<DollarSign className="h-4 w-4 text-emerald-600" />}
+                                label="Income"
+                                value={formatCurrency(metrics.revenue)}
                                 bg="bg-emerald-100"
                             />
                             <ReportItem
-                                icon={<TrendingDown className="h-5 w-5 text-red-600" />}
-                                label="Pengeluaran (Bahan)"
-                                value="Rp 3.520.000"
-                                trend="-1.4k"
+                                icon={<TrendingDown className="h-4 w-4 text-red-600" />}
+                                label="Est. COGS (Expenses)"
+                                value={formatCurrency(metrics.revenue * 0.4)}
                                 bg="bg-red-100"
                             />
                             <ReportItem
-                                icon={<Package className="h-5 w-5 text-amber-600" />}
-                                label="Profit Bersih"
-                                value="Rp 2.030.000"
-                                trend="+3.22k"
+                                icon={<Package className="h-4 w-4 text-amber-600" />}
+                                label="Est. Profit"
+                                value={formatCurrency(metrics.revenue * 0.6)}
                                 bg="bg-amber-100"
                             />
                         </CardContent>
                     </Card>
 
-                    {/* Monthly Campaign State (Kanan) */}
-                    <Card className="col-span-1 border-none shadow-sm lg:col-span-3">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    {/* Top Selling Products */}
+                    <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-3">
+                        <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-2">
                             <div>
-                                <CardTitle className="text-lg font-bold">
-                                    Kategori Terlaris
-                                </CardTitle>
-                                <CardDescription>7.58k Pengunjung Fashion</CardDescription>
+                                <CardTitle className="text-base font-bold">Top Products</CardTitle>
+                                <CardDescription className="text-xs">
+                                    Based on quantity sold
+                                </CardDescription>
                             </div>
-                            <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
-                                <MoreVertical className="h-4 w-4" />
-                            </Button>
                         </CardHeader>
-                        <CardContent className="space-y-6">
-                            <CampaignItem
-                                icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
-                                label="Kaos Polos"
-                                percent="45%"
-                                count="14,250"
-                            />
-                            <CampaignItem
-                                icon={<Scissors className="h-4 w-4 text-blue-500" />}
-                                label="Custom Sablon"
-                                percent="32%"
-                                count="4,523"
-                            />
-                            <CampaignItem
-                                icon={<Palette className="h-4 w-4 text-purple-500" />}
-                                label="Jaket / Hoodie"
-                                percent="15%"
-                                count="1,250"
-                            />
-                            <CampaignItem
-                                icon={<Users className="h-4 w-4 text-emerald-500" />}
-                                label="Aksesoris"
-                                percent="8%"
-                                count="750"
-                            />
+                        <CardContent className="space-y-4 px-4 pb-4">
+                            {top_products.length > 0 ? (
+                                top_products.map((item, i) => (
+                                    <CampaignItem
+                                        key={i}
+                                        icon={
+                                            <ShoppingBag className="h-3.5 w-3.5 text-orange-500" />
+                                        }
+                                        label={item.name}
+                                        percent={item.percent}
+                                        count={`${item.count} pcs`}
+                                    />
+                                ))
+                            ) : (
+                                <p className="py-4 text-center text-xs text-muted-foreground">
+                                    No sales data available.
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
 
-                {/* Filter & Table Section */}
-                <div className="flex flex-col gap-6 rounded-xl border bg-card p-6 shadow-sm">
+                {/* Table Section */}
+                <div className="flex flex-col gap-4 rounded-md border border-border bg-card p-4 shadow-none">
                     <div className="flex flex-col gap-2">
-                        <h2 className="text-xl font-bold">Pesanan Terbaru</h2>
-                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                            {/* Filters */}
-                            <div className="flex flex-1 flex-wrap items-center gap-3">
-                                <div className="w-full md:w-[200px]">
-                                    <Select defaultValue="all">
-                                        <SelectTrigger className="rounded-full">
-                                            <SelectValue placeholder="Tipe Pesanan" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">Semua Tipe</SelectItem>
-                                            <SelectItem value="retail">Ready Stock</SelectItem>
-                                            <SelectItem value="custom">Custom Order</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="w-full md:w-[200px]">
-                                    <Select defaultValue="all">
-                                        <SelectTrigger className="rounded-full">
-                                            <SelectValue placeholder="Status Pembayaran" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">Semua Status</SelectItem>
-                                            <SelectItem value="paid">Lunas</SelectItem>
-                                            <SelectItem value="unpaid">Belum Bayar</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="relative w-full md:w-[300px]">
-                                    <Search className="absolute top-2.5 left-3 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        placeholder="Cari nama pelanggan atau ID..."
-                                        className="rounded-full pl-9"
-                                    />
-                                </div>
-                            </div>
-                            <Button variant="ghost" size="icon" className="rounded-full">
-                                <Filter className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
+                        <h2 className="text-lg font-bold">Recent Orders</h2>
 
-                    {/* Table */}
-                    <div className="overflow-hidden rounded-lg border">
-                        <table className="w-full text-sm">
-                            <thead className="bg-muted/50">
-                                <tr className="border-b text-left text-xs font-medium text-muted-foreground uppercase">
-                                    <th className="px-6 py-4">Pelanggan</th>
-                                    <th className="px-6 py-4">Produk</th>
-                                    <th className="px-6 py-4">Tipe</th>
-                                    <th className="px-6 py-4">Total</th>
-                                    <th className="px-6 py-4">Status</th>
-                                    <th className="px-6 py-4 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y">
-                                {dummyOrders.map((order, i) => (
-                                    <tr
-                                        key={i}
-                                        className="bg-card transition-colors hover:bg-muted/30"
-                                    >
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                                                    {order.avatar}
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="font-semibold text-foreground">
-                                                        {order.name}
-                                                    </span>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {order.email}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="font-medium">{order.product}</span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {order.type === 'Custom' ? (
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200"
-                                                >
-                                                    <Scissors className="mr-1 h-3 w-3" /> Custom
-                                                </Badge>
-                                            ) : (
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                                >
-                                                    <ShoppingBag className="mr-1 h-3 w-3" /> Retail
-                                                </Badge>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 font-mono font-medium">
-                                            {order.total}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <StatusBadge status={order.status} />
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <ActionIconButton
-                                                icon={<Eye className="h-4 w-4" />}
-                                                tooltip="Lihat Detail"
-                                                onClick={() => {}}
-                                                variant="ghost"
-                                                className="h-8 w-8 rounded-full"
-                                            />
-                                            <ActionIconButton
-                                                icon={<MoreHorizontal className="h-4 w-4" />}
-                                                tooltip="Menu Lainnya"
-                                                onClick={() => {}}
-                                                variant="ghost"
-                                                className="h-8 w-8 rounded-full"
-                                            />
-                                        </td>
+                        <div className="mt-2 overflow-x-auto rounded-md border border-border">
+                            <table className="w-full min-w-[800px] text-sm">
+                                <thead className="bg-muted/50">
+                                    <tr className="border-b text-left text-[11px] font-medium tracking-wider text-muted-foreground uppercase">
+                                        <th className="px-4 py-2">ID</th>
+                                        <th className="px-4 py-2">Customer</th>
+                                        <th className="px-4 py-2">Main Product</th>
+                                        <th className="px-4 py-2">Type</th>
+                                        <th className="px-4 py-2">Total</th>
+                                        <th className="px-4 py-2">Status</th>
+                                        <th className="px-4 py-2 text-right">Action</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-border">
+                                    {recent_orders.length > 0 ? (
+                                        recent_orders.map((order, i) => (
+                                            <tr
+                                                key={i}
+                                                className="bg-card transition-colors hover:bg-muted/30"
+                                            >
+                                                <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">
+                                                    {order.order_number}
+                                                </td>
+                                                <td className="px-4 py-2.5">
+                                                    <div className="flex items-center gap-2">
+                                                        {order.avatar ? (
+                                                            <img
+                                                                src={order.avatar}
+                                                                className="h-7 w-7 rounded-md object-cover"
+                                                                alt="Avatar"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-[10px] font-bold text-primary">
+                                                                {getInitials(order.name)}
+                                                            </div>
+                                                        )}
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm font-semibold text-foreground">
+                                                                {order.name}
+                                                            </span>
+                                                            <span className="text-[11px] text-muted-foreground">
+                                                                {order.email}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-2.5 text-sm">
+                                                    <span className="font-medium">
+                                                        {order.product}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-2.5">
+                                                    <Badge
+                                                        variant="secondary"
+                                                        // Max rounded-md for badges
+                                                        className={`rounded-md px-2 py-0.5 text-[11px] ${order.type === 'Custom' ? 'bg-purple-100 text-purple-700 hover:bg-purple-200' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                                                    >
+                                                        {order.type === 'Custom' ? (
+                                                            <Scissors className="mr-1 h-3 w-3" />
+                                                        ) : (
+                                                            <ShoppingBag className="mr-1 h-3 w-3" />
+                                                        )}
+                                                        {order.type}
+                                                    </Badge>
+                                                </td>
+                                                <td className="px-4 py-2.5 font-mono text-sm font-medium">
+                                                    {formatCurrency(order.total)}
+                                                </td>
+                                                <td className="px-4 py-2.5">
+                                                    <StatusBadge status={order.status} />
+                                                </td>
+                                                <td className="px-4 py-2.5 text-right">
+                                                    <div className="flex justify-end gap-1">
+                                                        <Link href={`/orders/${order.id}/edit`}>
+                                                            {/* Button strictly rounded-full */}
+                                                            <ActionIconButton
+                                                                icon={
+                                                                    <Eye className="h-3.5 w-3.5" />
+                                                                }
+                                                                tooltip="View Details"
+                                                                onClick={() => {}}
+                                                                variant="ghost"
+                                                                className="h-7 w-7 rounded-full"
+                                                            />
+                                                        </Link>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td
+                                                colSpan={7}
+                                                className="py-6 text-center text-xs text-muted-foreground"
+                                            >
+                                                No incoming orders yet.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
 
-                    {/* Pagination Mock */}
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <p>Menampilkan 1 sampai 5 dari 25 pesanan</p>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                disabled
-                                className="h-8 rounded-full px-4"
-                            >
-                                Sebelumnya
-                            </Button>
-                            <div className="flex items-center gap-1">
+                        {/* Redirect to Order Index */}
+                        <div className="mt-3 flex items-center justify-center">
+                            <Link href="/orders">
+                                {/* Button strictly rounded-full */}
                                 <Button
-                                    variant="default"
+                                    variant="outline"
                                     size="sm"
-                                    className="h-8 w-8 rounded-full p-0"
+                                    className="rounded-full px-6 text-xs"
                                 >
-                                    1
+                                    View All Orders
                                 </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 rounded-full p-0"
-                                >
-                                    2
-                                </Button>
-                            </div>
-                            <Button variant="outline" size="sm" className="h-8 rounded-full px-4">
-                                Berikutnya
-                            </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -405,34 +389,19 @@ export default function Dashboard() {
     );
 }
 
-// --- Components & Data Helpers ---
+// --- Components Helpers ---
 
-const MetricCard = ({
-    title,
-    value,
-    trend,
-    trendUp,
-    icon,
-    badge,
-}: {
-    title: string;
-    value: string;
-    trend: string;
-    trendUp: boolean;
-    icon: React.ReactNode;
-    badge: string;
-}) => (
-    <Card className="border-none shadow-sm transition-all hover:shadow-md">
-        <CardContent className="p-6">
+const MetricCard = ({ title, value, trend, trendUp, icon, badge }: any) => (
+    <Card className="rounded-md border-border shadow-none">
+        <CardContent className="p-4">
             <div className="flex items-start justify-between">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/50 p-2.5">
+                {/* Max rounded-md for icon wrapper, reduced padding */}
+                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-secondary/50 p-1.5">
                     {icon}
                 </div>
                 <div className="flex flex-col items-end">
                     <span
-                        className={`flex items-center text-xs font-bold ${
-                            trendUp ? 'text-emerald-600' : 'text-red-600'
-                        }`}
+                        className={`flex items-center text-[11px] font-bold ${trendUp ? 'text-emerald-600' : 'text-red-600'}`}
                     >
                         {trendUp ? (
                             <TrendingUp className="mr-1 h-3 w-3" />
@@ -443,13 +412,14 @@ const MetricCard = ({
                     </span>
                 </div>
             </div>
-            <div className="mt-4">
-                <h3 className="text-2xl font-bold tracking-tight">{value}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{title}</p>
-                <div className="mt-3">
+            <div className="mt-3">
+                <h3 className="text-xl font-bold tracking-tight">{value}</h3>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">{title}</p>
+                <div className="mt-2">
                     <Badge
                         variant="secondary"
-                        className="rounded-md bg-muted/50 font-normal text-muted-foreground"
+                        // Max rounded-md for badges
+                        className="rounded-md bg-muted/50 px-1.5 py-0 text-[10px] font-normal text-muted-foreground"
                     >
                         {badge}
                     </Badge>
@@ -459,124 +429,60 @@ const MetricCard = ({
     </Card>
 );
 
-const ReportItem = ({
-    icon,
-    label,
-    value,
-    trend,
-    bg,
-}: {
-    icon: React.ReactNode;
-    label: string;
-    value: string;
-    trend: string;
-    bg: string;
-}) => (
-    <div className="flex items-center justify-between rounded-xl border border-dashed p-4">
-        <div className="flex items-center gap-4">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${bg}`}>
+const ReportItem = ({ icon, label, value, bg }: any) => (
+    // Max rounded-md, tighter padding
+    <div className="flex items-center justify-between rounded-md border border-dashed border-border p-3">
+        <div className="flex items-center gap-3">
+            <div className={`flex h-8 w-8 items-center justify-center rounded-md ${bg}`}>
                 {icon}
             </div>
             <div className="flex flex-col">
-                <span className="text-sm font-medium text-muted-foreground">{label}</span>
-                <span className="text-lg font-bold">{value}</span>
+                <span className="text-xs font-medium text-muted-foreground">{label}</span>
+                <span className="text-sm font-bold">{value}</span>
             </div>
         </div>
-        <div className="text-xs font-medium text-muted-foreground">{trend}</div>
     </div>
 );
 
-const CampaignItem = ({
-    icon,
-    label,
-    percent,
-    count,
-}: {
-    icon: React.ReactNode;
-    label: string;
-    percent: string;
-    count: string;
-}) => (
+const CampaignItem = ({ icon, label, percent, count }: any) => (
     <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary">
+        <div className="flex items-center gap-2.5">
+            {/* Max rounded-md */}
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-secondary">
                 {icon}
             </div>
-            <span className="text-sm font-medium">{label}</span>
+            <span className="max-w-[120px] truncate text-xs font-medium">{label}</span>
         </div>
-        <div className="flex items-center gap-4">
-            <span className="text-sm font-bold">{count}</span>
-            <span className="text-xs text-muted-foreground">{percent}</span>
+        <div className="flex items-center gap-3">
+            <span className="text-xs font-bold">{count}</span>
+            <span className="w-8 text-right text-[11px] text-muted-foreground">{percent}</span>
         </div>
     </div>
 );
 
 const StatusBadge = ({ status }: { status: string }) => {
-    const styles: Record<string, string> = {
-        Active: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-        Pending: 'bg-amber-100 text-amber-700 hover:bg-amber-200',
-        Inactive: 'bg-red-100 text-red-700 hover:bg-red-200',
-        Proses: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
+    // English Translation mapping
+    const statusMap: Record<string, { label: string; style: string }> = {
+        pending: { label: 'Pending', style: 'bg-amber-100 text-amber-700' },
+        paid: { label: 'Paid', style: 'bg-blue-100 text-blue-700' },
+        packed: { label: 'Packed', style: 'bg-purple-100 text-purple-700' },
+        shipped: { label: 'Shipped', style: 'bg-indigo-100 text-indigo-700' },
+        completed: { label: 'Completed', style: 'bg-emerald-100 text-emerald-700' },
+        cancelled: { label: 'Cancelled', style: 'bg-red-100 text-red-700' },
+    };
+
+    const current = statusMap[status?.toLowerCase()] || {
+        label: status,
+        style: 'bg-gray-100 text-gray-700',
     };
 
     return (
         <Badge
             variant="secondary"
-            className={`rounded-md px-2.5 py-0.5 text-xs font-semibold ${
-                styles[status] || 'bg-gray-100 text-gray-700'
-            }`}
+            // Max rounded-md for badges
+            className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${current.style}`}
         >
-            {status}
+            {current.label}
         </Badge>
     );
 };
-
-// --- Mock Data ---
-
-const dummyOrders = [
-    {
-        name: 'Jack Alfredo',
-        email: 'jack.alfredo@gmail.com',
-        avatar: 'JA',
-        product: 'Kaos Cotton 24s (Hitam)',
-        type: 'Retail',
-        total: 'Rp 85.000',
-        status: 'Active',
-    },
-    {
-        name: 'Sarah Mitchell',
-        email: 'sarah.m@studio.com',
-        avatar: 'SM',
-        product: 'Custom Hoodie Komunitas',
-        type: 'Custom',
-        total: 'Rp 2.400.000',
-        status: 'Active',
-    },
-    {
-        name: 'Robert Chen',
-        email: 'r.chen@startup.io',
-        avatar: 'RC',
-        product: 'Kemeja Flannel Kotak',
-        type: 'Retail',
-        total: 'Rp 185.000',
-        status: 'Pending',
-    },
-    {
-        name: 'Emily Wilson',
-        email: 'emily.wilson@art.com',
-        avatar: 'EW',
-        product: 'Custom Tote Bag Canvas',
-        type: 'Custom',
-        total: 'Rp 450.000',
-        status: 'Inactive',
-    },
-    {
-        name: 'David Garcia',
-        email: 'david.g@agency.net',
-        avatar: 'DG',
-        product: 'Jaket Denim Vintage',
-        type: 'Retail',
-        total: 'Rp 320.000',
-        status: 'Active',
-    },
-];
