@@ -10,16 +10,14 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-
 Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function () {
     // dashboard
-    Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
+    Route::get('dashboard', fn () => Inertia::render('dashboard'))->name('dashboard');
 
     // categories
     Route::prefix('categories')->name('categories.')->group(function () {
@@ -117,6 +115,8 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('update');
         Route::put('/{user}/status', [UserController::class, 'updateStatus'])
             ->name('update.status');
+        Route::post('/invite', [UserController::class, 'invite'])
+            ->name('invite');
     });
 
     // orders
@@ -130,5 +130,4 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
     });
 });
 
-
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

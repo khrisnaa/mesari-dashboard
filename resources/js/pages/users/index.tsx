@@ -1,15 +1,18 @@
 import { DataTable } from '@/components/data-table/data-table';
 import FlashToast from '@/components/flash-toast';
 import { PageHeader } from '@/components/page-header';
+import { Button } from '@/components/ui/button';
 import { ActiveDialog } from '@/components/user/active-dialog';
 import { getColumns } from '@/components/user/columns';
 import { EditDialog } from '@/components/user/edit-dialog';
+import { InviteDialog } from '@/components/user/invite-dialog';
 import { useDialog } from '@/hooks/use-dialog';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { PaginatedResponse } from '@/types/pagination';
 import { User } from '@/types/user';
 import { Head } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -39,6 +42,13 @@ const Index = ({ users }: PageProps) => {
         payload: activeData,
     } = useDialog<User>();
 
+    const {
+        isOpen: isInviteOpen,
+        open: openInvite,
+        close: closeInvite,
+        onOpenChange: onInviteOpenChange,
+    } = useDialog<User>();
+
     const columns = getColumns(openEdit, openActive);
 
     return (
@@ -50,6 +60,11 @@ const Index = ({ users }: PageProps) => {
                 <PageHeader
                     title="Users"
                     description="Manage application users and their access status."
+                    actions={
+                        <Button className="rounded-full" size="lg" onClick={() => openInvite()}>
+                            <Plus /> Invite Admin
+                        </Button>
+                    }
                 />
 
                 <DataTable
@@ -72,6 +87,12 @@ const Index = ({ users }: PageProps) => {
                 close={closeActive}
                 onOpenChange={onActiveOpenChange}
                 payload={activeData}
+            />
+
+            <InviteDialog
+                isOpen={isInviteOpen}
+                close={closeInvite}
+                onOpenChange={onInviteOpenChange}
             />
         </AppLayout>
     );

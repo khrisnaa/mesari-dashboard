@@ -2,10 +2,12 @@
 
 namespace App\Services\Admin;
 
-use App\Enums\UserStatus;
 use App\Models\User;
+use App\Notifications\AdminInvitationNotification;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -37,6 +39,16 @@ class UserService
     // update user detail
     public function update(User $user, array $data): bool
     {
+
+        if (array_key_exists('email_verified_at', $data)) {
+
+            if ($data['email_verified_at']) {
+                $data['email_verified_at'] = $user->email_verified_at ?? now();
+            } else {
+                $data['email_verified_at'] = null;
+            }
+        }
+
         return $user->update($data);
     }
 
@@ -46,5 +58,22 @@ class UserService
         return $user->update([
             'is_active' => $status,
         ]);
+    }
+
+    public function inviteAdmin(array $data): User
+    {
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make(Str::random(40)),
+            'email_verified_at' => now(),
+        ]);
+
+        $user->assignRole('admin');
+        $token = Password::createToken($user);
+        $user->notify(new AdminInvitationNotification($token));
+
+        return $user;
     }
 }

@@ -2,7 +2,7 @@ import users from '@/routes/users';
 import { DialogComponentProps } from '@/types/dialog';
 import { User } from '@/types/user';
 import { Form } from '@inertiajs/react';
-import { Save, X } from 'lucide-react';
+import { Send, X } from 'lucide-react';
 import { SubmitButton } from '../buttons/submit-button';
 import InputError from '../input-error';
 import { Button } from '../ui/button';
@@ -18,26 +18,23 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
 
-export const EditDialog = ({
+export const InviteDialog = ({
     isOpen,
     close,
     onOpenChange,
-    payload: user,
-}: DialogComponentProps<User>) => {
-    if (!user) return null;
-
+}: Omit<DialogComponentProps<User>, 'payload'>) => {
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[600px]" onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
-                    <DialogTitle>Edit User</DialogTitle>
+                    <DialogTitle>Invite Admin</DialogTitle>
                     <DialogDescription>
-                        Update user details and manage account status.
+                        Send an invitation email to a new admin to join the dashboard.
                     </DialogDescription>
                 </DialogHeader>
 
                 <Form
-                    {...users.update.form(user)}
+                    {...users.invite.form()}
                     disableWhileProcessing
                     className="space-y-6"
                     onSuccess={close}
@@ -51,8 +48,8 @@ export const EditDialog = ({
                                         <Input
                                             id="name"
                                             name="name"
-                                            defaultValue={user.name}
                                             autoComplete="off"
+                                            placeholder="Enter full name"
                                         />
                                         <InputError message={errors.name} />
                                     </div>
@@ -63,63 +60,22 @@ export const EditDialog = ({
                                             id="email"
                                             name="email"
                                             type="email"
-                                            defaultValue={user.email}
                                             autoComplete="off"
+                                            placeholder="admin@example.com"
                                         />
                                         <InputError message={errors.email} />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="phone">Phone</Label>
+                                    <Label htmlFor="phone">Phone (Optional)</Label>
                                     <Input
                                         id="phone"
                                         name="phone"
-                                        defaultValue={user.phone ?? ''}
                                         autoComplete="off"
                                         placeholder="e.g. +62..."
                                     />
                                     <InputError message={errors.phone} />
-                                </div>
-
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <div className="flex flex-col justify-start space-y-2">
-                                        <div className="flex items-center justify-between rounded-lg border p-3">
-                                            <div className="space-y-0.5">
-                                                <Label
-                                                    htmlFor="email_verified_at"
-                                                    className="cursor-pointer"
-                                                >
-                                                    Verification Status
-                                                </Label>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {user.email_verified_at
-                                                        ? `Verified at ${user.email_verified_at.substring(0, 10)}`
-                                                        : 'Manually verify this user.'}
-                                                </p>
-                                            </div>
-
-                                            <input
-                                                type="hidden"
-                                                name="email_verified_at"
-                                                value="0"
-                                            />
-                                            <Switch
-                                                id="email_verified_at"
-                                                name="email_verified_at"
-                                                value="1"
-                                                defaultChecked={!!user.email_verified_at}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-muted-foreground">Created At</Label>
-                                        <Input
-                                            value={user.created_at}
-                                            disabled
-                                            className="bg-muted text-muted-foreground"
-                                        />
-                                    </div>
                                 </div>
 
                                 <div className="flex flex-col justify-start space-y-2">
@@ -129,7 +85,8 @@ export const EditDialog = ({
                                                 Active Status
                                             </Label>
                                             <p className="text-xs text-muted-foreground">
-                                                Enable or disable this user account.
+                                                Enable or disable this user account upon
+                                                registration.
                                             </p>
                                         </div>
                                         <input type="hidden" name="is_active" value="0" />
@@ -137,7 +94,7 @@ export const EditDialog = ({
                                             id="is_active"
                                             name="is_active"
                                             value="1"
-                                            defaultChecked={user.is_active}
+                                            defaultChecked={true}
                                         />
                                     </div>
                                 </div>
@@ -158,8 +115,8 @@ export const EditDialog = ({
 
                                 <SubmitButton processing={processing}>
                                     <span className="flex items-center gap-2">
-                                        <Save className="h-4 w-4" />
-                                        Update User
+                                        <Send className="h-4 w-4" />
+                                        Send Invitation
                                     </span>
                                 </SubmitButton>
                             </DialogFooter>

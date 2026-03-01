@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Helpers\FlashHelper;
-use App\Models\User;
-use App\Services\Admin\UserService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\User\InviteAdminRequest;
 use App\Http\Requests\Admin\User\UpdateUserRequest;
 use App\Http\Requests\Admin\User\UpdateUserStatusRequest;
+use App\Models\User;
+use App\Services\Admin\UserService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -25,15 +26,14 @@ class UserController extends Controller
         ]);
     }
 
-
     public function update(UpdateUserRequest $request, User $user)
     {
+
         $this->userService->update($user, $request->validated());
 
         return redirect()->route('users.index')
             ->with('success', FlashHelper::stamp('User successfully updated.'));
     }
-
 
     // update user status only
     public function updateStatus(UpdateUserStatusRequest $request, User $user)
@@ -42,5 +42,13 @@ class UserController extends Controller
 
         return redirect()->back()
             ->with('success', FlashHelper::stamp('User status successfully updated.'));
+    }
+
+    public function invite(InviteAdminRequest $request)
+    {
+        $this->userService->inviteAdmin($request->validated());
+
+        return redirect()->route('users.index')
+            ->with('success', FlashHelper::stamp('Admin invitation has been sent successfully.'));
     }
 }
