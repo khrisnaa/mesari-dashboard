@@ -1,15 +1,16 @@
 import { DataTable } from '@/components/data-table/data-table';
 
 import FlashToast from '@/components/flash-toast';
-import { getColumns } from '@/components/order/column';
+import { getColumns } from '@/components/order/columns';
 import { EditDialog } from '@/components/order/edit-dialog';
+import { ShowDialog } from '@/components/order/show-dialog';
 import { PageHeader } from '@/components/page-header';
 import { useDialog } from '@/hooks/use-dialog';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Order } from '@/types/order';
 import { PaginatedResponse } from '@/types/pagination';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,7 +32,19 @@ const Index = ({ orders }: PageProps) => {
         payload: editData,
     } = useDialog<Order>();
 
-    const columns = getColumns(openEdit);
+    const {
+        isOpen: isShowOpen,
+        open: openShow,
+        close: closeShow,
+        onOpenChange: onShowOpenChange,
+        payload: showData,
+    } = useDialog<Order>();
+
+    const editRedirect = (order: Order) => {
+        router.get(`/orders/${order.id}/edit`);
+    };
+
+    const columns = getColumns(editRedirect, openShow);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -57,6 +70,12 @@ const Index = ({ orders }: PageProps) => {
                 close={closeEdit}
                 onOpenChange={onEditOpenChange}
                 payload={editData}
+            />
+            <ShowDialog
+                isOpen={isShowOpen}
+                close={closeShow}
+                onOpenChange={onShowOpenChange}
+                payload={showData}
             />
         </AppLayout>
     );

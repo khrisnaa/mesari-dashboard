@@ -37,7 +37,7 @@ export const EditDialog = ({
                 </DialogHeader>
 
                 <Form
-                    {...orders.update.form(order)}
+                    {...orders.update.status.form(order)}
                     resetOnSuccess={['order_status', 'payment_status']}
                     disableWhileProcessing
                     className="space-y-6"
@@ -61,7 +61,7 @@ export const EditDialog = ({
                                     <div className="space-y-2">
                                         <Label htmlFor="status">Order Status</Label>
                                         <Select
-                                            defaultValue={order.status}
+                                            defaultValue={order.order_status}
                                             onValueChange={(val) => {
                                                 const hidden = document.getElementById(
                                                     'status_input',
@@ -85,7 +85,7 @@ export const EditDialog = ({
                                             type="hidden"
                                             id="status_input"
                                             name="status"
-                                            defaultValue={order.status}
+                                            defaultValue={order.order_status}
                                         />
                                         <InputError message={errors.status} />
                                     </div>

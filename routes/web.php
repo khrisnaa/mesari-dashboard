@@ -145,8 +145,12 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('index');
         Route::get('/{order}', [OrderController::class, 'show'])
             ->name('show');
+        Route::get('/{order}/edit', [OrderController::class, 'edit'])
+            ->name('edit');
         Route::put('/{order}', [OrderController::class, 'update'])
             ->name('update');
+        Route::put('/{order}/status', [OrderController::class, 'updateStatus'])
+            ->name('update.status');
     });
 });
 

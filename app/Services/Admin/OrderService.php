@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\Order;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -93,6 +94,50 @@ class OrderService
             }
 
             return true;
+        });
+    }
+
+    public function update(Order $order, array $data): bool
+    {
+        return DB::transaction(function () use ($order, $data) {
+
+            $paymentProofPath = $order->payment?->payment_proof;
+
+            if (isset($data['payment_proof']) && $data['payment_proof'] instanceof UploadedFile) {
+
+                if ($paymentProofPath) {
+                    Storage::disk('public')->delete($paymentProofPath);
+                }
+
+                $paymentProofPath = $data['payment_proof']->store('payment_proofs', 'public');
+            }
+
+            if ($order->payment) {
+                $order->payment->update([
+                    'transaction_status' => $data['payment_status'],
+                    'payment_proof' => $paymentProofPath,
+                    'admin_note' => $data['admin_note'] ?? $order->payment->admin_note,
+                    'payment_method_info' => $data['payment_method_info'] ?? $order->payment->payment_method_info,
+                ]);
+            }
+
+            $orderData = collect($data)->only([
+                'order_status',
+                'payment_status',
+                'shipping_tracking_number',
+                'shipping_estimation',
+                'recipient_name',
+                'recipient_phone',
+                'recipient_address_line',
+                'recipient_province',
+                'recipient_city',
+                'recipient_district',
+                'recipient_subdistrict',
+                'postal_code',
+                'note',
+            ])->toArray();
+
+            return $order->update($orderData);
         });
     }
 }
