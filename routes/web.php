@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyProfileController;
+use App\Http\Controllers\Admin\CustomizationController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentMethodController;
@@ -151,6 +152,13 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('update');
         Route::put('/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('update.status');
+    });
+
+    // customizations
+    Route::prefix('customizations')->name('customizations.')->group(function () {
+        Route::get('/', [CustomizationController::class, 'index'])->name('index');
+        // Route::get('/{customization}/edit', [CustomizationController::class, 'edit'])->name('edit');
+        Route::put('/{customization}', [CustomizationController::class, 'update'])->name('update');
     });
 });
 

@@ -21,30 +21,6 @@ export const ShowDialog = ({
 }: DialogComponentProps<Order>) => {
     if (!order) return null;
 
-    const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
-        <div className="mt-1 mb-3 flex items-center gap-2">
-            <Icon className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-                {title}
-            </span>
-        </div>
-    );
-
-    const DetailItem = ({
-        label,
-        value,
-        mono = false,
-    }: {
-        label: string;
-        value: any;
-        mono?: boolean;
-    }) => (
-        <div className="space-y-1">
-            <div className="text-xs text-muted-foreground">{label}</div>
-            <div className={`text-sm font-medium ${mono ? 'font-mono' : ''}`}>{value ?? '-'}</div>
-        </div>
-    );
-
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[750px]">
@@ -209,3 +185,27 @@ export const ShowDialog = ({
         </Dialog>
     );
 };
+
+const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
+    <div className="mt-1 mb-3 flex items-center gap-2">
+        <Icon className="h-4 w-4 text-primary" />
+        <span className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+            {title}
+        </span>
+    </div>
+);
+
+const DetailItem = ({
+    label,
+    value,
+    mono = false,
+}: {
+    label: string;
+    value: any;
+    mono?: boolean;
+}) => (
+    <div className="space-y-1">
+        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className={`text-sm font-medium ${mono ? 'font-mono' : ''}`}>{value ?? '-'}</div>
+    </div>
+);

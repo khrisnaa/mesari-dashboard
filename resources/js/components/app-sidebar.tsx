@@ -12,6 +12,7 @@ import { dashboard } from '@/routes';
 import banners from '@/routes/banners';
 import categories from '@/routes/categories';
 import companyProfile from '@/routes/company-profile';
+import customizations from '@/routes/customizations';
 import faqs from '@/routes/faqs';
 import orders from '@/routes/orders';
 import paymentMethods from '@/routes/payment-methods';
@@ -69,7 +70,7 @@ const mainNavItems: NavItemGroup[] = [
         heading: 'Order',
         items: [
             { title: 'Orders', href: orders.index(), icon: ReceiptIcon },
-            { title: 'Customizations', href: orders.index(), icon: ScissorsIcon },
+            { title: 'Customizations', href: customizations.index(), icon: ScissorsIcon },
             { title: 'Payment Methods', href: paymentMethods.index(), icon: CreditCardIcon },
         ],
     },
