@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyProfileController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\TestimonialController;
@@ -54,13 +55,22 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('update.status');
     });
 
-    Route::prefix('productReviews')->name('productReviews.')->group(function () {
+    // product reviews
+    Route::prefix('product-reviews')->name('product-reviews.')->group(function () {
         Route::get('/', [ProductReviewController::class, 'index'])
             ->name('index');
         Route::put('/{productReview}', [ProductReviewController::class, 'update'])
             ->name('update');
         Route::delete('/{productReview}', [ProductReviewController::class, 'destroy'])
             ->name('destroy');
+    });
+
+    // payment-methods
+    Route::prefix('payment-methods')->name('payment-methods.')->group(function () {
+        Route::get('/', [PaymentMethodController::class, 'index'])->name('index');
+        Route::post('/', [PaymentMethodController::class, 'store'])->name('store');
+        Route::put('/{paymentMethod}', [PaymentMethodController::class, 'update'])->name('update');
+        Route::delete('/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->name('destroy');
     });
 
     // testimonials

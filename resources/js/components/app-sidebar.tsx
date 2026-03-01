@@ -14,7 +14,8 @@ import categories from '@/routes/categories';
 import companyProfile from '@/routes/company-profile';
 import faqs from '@/routes/faqs';
 import orders from '@/routes/orders';
-import productReviews from '@/routes/productReviews';
+import paymentMethods from '@/routes/payment-methods';
+import productReviews from '@/routes/product-reviews';
 import products from '@/routes/products';
 import testimonials from '@/routes/testimonials';
 import users from '@/routes/users';
@@ -23,6 +24,7 @@ import { Link } from '@inertiajs/react';
 import {
     BookOpenIcon,
     Building2Icon,
+    CreditCardIcon,
     FolderIcon,
     HelpCircleIcon,
     ImageIcon,
@@ -68,6 +70,7 @@ const mainNavItems: NavItemGroup[] = [
         items: [
             { title: 'Orders', href: orders.index(), icon: ReceiptIcon },
             { title: 'Customizations', href: orders.index(), icon: ScissorsIcon },
+            { title: 'Payment Methods', href: paymentMethods.index(), icon: CreditCardIcon },
         ],
     },
     {

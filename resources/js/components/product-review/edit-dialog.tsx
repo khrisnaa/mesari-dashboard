@@ -1,4 +1,4 @@
-import productReviews from '@/routes/productReviews';
+import productReviews from '@/routes/product-reviews';
 import { DialogComponentProps } from '@/types/dialog';
 import { ProductReview } from '@/types/product-review';
 import { Form } from '@inertiajs/react';

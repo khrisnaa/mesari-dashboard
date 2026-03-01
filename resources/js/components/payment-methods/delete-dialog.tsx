@@ -1,6 +1,6 @@
-import productReviews from '@/routes/product-reviews';
+import paymentMethods from '@/routes/payment-methods';
 import { DialogComponentProps } from '@/types/dialog';
-import { ProductReview } from '@/types/product-review';
+import { PaymentMethod } from '@/types/payment-method';
 import { Form } from '@inertiajs/react';
 import { Trash2, X } from 'lucide-react';
 import { SubmitButton } from '../buttons/submit-button';
@@ -18,23 +18,23 @@ export const DeleteDialog = ({
     isOpen,
     close,
     onOpenChange,
-    payload: review,
-}: DialogComponentProps<ProductReview>) => {
-    if (!review) return null;
+    payload: method,
+}: DialogComponentProps<PaymentMethod>) => {
+    if (!method) return null;
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Delete Review</DialogTitle>
+                    <DialogTitle>Delete Payment Method</DialogTitle>
                     <DialogDescription>
-                        This action cannot be undone. Are you sure you want to completely remove
-                        this product review?
+                        This action cannot be undone. Are you sure you want to permanently remove
+                        this payment method?
                     </DialogDescription>
                 </DialogHeader>
 
                 <Form
-                    {...productReviews.destroy.form(review)}
+                    {...paymentMethods.destroy.form(method)}
                     disableWhileProcessing
                     onSuccess={close}
                 >
