@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Midtrans\Config;
 use Midtrans\Notification;
 use Midtrans\Snap;
+use Midtrans\Transaction;
 
 class PaymentController extends Controller
 {
@@ -216,31 +217,27 @@ class PaymentController extends Controller
     public function checkStatus($id)
     {
         try {
-            // 1. Cari data payment di database kita dulu
+
             $payment = Payment::where('order_id', $id)
                 ->orWhere('midtrans_order_id', $id)
                 ->firstOrFail();
 
-            // 2. Tanya ke Midtrans menggunakan midtrans_order_id
-            // Kita cast ke (object) untuk menghindari error "Found mixed[]"
-            $status = (object) \Midtrans\Transaction::status($payment->midtrans_order_id);
+            $status = (object) Transaction::status($payment->midtrans_order_id);
 
             $midtransStatus = $status->transaction_status;
             $paymentStatus = $payment->transaction_status;
 
-            // 3. Jika di database kita masih pending, tapi di Midtrans sudah Settlement/Capture
             if ($paymentStatus !== PaymentStatus::PAID->value &&
                ($midtransStatus === 'settlement' || $midtransStatus === 'capture')) {
 
                 DB::transaction(function () use ($payment, $status) {
-                    // Update tabel Payment
+
                     $payment->update([
                         'transaction_status' => PaymentStatus::PAID->value,
                         'midtrans_transaction_id' => $status->transaction_id,
                         'payload' => json_encode($status),
                     ]);
 
-                    // Update tabel Order
                     $payment->order->update([
                         'order_status' => OrderStatus::PAID->value,
                         'payment_status' => PaymentStatus::PAID->value,
@@ -277,7 +274,6 @@ class PaymentController extends Controller
                 $order = Order::findOrFail($request->order_id);
                 $method = PaymentMethod::findOrFail($request->payment_method_id);
 
-                // Tentukan status berdasarkan keberadaan file bukti transfer
                 $paymentStatus = $request->hasFile('payment_proof')
                     ? PaymentStatus::WAITING_APPROVAL->value
                     : PaymentStatus::PENDING->value;
@@ -286,15 +282,13 @@ class PaymentController extends Controller
                     ? OrderStatus::WAITING_APPROVAL->value
                     : OrderStatus::PENDING->value;
 
-                // 1. Snapshot data dari Master ke Tabel Payment
                 $payment = Payment::updateOrCreate(
                     ['order_id' => $order->id],
                     [
                         'payment_method_info' => "{$method->bank_name} - {$method->account_number}",
                         'payment_type' => 'manual',
                         'gross_amount' => $order->grand_total,
-                        'transaction_status' => $paymentStatus, // Gunakan variabel enum di sini
-                        // Simpan info rekening di payload agar FE bisa baca
+                        'transaction_status' => $paymentStatus,
                         'payload' => json_encode([
                             'bank' => $method->bank_name,
                             'number' => $method->account_number,
@@ -303,9 +297,8 @@ class PaymentController extends Controller
                     ]
                 );
 
-                // 2. Handle Upload Proof jika ada
                 if ($request->hasFile('payment_proof')) {
-                    // Hapus foto lama jika sebelumnya user sudah pernah upload
+
                     if ($payment->payment_proof) {
                         Storage::disk('public')->delete($payment->payment_proof);
                     }
@@ -314,10 +307,9 @@ class PaymentController extends Controller
                     $payment->update(['payment_proof' => $path]);
                 }
 
-                // 3. Sync status ke Order
                 $order->update([
                     'payment_status' => $paymentStatus,
-                    'order_status' => $orderStatus, // Opsional: Samakan status ordernya juga
+                    'order_status' => $orderStatus,
                 ]);
 
                 return ApiResponse::success('Manual payment proof submitted successfully', $payment);

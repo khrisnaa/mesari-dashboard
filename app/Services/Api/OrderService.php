@@ -76,7 +76,6 @@ class OrderService
 
                 $variant->decrement('stock', $item->quantity);
 
-                // 🔥 PERBAIKAN 1: Gunakan $item->price yang dipassing dari fungsi sebelumnya
                 $lineSubtotal = $item->price * $item->quantity;
                 $totalItemPrice += $lineSubtotal;
 
@@ -104,7 +103,7 @@ class OrderService
                 'order_number' => $this->generateOrderNumber(),
                 'order_status' => OrderStatus::PENDING->value,
                 'payment_status' => PaymentStatus::PENDING->value,
-                'subtotal' => $totalItemPrice, // Sekarang akan menyimpan total base + custom
+                'subtotal' => $totalItemPrice,
                 'shipping_cost' => $shippingPrice,
                 'discount_amount' => 0,
                 'grand_total' => $grandTotal,
@@ -137,14 +136,12 @@ class OrderService
                     'customization_id' => $item->customization_id ?? null,
                     'product_variant_id' => $variant->id,
 
-                    // 🔥 PERBAIKAN 2: Gunakan label "Custom Design" jika dikirim
                     'product_name' => $item->product_name ?? $variant->product->name,
                     'variant_name' => $item->variant_name ?? $variant->attributes->pluck('name')->implode(' / '),
 
-                    // 🔥 PERBAIKAN 3: Simpan harga gabungan ke database
                     'price' => $item->price,
                     'quantity' => $item->quantity,
-                    'subtotal' => $item->subtotal, // Bisa juga pakai: $item->price * $item->quantity
+                    'subtotal' => $item->subtotal,
                 ]);
             }
 

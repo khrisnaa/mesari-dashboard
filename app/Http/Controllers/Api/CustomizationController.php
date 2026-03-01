@@ -25,7 +25,6 @@ class CustomizationController extends Controller
         $this->orderService = $orderService;
     }
 
-    // API 1: Simpan Desain & Generate URL Gambar
     public function store(StoreCustomizationRequest $request)
     {
         $customization = $this->customizationService->storeCustomization(
@@ -39,7 +38,6 @@ class CustomizationController extends Controller
         );
     }
 
-    // API 2: Langsung Checkout dari Desain
     public function checkout(CustomizationCheckoutRequest $request)
     {
 

@@ -20,4 +20,19 @@ class PreviewShippingRequest extends FormRequest
             'quantity' => ['nullable', 'integer', 'min:1'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'address_id.required' => 'The address ID is required.',
+            'address_id.uuid' => 'The address ID must be a valid UUID.',
+            'address_id.exists' => 'The selected address does not exist.',
+
+            'product_variant_id.uuid' => 'The product variant ID must be a valid UUID.',
+            'product_variant_id.exists' => 'The selected product variant does not exist.',
+
+            'quantity.integer' => 'The quantity must be an integer.',
+            'quantity.min' => 'The quantity must be at least 1.',
+        ];
+    }
 }

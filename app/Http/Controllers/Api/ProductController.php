@@ -103,10 +103,9 @@ class ProductController extends Controller
     public function customizables(ProductFilterRequest $request)
     {
         try {
-            // Memaksa parameter 'is_customizable' menjadi true sebelum masuk ke Service
+
             $request->merge(['is_customizable' => true]);
 
-            // Gunakan fungsi paginate yang sudah ada
             $products = $this->productService->paginate($request);
 
             return ApiResponse::success('List of customizable products', ProductResource::collection($products), 200, [

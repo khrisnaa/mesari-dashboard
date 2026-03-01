@@ -23,4 +23,28 @@ class ProductFilterRequest extends FormRequest
             'is_customizable' => ['nullable', 'boolean'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'search.string' => 'The search keyword must be a valid string.',
+            'search.max' => 'The search keyword may not be longer than 100 characters.',
+
+            'category_id.uuid' => 'The category ID must be a valid UUID.',
+
+            'min_price.numeric' => 'The minimum price must be a number.',
+            'min_price.min' => 'The minimum price must be at least 0.',
+
+            'max_price.numeric' => 'The maximum price must be a number.',
+            'max_price.min' => 'The maximum price must be at least 0.',
+
+            'sort.in' => 'The sort option is invalid. Allowed values: newest, price_asc, price_desc.',
+
+            'per_page.integer' => 'The per page value must be an integer.',
+            'per_page.min' => 'The per page value must be at least 1.',
+            'per_page.max' => 'The per page value may not be greater than 100.',
+
+            'is_customizable.boolean' => 'The customizable flag must be true or false.',
+        ];
+    }
 }
