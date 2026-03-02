@@ -121,4 +121,24 @@ class ProductController extends Controller
             return ApiResponse::error('Failed to load customizable products.', $e->getMessage(), 500);
         }
     }
+
+    public function highlighted()
+    {
+        try {
+
+            $products = $this->productService->getHighlighted();
+
+            return ApiResponse::success(
+                'List of highlighted products',
+                ProductResource::collection($products),
+                200
+            );
+        } catch (Throwable $e) {
+            return ApiResponse::error(
+                'Failed to load highlighted products.',
+                $e->getMessage(),
+                500
+            );
+        }
+    }
 }

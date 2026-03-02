@@ -10,6 +10,7 @@ class Payment extends Model
     use HasUuids;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];

@@ -78,7 +78,7 @@ class ProductService
         $product = Product::with([
             'category',
             'images',
-            'reviews.user',
+            'reviews',
             'variants' => function ($query) {
                 $query->where('price', '>', 0)
                     ->orderBy('price', 'asc');
@@ -116,5 +116,23 @@ class ProductService
                 'avg' => round($reviewsAvg ?? 0, 1),
             ],
         ];
+    }
+
+    public function getHighlighted()
+    {
+        return Product::query()
+            ->where('is_published', true)
+            ->where('is_highlighted', true)
+            ->where('is_customizable', false)
+            ->with([
+                'category',
+                'images',
+                'variants' => function ($q) {
+                    $q->where('price', '>', 0);
+                },
+                'variants.attributes',
+            ])
+            ->latest()
+            ->get();
     }
 }

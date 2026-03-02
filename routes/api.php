@@ -32,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/faqs', [FaqController::class, 'index']);
 Route::get('/testimonials', [TestimonialController::class, 'index']);
 Route::get('/products/customizables', [ProductController::class, 'customizables']);
+Route::get('/products/highlighted', [ProductController::class, 'highlighted']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products/{slug}/reviews', [ProductController::class, 'reviews']);

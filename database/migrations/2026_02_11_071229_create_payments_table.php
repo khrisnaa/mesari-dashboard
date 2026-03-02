@@ -30,7 +30,6 @@ return new class extends Migration
             $table->string('payment_proof')->nullable();
             $table->text('admin_note')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
