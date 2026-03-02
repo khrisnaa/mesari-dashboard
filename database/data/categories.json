@@ -1,5 +1,4 @@
 [
     { "name": "T-Shirt", "slug": "t-shirt" },
-    { "name": "Long Sleeves", "slug": "long-sleeves" },
-    { "name": "Tanktop", "slug": "tanktop" }
+    { "name": "Long Sleeves", "slug": "long-sleeves" }
 ]

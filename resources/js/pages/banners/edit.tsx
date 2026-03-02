@@ -64,6 +64,7 @@ const Edit = ({ banner, categories, products }: PageProps) => {
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
         router.post(
             `/banners/${banner.id}`,
             {
@@ -72,6 +73,15 @@ const Edit = ({ banner, categories, products }: PageProps) => {
             },
             {
                 forceFormData: true,
+                onError: (errors) => {
+                    console.log('ERRORS:', errors);
+                },
+                onSuccess: () => {
+                    console.log('Success update banner');
+                },
+                onFinish: () => {
+                    console.log('Request finished');
+                },
             },
         );
     };

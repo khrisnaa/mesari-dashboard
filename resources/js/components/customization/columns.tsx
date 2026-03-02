@@ -74,6 +74,7 @@ export const getColumns = (
         header: 'Order Status',
         cell: ({ row }) => {
             const status = row.original.order_item?.order?.order_status;
+
             if (!status) return <span className="text-xs text-muted-foreground">-</span>;
 
             return (

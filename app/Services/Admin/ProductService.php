@@ -27,6 +27,7 @@ class ProductService
             ->withSum('variants as total_stock', 'stock')
             ->with([
                 'category',
+                'images',
                 'variants' => fn ($query) => $query->with('attributes')->orderBy('price', 'asc'),
             ])
             ->when(

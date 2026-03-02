@@ -71,7 +71,7 @@ const mainNavItems: NavItemGroup[] = [
         items: [
             { title: 'Orders', href: orders.index(), icon: ReceiptIcon },
             { title: 'Customizations', href: customizations.index(), icon: ScissorsIcon },
-            { title: 'Payment Methods', href: paymentMethods.index(), icon: CreditCardIcon },
+            { title: 'Bank Accounts', href: paymentMethods.index(), icon: CreditCardIcon },
         ],
     },
     {

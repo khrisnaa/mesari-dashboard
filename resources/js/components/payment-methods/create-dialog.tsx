@@ -18,26 +18,23 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
 
-export const EditDialog = ({
+export const CreateDialog = ({
     isOpen,
     close,
     onOpenChange,
-    payload: payment,
-}: DialogComponentProps<PaymentMethod>) => {
-    if (!payment) return null;
-
+}: Omit<DialogComponentProps<PaymentMethod>, 'payload'>) => {
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
-                    <DialogTitle>Edit Bank Account</DialogTitle>
+                    <DialogTitle>Add Payment Method</DialogTitle>
                     <DialogDescription>
-                        Update bank account details for customer payments.
+                        Add a new bank account details for customer payments.
                     </DialogDescription>
                 </DialogHeader>
 
                 <Form
-                    {...paymentMethods.update.form(payment)}
+                    {...paymentMethods.store.form()}
                     disableWhileProcessing
                     className="space-y-6"
                     onSuccess={close}
@@ -51,7 +48,7 @@ export const EditDialog = ({
                                         <Input
                                             id="bank_name"
                                             name="bank_name"
-                                            defaultValue={payment.bank_name}
+                                            placeholder="e.g., BCA, Mandiri"
                                         />
                                         <InputError message={errors.bank_name} />
                                     </div>
@@ -60,7 +57,7 @@ export const EditDialog = ({
                                         <Input
                                             id="account_owner"
                                             name="account_owner"
-                                            defaultValue={payment.account_owner}
+                                            placeholder="e.g., John Doe"
                                         />
                                         <InputError message={errors.account_owner} />
                                     </div>
@@ -70,7 +67,7 @@ export const EditDialog = ({
                                     <Input
                                         id="account_number"
                                         name="account_number"
-                                        defaultValue={payment.account_number}
+                                        placeholder="e.g., 1234567890"
                                     />
                                     <InputError message={errors.account_number} />
                                 </div>
@@ -81,7 +78,7 @@ export const EditDialog = ({
                                         id="is_active"
                                         name="is_active"
                                         value="1"
-                                        defaultChecked={payment.is_active}
+                                        defaultChecked={true}
                                     />
                                 </div>
                             </div>
@@ -100,7 +97,7 @@ export const EditDialog = ({
                                 <SubmitButton processing={processing}>
                                     <span className="flex items-center gap-2">
                                         <Save className="h-4 w-4" />
-                                        Update
+                                        Save
                                     </span>
                                 </SubmitButton>
                             </DialogFooter>

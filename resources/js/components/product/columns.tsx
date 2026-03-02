@@ -41,14 +41,14 @@ export const getColumns = (onArchive: (product: Product) => void): ColumnDef<Pro
         ),
         cell: ({ row }) => {
             const images = row.original.images || [];
-            const thumbnail = images.find((img: any) => img.type === 'thumbnail') || images[0];
+            const thumbnail = images.find((img) => img.type === 'thumbnail') || images[0];
 
             return (
                 <div className="py-2 pr-2">
                     <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border bg-muted/50">
                         {thumbnail ? (
                             <img
-                                src={thumbnail.path}
+                                src={`/storage/${thumbnail.path}`}
                                 alt={row.original.name}
                                 className="h-full w-full object-cover transition-transform hover:scale-105"
                                 loading="lazy"

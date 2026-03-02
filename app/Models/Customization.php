@@ -32,9 +32,9 @@ class Customization extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function orderItems()
+    public function orderItem()
     {
-        return $this->hasMany(OrderItem::class, 'customization_id');
+        return $this->hasOne(OrderItem::class, 'customization_id');
     }
 
     public function productVariant()
