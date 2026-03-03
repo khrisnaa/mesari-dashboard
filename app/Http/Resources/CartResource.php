@@ -8,10 +8,13 @@ class CartResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $items = CartItemResource::collection($this->items);
+        $total = collect($items)->sum('subtotal');
+
         return [
             'id' => $this->id,
-            'items' => CartItemResource::collection($this->items),
-            'total' => (float) $this->items->sum('subtotal'),
+            'items' => $items,
+            'total' => (float) $total,
             'total_quantity' => $this->items->sum('quantity'),
         ];
     }

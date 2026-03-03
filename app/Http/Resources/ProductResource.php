@@ -9,6 +9,12 @@ class ProductResource extends JsonResource
 {
     public function toArray(Request $request)
     {
+        $now = now();
+
+        $isDiscountActive = $this->discount_value > 0 &&
+                            ($this->discount_start_at === null || $now->greaterThanOrEqualTo($this->discount_start_at)) &&
+                            ($this->discount_end_at === null || $now->lessThanOrEqualTo($this->discount_end_at));
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -19,6 +25,7 @@ class ProductResource extends JsonResource
             'discount' => [
                 'type' => $this->discount_type,
                 'value' => $this->discount_value !== null ? (float) $this->discount_value : null,
+                'is_active' => $isDiscountActive,
                 'start_at' => $this->discount_start_at,
                 'end_at' => $this->discount_end_at,
             ],

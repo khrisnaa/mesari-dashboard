@@ -10,10 +10,33 @@ class VariantDetailResource extends JsonResource
     public function toArray(Request $request): array
     {
         $product = $this->product;
+        $now = now();
+
+        $discountValue = (float) $product?->discount_value;
+        $discountType = $product?->discount_type;
+
+        $isDiscountActive = $discountValue > 0 &&
+            ($product->discount_start_at === null || $now->greaterThanOrEqualTo($product->discount_start_at)) &&
+            ($product->discount_end_at === null || $now->lessThanOrEqualTo($product->discount_end_at));
+
+        $originalPrice = (float) $this->price;
+        $finalPrice = $originalPrice;
+
+        if ($isDiscountActive) {
+            if ($discountType === 'percentage') {
+                $finalPrice = $originalPrice - ($originalPrice * ($discountValue / 100));
+            } elseif ($discountType === 'fixed') {
+                $finalPrice = max(0, $originalPrice - $discountValue);
+            }
+        }
 
         return [
             'id' => $this->id,
-            'price' => (float) $this->price,
+
+            'price' => (float) $finalPrice,
+
+            'original_price' => $originalPrice,
+
             'product' => [
                 'id' => $product?->id,
                 'name' => $product?->name,
@@ -22,6 +45,12 @@ class VariantDetailResource extends JsonResource
                     ?->path
                         ? asset('storage/'.$product->images->firstWhere('type', 'thumbnail')->path)
                         : null,
+
+                'discount' => [
+                    'is_active' => $isDiscountActive,
+                    'type' => $discountType,
+                    'value' => $discountValue,
+                ],
             ],
             'variant' => [
                 'id' => $this->id,
@@ -30,7 +59,7 @@ class VariantDetailResource extends JsonResource
                 })->values(),
                 'stock' => $this->stock,
             ],
-            // Opsional: Jika frontend butuh data stock di luar objek variant juga
+
             'stock' => (int) $this->stock,
         ];
     }

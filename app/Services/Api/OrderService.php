@@ -66,21 +66,59 @@ class OrderService
 
             $totalItemPrice = 0;
             $totalWeight = 0;
+            $totalDiscountAmount = 0; // Tambahan: untuk merekam total diskon
 
+            $processedItems = []; // Menyimpan kalkulasi harga agar tidak diulang di loop kedua
+
+            // LOOPING 1: Pengecekan stok, perhitungan harga final & berat
             foreach ($items as $item) {
                 $variant = $variants[$item->product_variant_id];
+                $product = $variant->product;
 
                 if ($variant->stock < $item->quantity) {
-                    throw new Exception('Stock not enough.');
+                    throw new Exception('Stock not enough for '.$product->name);
                 }
 
                 $variant->decrement('stock', $item->quantity);
 
-                $lineSubtotal = $item->price * $item->quantity;
+                // 1. Validasi Diskon Langsung dari Database (Real-time)
+                $now = now();
+                $discountValue = (float) $product->discount_value;
+                $discountType = $product->discount_type;
+
+                $isDiscountActive = $discountValue > 0 &&
+                    ($product->discount_start_at === null || $now->greaterThanOrEqualTo($product->discount_start_at)) &&
+                    ($product->discount_end_at === null || $now->lessThanOrEqualTo($product->discount_end_at));
+
+                $originalPrice = (float) $variant->price;
+                $finalUnitPrice = $originalPrice;
+
+                if ($isDiscountActive) {
+                    if ($discountType === 'percentage') {
+                        $finalUnitPrice = $originalPrice - ($originalPrice * ($discountValue / 100));
+                    } elseif ($discountType === 'fixed') {
+                        $finalUnitPrice = max(0, $originalPrice - $discountValue);
+                    }
+                }
+
+                // 2. Kalkulasi Subtotal & Diskon
+                $lineSubtotal = $finalUnitPrice * $item->quantity;
                 $totalItemPrice += $lineSubtotal;
 
-                $productWeight = $variant->product->weight ?? 0;
+                // Opsional: Hitung berapa rupiah yang dihemat pembeli
+                $discountSaved = ($originalPrice - $finalUnitPrice) * $item->quantity;
+                $totalDiscountAmount += $discountSaved;
+
+                $productWeight = $product->weight ?? 0;
                 $totalWeight += $productWeight * $item->quantity;
+
+                // 3. Simpan data yang sudah dihitung untuk di-insert ke OrderItem nanti
+                $processedItems[] = [
+                    'item' => $item,
+                    'variant' => $variant,
+                    'final_price' => $finalUnitPrice,
+                    'subtotal' => $lineSubtotal,
+                ];
             }
 
             $address = $user->addresses()->findOrFail($data['address_id']);
@@ -98,14 +136,18 @@ class OrderService
 
             $grandTotal = $totalItemPrice + $shippingPrice;
 
+            // BUAT ORDER
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_number' => $this->generateOrderNumber(),
                 'order_status' => OrderStatus::PENDING->value,
                 'payment_status' => PaymentStatus::PENDING->value,
+
+                // Subtotal sekarang adalah total harga BARANG yang sudah dipotong diskon
                 'subtotal' => $totalItemPrice,
                 'shipping_cost' => $shippingPrice,
-                'discount_amount' => 0,
+                // Rekam berapa diskon yang didapat (berguna untuk laporan & resi)
+                'discount_amount' => $totalDiscountAmount,
                 'grand_total' => $grandTotal,
 
                 'shipping_courier_code' => $data['shipping_courier_code'],
@@ -128,8 +170,10 @@ class OrderService
                 'note' => $data['note'] ?? null,
             ]);
 
-            foreach ($items as $item) {
-                $variant = $variants[$item->product_variant_id];
+            // LOOPING 2: Buat Order Item menggunakan harga yang sudah valid
+            foreach ($processedItems as $processed) {
+                $item = $processed['item'];
+                $variant = $processed['variant'];
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -139,9 +183,10 @@ class OrderService
                     'product_name' => $item->product_name ?? $variant->product->name,
                     'variant_name' => $item->variant_name ?? $variant->attributes->pluck('name')->implode(' / '),
 
-                    'price' => $item->price,
+                    // Gunakan harga dan subtotal hasil kalkulasi backend, BUKAN dari frontend
+                    'price' => $processed['final_price'],
                     'quantity' => $item->quantity,
-                    'subtotal' => $item->subtotal,
+                    'subtotal' => $processed['subtotal'],
                 ]);
             }
 
@@ -169,44 +214,72 @@ class OrderService
 
         $origin = config('rajaongkir.origin');
 
+        // Memastikan berat minimal 1 gram
+        $validWeight = $weight > 0 ? $weight : 1000;
+
+        // 1. SIAPKAN PAYLOAD
+        $payload = [
+            'origin' => $origin,
+            'destination' => $destination,
+            'weight' => $validWeight,
+            'courier' => $courierCode,
+            // 'originType' => 'city',         // Buka jika pakai akun PRO
+            // 'destinationType' => 'subdistrict', // Buka jika pakai akun PRO
+        ];
+
+        // 2. LOG DATA REQUEST (Sebelum dikirim ke API)
+        Log::info('--- RAJAONGKIR REQUEST ---');
+        Log::info('URL Endpoint: '.config('rajaongkir.cost_api_url'));
+        Log::info('Payload Data:', $payload);
+        Log::info('Target Service: '.$courierService);
+
+        // Eksekusi API
         $response = Http::asForm()
             ->timeout(10)
             ->withHeaders([
                 'key' => config('rajaongkir.api_key'),
                 'Accept' => 'application/json',
             ])
-            ->post(config('rajaongkir.cost_api_url'), [
-                'origin' => $origin,
-                'destination' => $destination,
-                'weight' => $weight,
-                'courier' => $courierCode,
-                'price' => 'lowest',
-            ]);
+            ->post(config('rajaongkir.cost_api_url'), $payload);
 
+        // 3. LOG DATA RESPONSE (Hasil dari API)
+        $responseBody = $response->json();
+
+        Log::info('--- RAJAONGKIR RESPONSE ---');
+        Log::info('Status HTTP: '.$response->status());
+        Log::info('Body Response:', $responseBody ?? ['raw' => $response->body()]);
+
+        // Cek jika HTTP status bukan 200 OK
         if (! $response->successful()) {
-            throw new \Exception('Failed to calculate shipping cost.');
+            $errorMessage = $responseBody['rajaongkir']['status']['description'] ?? 'Unknown API Error';
+            Log::error('RajaOngkir API Failed: '.$errorMessage);
+            throw new \Exception('Gagal menghitung ongkir: '.$errorMessage);
         }
 
-        $data = $response->json();
-
-        if (! isset($data['data']) || empty($data['data'])) {
-            throw new \Exception('Shipping services not found.');
+        // Pastikan struktur data sesuai dengan kembalian RajaOngkir
+        if (! isset($responseBody['rajaongkir']['results'][0]['costs']) || empty($responseBody['rajaongkir']['results'][0]['costs'])) {
+            Log::warning('RajaOngkir: Kurir tidak mendukung rute ini atau data kosong.');
+            throw new \Exception('Layanan pengiriman tidak ditemukan untuk rute ini.');
         }
 
-        $services = collect($data['data']);
+        $services = collect($responseBody['rajaongkir']['results'][0]['costs']);
 
-        $selected = $services->first(function ($service) use ($courierCode, $courierService) {
-            return $service['code'] === $courierCode
-                && $service['service'] === $courierService;
+        // Cari service yang cocok (abaikan huruf besar/kecil agar lebih aman)
+        $selected = $services->first(function ($service) use ($courierService) {
+            return strtoupper($service['service']) === strtoupper($courierService);
         });
 
         if (! $selected) {
-            throw new \Exception('Selected courier service not available.');
+            $availableServices = $services->pluck('service')->implode(', ');
+            Log::warning("RajaOngkir: Service '{$courierService}' tidak ditemukan. Tersedia: {$availableServices}");
+            throw new \Exception("Layanan '{$courierService}' tidak tersedia. Pilih layanan lain.");
         }
 
+        Log::info('Ongkir Berhasil Dihitung: Rp'.$selected['cost'][0]['value']);
+
         return [
-            'cost' => (int) $selected['cost'],
-            'etd' => $selected['etd'] ?? null,
+            'cost' => (int) $selected['cost'][0]['value'],
+            'etd' => $selected['cost'][0]['etd'] ?? null,
         ];
     }
 

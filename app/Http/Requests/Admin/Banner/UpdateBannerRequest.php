@@ -27,8 +27,8 @@ class UpdateBannerRequest extends FormRequest
             'title' => ['required', 'string'],
             'description' => ['required', 'string'],
 
-            'backdrop' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'backdrop' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5048'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5048'],
 
             'cta_type' => ['nullable', 'string', 'in:'.implode(',', array_column(BannerType::cases(), 'value'))],
             'cta_text' => ['nullable', 'string'],

@@ -15,7 +15,7 @@ class ManualPaymentRequest extends FormRequest
     {
         return [
             'order_id' => 'required|exists:orders,id',
-            'payment_method_id' => 'required|exists:payment_methods,id',
+            'payment_method_id' => 'required|exists:bank_accounts,id',
             'payment_proof' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }

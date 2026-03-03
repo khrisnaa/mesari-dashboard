@@ -22,7 +22,7 @@ import { Banner } from '@/types/banner';
 import { Category } from '@/types/category';
 import { BannerType } from '@/types/enum';
 import { Product } from '@/types/product';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useState } from 'react';
 
@@ -47,7 +47,7 @@ const Edit = ({ banner, categories, products }: PageProps) => {
     const [backdrop, setBackdrop] = useState<ImageValue | null>(null);
     const [image, setImage] = useState<ImageValue | null>(null);
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, transform } = useForm({
         title: banner.title ?? '',
         description: banner.description ?? '',
         backdrop: null as File | null,
@@ -65,25 +65,18 @@ const Edit = ({ banner, categories, products }: PageProps) => {
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        router.post(
-            `/banners/${banner.id}`,
-            {
-                ...data,
-                _method: 'put',
-            },
-            {
-                forceFormData: true,
-                onError: (errors) => {
-                    console.log('ERRORS:', errors);
-                },
-                onSuccess: () => {
-                    console.log('Success update banner');
-                },
-                onFinish: () => {
-                    console.log('Request finished');
-                },
-            },
-        );
+        // 1. Transform data sesaat sebelum dikirim
+        transform((data) => ({
+            ...data,
+            _method: 'put',
+        }));
+
+        // 2. Kirim menggunakan 'post' dari useForm (bukan router)
+        post(`/banners/${banner.id}`, {
+            forceFormData: true,
+            onSuccess: () => console.log('Success update banner'),
+            onError: (err) => console.log('Error muncul di sini dan di state errors:', err),
+        });
     };
 
     // Fungsi untuk mereset field terkait saat mengganti tipe CTA
