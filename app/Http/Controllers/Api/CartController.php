@@ -45,11 +45,6 @@ class CartController extends Controller
             'quantity',
         ]));
 
-        // $cart->load([
-        //     'items.variant.product.images',
-        //     'items.variant.attributes',
-        // ]);
-
         $result->load([
             'variant.product.images',
             'variant.attributes',
@@ -97,11 +92,6 @@ class CartController extends Controller
             ->firstOrFail();
 
         $this->cartService->deleteItem($item);
-
-        // $cart->load([
-        //     'items.variant.product.images',
-        //     'items.variant.attributes',
-        // ]);
 
         return ApiResponse::success(
             'Cart item removed',

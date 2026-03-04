@@ -6,15 +6,13 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\Auth\LoginRequest;
-use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Events\Verified;
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Requests\Api\Auth\ResetPasswordRequest;
+use App\Http\Resources\UserResource;
+use App\Models\User;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
@@ -24,36 +22,34 @@ class AuthController extends Controller
         $data = $request->validated();
 
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
+            'name' => $data['name'],
+            'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
 
-        // send notification
         $user->sendEmailVerificationNotification();
 
         return ApiResponse::success(
             'Account created successfully. Please verify your email.',
             [
                 'user' => new UserResource($user),
-                'must_verify_email' => true
+                'must_verify_email' => true,
             ],
             201
         );
     }
-
 
     public function login(LoginRequest $request)
     {
 
         $user = User::where('email', $request->email)->first();
 
-        if (! $user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             return ApiResponse::error('Invalid credentials', null, 401);
         }
 
         // verification check
-        if (!$user->hasVerifiedEmail()) {
+        if (! $user->hasVerifiedEmail()) {
             return ApiResponse::error('Please verify your email first.', null, 403);
         }
 
@@ -66,12 +62,11 @@ class AuthController extends Controller
         return ApiResponse::success(
             'Login successful.',
             [
-                'user'       => new UserResource($user),
-                'token'      => $token,
+                'user' => new UserResource($user),
+                'token' => $token,
             ]
         );
     }
-
 
     public function resendVerificationEmail(Request $request)
     {
@@ -97,7 +92,7 @@ class AuthController extends Controller
             (string) $request->route('hash'),
             sha1($user->email)
         )) {
-            return redirect(env('FRONTEND_URL') . '/verify/error');
+            return redirect(env('FRONTEND_URL').'/verify/error');
         }
 
         // mark email as verified if not already verified
@@ -105,7 +100,7 @@ class AuthController extends Controller
             $user->markEmailAsVerified();
         }
 
-        return redirect(env('FRONTEND_URL') . '/login?verified=1');
+        return redirect(env('FRONTEND_URL').'/login?verified=1');
     }
 
     public function logout(Request $request)
@@ -115,8 +110,6 @@ class AuthController extends Controller
 
         return ApiResponse::success('Logout successful.');
     }
-
-
 
     public function forgotPassword(ForgotPasswordRequest $request)
     {
@@ -138,14 +131,13 @@ class AuthController extends Controller
         return ApiResponse::success('Password reset email sent.');
     }
 
-
     public function resetPassword(ResetPasswordRequest $request)
     {
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([
-                    'password' => Hash::make($password)
+                    'password' => Hash::make($password),
                 ])->save();
 
                 // delete all old tokens (security)
