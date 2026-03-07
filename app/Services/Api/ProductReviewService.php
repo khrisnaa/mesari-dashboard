@@ -52,4 +52,22 @@ class ProductReviewService
             new ProductReviewResource($review)
         );
     }
+
+    public function delete(ProductReview $review)
+    {
+        try {
+            $review->delete();
+
+            return ApiResponse::success(
+                'Review successfully deleted.',
+                null,
+                200
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error(
+                'Failed to delete the review. Please try again.',
+                500
+            );
+        }
+    }
 }

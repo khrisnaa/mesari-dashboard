@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // orders
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel']);
 
     // shipping cost
     Route::post('/shipping/preview', [OrderController::class, 'previewShipping']);
@@ -88,6 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // reviews
     Route::post('/reviews', [ProductReviewController::class, 'store']);
     Route::put('/reviews/{id}', [ProductReviewController::class, 'update']);
+    Route::delete('/reviews/{id}', [ProductReviewController::class, 'destroy']);
 
     // customizations
     Route::post('/customizations', [CustomizationController::class, 'store']);

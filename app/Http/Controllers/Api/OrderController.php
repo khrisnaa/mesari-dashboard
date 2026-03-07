@@ -10,6 +10,7 @@ use App\Http\Requests\Api\Order\PreviewShippingRequest;
 use App\Http\Resources\OrderDetailResource;
 use App\Http\Resources\OrderListResource;
 use App\Http\Resources\OrderResource;
+use App\Models\Order;
 use App\Models\ProductVariant;
 use App\Services\Api\OrderService;
 use Illuminate\Http\Request;
@@ -62,14 +63,13 @@ class OrderController extends Controller
             200,
             [
                 'current_page' => $orders->currentPage(),
-                'last_page'    => $orders->lastPage(),
-                'per_page'     => $orders->perPage(),
-                'total'        => $orders->total(),
-                'has_more'     => $orders->hasMorePages(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+                'has_more' => $orders->hasMorePages(),
             ]
         );
     }
-
 
     public function show($id, Request $request)
     {
@@ -100,7 +100,7 @@ class OrderController extends Controller
 
         if ($totalWeight <= 0) {
             return response()->json([
-                'message' => 'No items found.'
+                'message' => 'No items found.',
             ], 422);
         }
 
@@ -110,17 +110,36 @@ class OrderController extends Controller
         );
 
         return response()->json([
-            'data' => $services
+            'data' => $services,
         ]);
     }
 
     private function calculateCartWeight($user): int
     {
-        if (!$user->cart) {
+        if (! $user->cart) {
             return 0;
         }
+
         return $user->cart->items->sum(function ($item) {
             return ($item->variant->product->weight ?? 0) * $item->quantity;
         });
+    }
+
+    public function cancel(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            return ApiResponse::error('Unauthorized. You do not have access to this order.', 403);
+        }
+
+        try {
+            $order = $this->orderService->cancelOrder($order);
+
+            return ApiResponse::success(
+                'Order cancelled successfully.',
+                new OrderResource($order)
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error($e->getMessage(), 400);
+        }
     }
 }

@@ -16,7 +16,6 @@ import {
     Users,
 } from 'lucide-react';
 
-// --- Interfaces ---
 interface OrderData {
     id: string;
     order_number: string;
@@ -46,7 +45,6 @@ interface DashboardProps {
     top_products: TopProduct[];
 }
 
-// Helper Format Rupiah (Kept IDR formatting but named generically if needed)
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -55,7 +53,6 @@ const formatCurrency = (amount: number) => {
     }).format(amount);
 };
 
-// Helper Initials (Budi Santoso -> BS)
 const getInitials = (name: string) => {
     return (
         name
@@ -72,9 +69,7 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
         <AppLayout>
             <Head title="Dashboard" />
 
-            {/* Tightened outer padding and gaps */}
             <div className="container mx-auto flex max-w-[1600px] flex-col gap-5 p-3 md:p-5">
-                {/* Header */}
                 <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -98,7 +93,6 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                     </div>
                 </div>
 
-                {/* Top Metrics Cards - tighter gap */}
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
                     <MetricCard
                         title="Total Revenue"
@@ -134,9 +128,7 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                     />
                 </div>
 
-                {/* Middle Charts Section */}
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-                    {/* Main Chart - Revenue */}
                     <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-6">
                         <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-1">
                             <div>
@@ -197,7 +189,6 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                         </CardContent>
                     </Card>
 
-                    {/* Weekly Activity Report */}
                     <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-3">
                         <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-2">
                             <div>
@@ -229,7 +220,6 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                         </CardContent>
                     </Card>
 
-                    {/* Top Selling Products */}
                     <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-3">
                         <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-2">
                             <div>
@@ -261,7 +251,6 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                     </Card>
                 </div>
 
-                {/* Table Section */}
                 <div className="flex flex-col gap-4 rounded-md border border-border bg-card p-4 shadow-none">
                     <div className="flex flex-col gap-2">
                         <h2 className="text-lg font-bold">Recent Orders</h2>
@@ -340,7 +329,6 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                                                 <td className="px-4 py-2.5 text-right">
                                                     <div className="flex justify-end gap-1">
                                                         <Link href={`/orders/${order.id}/edit`}>
-                                                            {/* Button strictly rounded-full */}
                                                             <ActionIconButton
                                                                 icon={
                                                                     <Eye className="h-3.5 w-3.5" />
@@ -369,10 +357,8 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                             </table>
                         </div>
 
-                        {/* Redirect to Order Index */}
                         <div className="mt-3 flex items-center justify-center">
                             <Link href="/orders">
-                                {/* Button strictly rounded-full */}
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -389,13 +375,10 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
     );
 }
 
-// --- Components Helpers ---
-
 const MetricCard = ({ title, value, trend, trendUp, icon, badge }: any) => (
     <Card className="rounded-md border-border shadow-none">
         <CardContent className="p-4">
             <div className="flex items-start justify-between">
-                {/* Max rounded-md for icon wrapper, reduced padding */}
                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-secondary/50 p-1.5">
                     {icon}
                 </div>
@@ -430,7 +413,6 @@ const MetricCard = ({ title, value, trend, trendUp, icon, badge }: any) => (
 );
 
 const ReportItem = ({ icon, label, value, bg }: any) => (
-    // Max rounded-md, tighter padding
     <div className="flex items-center justify-between rounded-md border border-dashed border-border p-3">
         <div className="flex items-center gap-3">
             <div className={`flex h-8 w-8 items-center justify-center rounded-md ${bg}`}>
@@ -447,7 +429,6 @@ const ReportItem = ({ icon, label, value, bg }: any) => (
 const CampaignItem = ({ icon, label, percent, count }: any) => (
     <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-            {/* Max rounded-md */}
             <div className="flex h-7 w-7 items-center justify-center rounded-md bg-secondary">
                 {icon}
             </div>
@@ -461,7 +442,6 @@ const CampaignItem = ({ icon, label, percent, count }: any) => (
 );
 
 const StatusBadge = ({ status }: { status: string }) => {
-    // English Translation mapping
     const statusMap: Record<string, { label: string; style: string }> = {
         pending: { label: 'Pending', style: 'bg-amber-100 text-amber-700' },
         paid: { label: 'Paid', style: 'bg-blue-100 text-blue-700' },
@@ -479,7 +459,6 @@ const StatusBadge = ({ status }: { status: string }) => {
     return (
         <Badge
             variant="secondary"
-            // Max rounded-md for badges
             className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${current.style}`}
         >
             {current.label}

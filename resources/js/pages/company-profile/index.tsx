@@ -38,7 +38,6 @@ const Index = ({ profile }: PageProps) => {
             <Head title="Company Profile" />
 
             <div className="container mx-auto space-y-8 p-4 md:p-8">
-                {/* Header Section */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight text-foreground">
@@ -57,7 +56,6 @@ const Index = ({ profile }: PageProps) => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    {/* Main Content - Left Column */}
                     <div className="space-y-6 lg:col-span-2">
                         <Card>
                             <CardHeader>
@@ -75,7 +73,6 @@ const Index = ({ profile }: PageProps) => {
                             </CardContent>
                         </Card>
 
-                        {/* Location / Address Card */}
                         <Card className="">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -85,7 +82,10 @@ const Index = ({ profile }: PageProps) => {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <p className="text-sm text-muted-foreground">
-                                    {profile.address}, {profile.city}, {profile.province}{' '}
+                                    {profile.address},{' '}
+                                    {profile.subdistrict_name && `${profile.subdistrict_name}, `}
+                                    {profile.district_name && `${profile.district_name}, `}
+                                    {profile.city_name}, {profile.province_name}{' '}
                                     {profile.postal_code}
                                 </p>
                                 {profile.google_map_url && (
@@ -109,7 +109,7 @@ const Index = ({ profile }: PageProps) => {
                                                 loading="lazy"
                                                 allowFullScreen
                                                 src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                                                    `${profile.address}, ${profile.city}`,
+                                                    `${profile.address}, ${profile.city_name}`,
                                                 )}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                                             />
                                         </div>
@@ -119,9 +119,7 @@ const Index = ({ profile }: PageProps) => {
                         </Card>
                     </div>
 
-                    {/* Sidebar - Right Column */}
                     <div className="space-y-6">
-                        {/* Contact Information */}
                         <Card className="h-fit">
                             <CardHeader>
                                 <CardTitle className="text-base">Contact & Operations</CardTitle>
@@ -151,7 +149,6 @@ const Index = ({ profile }: PageProps) => {
                             </CardContent>
                         </Card>
 
-                        {/* Social Media */}
                         <Card className="h-fit">
                             <CardHeader>
                                 <CardTitle className="text-base">Social Media</CardTitle>
@@ -187,8 +184,6 @@ const Index = ({ profile }: PageProps) => {
 };
 
 export default Index;
-
-// --- Helper Components ---
 
 const InfoItem = ({
     icon,

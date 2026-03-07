@@ -214,17 +214,15 @@ class OrderService
 
         $origin = config('rajaongkir.origin');
 
-        // Memastikan berat minimal 1 gram
         $validWeight = $weight > 0 ? $weight : 1000;
 
-        // 1. SIAPKAN PAYLOAD
         $payload = [
             'origin' => $origin,
             'destination' => $destination,
             'weight' => $validWeight,
             'courier' => $courierCode,
-            // 'originType' => 'city',         // Buka jika pakai akun PRO
-            // 'destinationType' => 'subdistrict', // Buka jika pakai akun PRO
+            // 'originType' => 'city',
+            // 'destinationType' => 'subdistrict',
         ];
 
         // 2. LOG DATA REQUEST (Sebelum dikirim ke API)
@@ -233,7 +231,6 @@ class OrderService
         Log::info('Payload Data:', $payload);
         Log::info('Target Service: '.$courierService);
 
-        // Eksekusi API
         $response = Http::asForm()
             ->timeout(10)
             ->withHeaders([
@@ -242,29 +239,29 @@ class OrderService
             ])
             ->post(config('rajaongkir.cost_api_url'), $payload);
 
-        // 3. LOG DATA RESPONSE (Hasil dari API)
         $responseBody = $response->json();
 
         Log::info('--- RAJAONGKIR RESPONSE ---');
         Log::info('Status HTTP: '.$response->status());
         Log::info('Body Response:', $responseBody ?? ['raw' => $response->body()]);
 
-        // Cek jika HTTP status bukan 200 OK
+        // 1. Sesuaikan penanganan error jika HTTP gagal
         if (! $response->successful()) {
-            $errorMessage = $responseBody['rajaongkir']['status']['description'] ?? 'Unknown API Error';
-            Log::error('RajaOngkir API Failed: '.$errorMessage);
+            $errorMessage = $responseBody['meta']['message'] ?? 'Unknown API Error';
+            Log::error('API Failed: '.$errorMessage);
             throw new \Exception('Gagal menghitung ongkir: '.$errorMessage);
         }
 
-        // Pastikan struktur data sesuai dengan kembalian RajaOngkir
-        if (! isset($responseBody['rajaongkir']['results'][0]['costs']) || empty($responseBody['rajaongkir']['results'][0]['costs'])) {
-            Log::warning('RajaOngkir: Kurir tidak mendukung rute ini atau data kosong.');
+        // 2. Sesuaikan pengecekan data kosong menggunakan key ['data']
+        if (! isset($responseBody['data']) || empty($responseBody['data'])) {
+            Log::warning('RajaOngkir (Komerce): Kurir tidak mendukung rute ini atau data kosong.');
             throw new \Exception('Layanan pengiriman tidak ditemukan untuk rute ini.');
         }
 
-        $services = collect($responseBody['rajaongkir']['results'][0]['costs']);
+        // 3. Masukkan data ke collection
+        $services = collect($responseBody['data']);
 
-        // Cari service yang cocok (abaikan huruf besar/kecil agar lebih aman)
+        // 4. Cari service yang sesuai (contoh: 'REG')
         $selected = $services->first(function ($service) use ($courierService) {
             return strtoupper($service['service']) === strtoupper($courierService);
         });
@@ -275,11 +272,12 @@ class OrderService
             throw new \Exception("Layanan '{$courierService}' tidak tersedia. Pilih layanan lain.");
         }
 
-        Log::info('Ongkir Berhasil Dihitung: Rp'.$selected['cost'][0]['value']);
+        // 5. Ambil nilai cost secara langsung (Komerce tidak menggunakan array bersarang untuk cost)
+        Log::info('Ongkir Berhasil Dihitung: Rp'.$selected['cost']);
 
         return [
-            'cost' => (int) $selected['cost'][0]['value'],
-            'etd' => $selected['cost'][0]['etd'] ?? null,
+            'cost' => (int) $selected['cost'],
+            'etd' => $selected['etd'] ?? null,
         ];
     }
 
@@ -416,5 +414,18 @@ class OrderService
 
             return $order;
         });
+    }
+
+    public function cancelOrder(Order $order): Order
+    {
+        if ($order->order_status !== OrderStatus::PENDING->value) {
+            throw new Exception("The order cannot be canceled because the current status is {$order->order_status}.");
+        }
+
+        $order->update([
+            'order_status' => OrderStatus::CANCELLED->value,
+        ]);
+
+        return $order->fresh();
     }
 }

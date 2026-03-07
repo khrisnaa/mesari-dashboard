@@ -67,14 +67,6 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('destroy');
     });
 
-    // payment-methods
-    Route::prefix('payment-methods')->name('payment-methods.')->group(function () {
-        Route::get('/', [PaymentMethodController::class, 'index'])->name('index');
-        Route::post('/', [PaymentMethodController::class, 'store'])->name('store');
-        Route::put('/{paymentMethod}', [PaymentMethodController::class, 'update'])->name('update');
-        Route::delete('/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->name('destroy');
-    });
-
     // testimonials
     Route::prefix('testimonials')->name('testimonials.')->group(function () {
         Route::get('/', [TestimonialController::class, 'index'])
@@ -119,28 +111,6 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
             ->name('destroy');
     });
 
-    // company-profile
-    Route::prefix('company-profile')->name('company-profile.')->group(function () {
-        Route::get('/', [CompanyProfileController::class, 'index'])
-            ->name('index');
-        Route::get('/edit', [CompanyProfileController::class, 'edit'])
-            ->name('edit');
-        Route::put('/{profile}', [CompanyProfileController::class, 'update'])
-            ->name('update');
-    });
-
-    // users
-    Route::prefix('users')->name('users.')->group(function () {
-        Route::get('/', [UserController::class, 'index'])
-            ->name('index');
-        Route::put('/{user}', [UserController::class, 'update'])
-            ->name('update');
-        Route::put('/{user}/status', [UserController::class, 'updateStatus'])
-            ->name('update.status');
-        Route::post('/invite', [UserController::class, 'invite'])
-            ->name('invite');
-    });
-
     // orders
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])
@@ -164,6 +134,33 @@ Route::middleware(['auth', 'verified', 'role:admin|superadmin'])->group(function
         Route::get('/', [CustomizationController::class, 'index'])->name('index');
         // Route::get('/{customization}/edit', [CustomizationController::class, 'edit'])->name('edit');
         Route::put('/{customization}', [CustomizationController::class, 'update'])->name('update');
+    });
+
+    Route::middleware(['role:superadmin'])->group(function () {
+
+        // payment-methods
+        Route::prefix('payment-methods')->name('payment-methods.')->group(function () {
+            Route::get('/', [PaymentMethodController::class, 'index'])->name('index');
+            Route::post('/', [PaymentMethodController::class, 'store'])->name('store');
+            Route::put('/{paymentMethod}', [PaymentMethodController::class, 'update'])->name('update');
+            Route::delete('/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->name('destroy');
+        });
+
+        // company-profile
+        Route::prefix('company-profile')->name('company-profile.')->group(function () {
+            Route::get('/', [CompanyProfileController::class, 'index'])->name('index');
+            Route::get('/edit', [CompanyProfileController::class, 'edit'])->name('edit');
+            Route::put('/{profile}', [CompanyProfileController::class, 'update'])->name('update');
+        });
+
+        // users
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::put('/{user}', [UserController::class, 'update'])->name('update');
+            Route::put('/{user}/status', [UserController::class, 'updateStatus'])->name('update.status');
+            Route::post('/invite', [UserController::class, 'invite'])->name('invite');
+        });
+
     });
 });
 

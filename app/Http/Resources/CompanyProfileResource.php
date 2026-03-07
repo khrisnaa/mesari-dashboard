@@ -18,9 +18,14 @@ class CompanyProfileResource extends JsonResource
             'phone' => $this->phone,
             'whatsapp' => $this->whatsapp,
             'address' => $this->address,
-            'city' => $this->city,
-            'province' => $this->province,
+
+            'origin_id' => $this->origin_id,
+            'province_name' => $this->province_name,
+            'city_name' => $this->city_name,
+            'district_name' => $this->district_name,
+            'subdistrict_name' => $this->subdistrict_name,
             'postal_code' => $this->postal_code,
+
             'google_map_url' => $this->google_map_url,
             'working_hours' => $this->working_hours,
             'instagram' => $this->instagram,

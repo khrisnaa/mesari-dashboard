@@ -10,12 +10,9 @@ import AppLayout from '@/layouts/app-layout';
 import companyProfile from '@/routes/company-profile';
 import { BreadcrumbItem } from '@/types';
 import { CompanyProfile } from '@/types/company-profile';
-import { Form, Head } from '@inertiajs/react';
-import { ArrowLeft, Save } from 'lucide-react';
-
-interface PageProps {
-    profile: CompanyProfile;
-}
+import { Form, Head, router } from '@inertiajs/react';
+import { ArrowLeft, Save, Search } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,7 +25,63 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const Edit = ({ profile }: PageProps) => {
+interface LocationData {
+    id: number;
+    province_name: string;
+    city_name: string;
+    district_name: string;
+    subdistrict_name: string;
+    zip_code: string;
+}
+
+interface PageProps {
+    profile: CompanyProfile;
+    locations?: LocationData[];
+}
+
+const Edit = ({ profile, locations = [] }: PageProps) => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
+
+    const [locData, setLocData] = useState({
+        origin_id: profile.origin_id || '',
+        province_name: profile.province_name || '',
+        city_name: profile.city_name || '',
+        district_name: profile.district_name || '',
+        subdistrict_name: profile.subdistrict_name || '',
+        postal_code: profile.postal_code || '',
+    });
+
+    const handleSearchKeyDown = (e: any) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+
+            if (!searchQuery.trim()) return;
+
+            setIsSearching(true);
+            router.reload({
+                data: { search: searchQuery },
+                only: ['locations'],
+                // preserveState: true,
+                // preserveScroll: true,
+                onFinish: () => setIsSearching(false),
+            });
+        }
+    };
+
+    const handleSelectLocation = (loc: LocationData) => {
+        setLocData({
+            origin_id: loc.id,
+            province_name: loc.province_name,
+            city_name: loc.city_name,
+            district_name: loc.district_name,
+            subdistrict_name: loc.subdistrict_name,
+            postal_code: loc.zip_code || '',
+        });
+
+        setSearchQuery('');
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Company Profile" />
@@ -59,7 +112,7 @@ const Edit = ({ profile }: PageProps) => {
                                     <ArrowLeft className="h-4 w-4" />
                                     Cancel
                                 </Button>
-                                <SubmitButton processing={processing} className="rounded-full">
+                                <SubmitButton processing={processing}>
                                     <span className="flex items-center gap-2">
                                         <Save className="h-4 w-4" />
                                         Save Changes
@@ -118,10 +171,58 @@ const Edit = ({ profile }: PageProps) => {
                                     <CardHeader>
                                         <CardTitle>Location & Address</CardTitle>
                                         <CardDescription>
-                                            Where customers can find you.
+                                            Where customers can find you and your origin shipping
+                                            point.
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="grid gap-6">
+                                        <div className="space-y-2 rounded-lg border bg-muted/30 p-4">
+                                            <Label>Search Origin Location</Label>
+                                            <div className="relative">
+                                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                                <Input
+                                                    type="text"
+                                                    placeholder="Type subdistrict or city name and press Enter..."
+                                                    className="pl-9"
+                                                    value={searchQuery}
+                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                    onKeyDown={handleSearchKeyDown}
+                                                />
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">
+                                                Press <strong>Enter</strong> to search location.
+                                            </p>
+
+                                            {isSearching && (
+                                                <p className="text-sm text-blue-500">
+                                                    Searching...
+                                                </p>
+                                            )}
+                                            {locations.length > 0 && searchQuery && (
+                                                <div className="mt-2 flex max-h-48 flex-col gap-1 overflow-y-auto rounded-md border bg-background p-1 shadow-sm">
+                                                    {locations.map((loc) => (
+                                                        <button
+                                                            key={loc.id}
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleSelectLocation(loc)
+                                                            }
+                                                            className="flex flex-col items-start rounded px-3 py-2 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                                                        >
+                                                            <span className="font-medium">
+                                                                {loc.subdistrict_name},{' '}
+                                                                {loc.district_name}
+                                                            </span>
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {loc.city_name}, {loc.province_name}{' '}
+                                                                - {loc.zip_code}
+                                                            </span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+
                                         <div className="space-y-2">
                                             <Label>Full Address</Label>
                                             <Textarea
@@ -134,25 +235,66 @@ const Edit = ({ profile }: PageProps) => {
                                             <InputError message={errors.address} />
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                            <div className="space-y-2">
-                                                <Label>City / Regency</Label>
-                                                <Input name="city" defaultValue={profile.city} />
-                                                <InputError message={errors.city} />
-                                            </div>
+                                        <input
+                                            type="hidden"
+                                            name="origin_id"
+                                            value={locData.origin_id}
+                                        />
+                                        <InputError message={errors.origin_id} />
+
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             <div className="space-y-2">
                                                 <Label>Province</Label>
                                                 <Input
-                                                    name="province"
-                                                    defaultValue={profile.province}
+                                                    name="province_name"
+                                                    value={locData.province_name}
+                                                    readOnly
+                                                    className="bg-muted"
                                                 />
-                                                <InputError message={errors.province} />
+                                                <InputError message={errors.province_name} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>City / Regency</Label>
+                                                <Input
+                                                    name="city_name"
+                                                    value={locData.city_name}
+                                                    readOnly
+                                                    className="bg-muted"
+                                                />
+                                                <InputError message={errors.city_name} />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                            <div className="space-y-2">
+                                                <Label>District</Label>
+                                                <Input
+                                                    name="district_name"
+                                                    value={locData.district_name}
+                                                    readOnly
+                                                    className="bg-muted"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Subdistrict</Label>
+                                                <Input
+                                                    name="subdistrict_name"
+                                                    value={locData.subdistrict_name}
+                                                    readOnly
+                                                    className="bg-muted"
+                                                />
                                             </div>
                                             <div className="space-y-2">
                                                 <Label>Postal Code</Label>
                                                 <Input
                                                     name="postal_code"
-                                                    defaultValue={profile.postal_code}
+                                                    value={locData.postal_code}
+                                                    onChange={(e) =>
+                                                        setLocData({
+                                                            ...locData,
+                                                            postal_code: e.target.value,
+                                                        })
+                                                    }
                                                 />
                                                 <InputError message={errors.postal_code} />
                                             </div>
@@ -189,13 +331,11 @@ const Edit = ({ profile }: PageProps) => {
                                             />
                                             <InputError message={errors.email} />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label>Phone Number</Label>
                                             <Input name="phone" defaultValue={profile.phone} />
                                             <InputError message={errors.phone} />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label>WhatsApp</Label>
                                             <Input
@@ -204,7 +344,6 @@ const Edit = ({ profile }: PageProps) => {
                                             />
                                             <InputError message={errors.whatsapp} />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label>Working Hours</Label>
                                             <Input
@@ -234,7 +373,6 @@ const Edit = ({ profile }: PageProps) => {
                                             />
                                             <InputError message={errors.instagram} />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label>TikTok URL</Label>
                                             <Input
@@ -244,7 +382,6 @@ const Edit = ({ profile }: PageProps) => {
                                             />
                                             <InputError message={errors.tiktok} />
                                         </div>
-
                                         <div className="space-y-2">
                                             <Label>Facebook URL</Label>
                                             <Input

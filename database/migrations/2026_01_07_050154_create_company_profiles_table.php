@@ -20,11 +20,17 @@ return new class extends Migration
             $table->string('phone');
             $table->string('whatsapp');
             $table->string('address');
-            $table->string('city');
-            $table->string('province');
-            $table->string('postal_code');
-            $table->string('google_map_url');
-            $table->string('working_hours');
+
+            $table->string('province_name')->nullable();
+            $table->string('city_name')->nullable();
+            $table->string('district_name')->nullable();
+            $table->string('subdistrict_name')->nullable();
+            $table->string('postal_code')->nullable();
+
+            $table->unsignedBigInteger('origin_id')->nullable();
+
+            $table->string('google_map_url')->nullable();
+            $table->string('working_hours')->nullable();
             $table->string('instagram')->nullable();
             $table->string('tiktok')->nullable();
             $table->string('facebook')->nullable();

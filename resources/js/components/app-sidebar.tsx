@@ -21,7 +21,7 @@ import products from '@/routes/products';
 import testimonials from '@/routes/testimonials';
 import users from '@/routes/users';
 import { type NavItemGroup } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpenIcon,
     Building2Icon,
@@ -41,12 +41,11 @@ import {
 import AppLogo from './app-logo';
 import { NavMain } from './nav-main';
 
-const mainNavItems: NavItemGroup[] = [
+const getMainNavItems = (isSuperAdmin: boolean): NavItemGroup[] => [
     {
         heading: 'Dashboard',
         items: [{ title: 'Overview', href: dashboard(), icon: LayoutGridIcon }],
     },
-
     {
         heading: 'Catalog',
         items: [
@@ -54,30 +53,36 @@ const mainNavItems: NavItemGroup[] = [
             { title: 'Categories', href: categories.index(), icon: TagIcon },
         ],
     },
-
     {
         heading: 'Content Management',
         items: [
-            { title: 'Company Profile', href: companyProfile.index(), icon: Building2Icon },
+            ...(isSuperAdmin
+                ? [{ title: 'Company Profile', href: companyProfile.index(), icon: Building2Icon }]
+                : []),
             { title: 'Banners', href: banners.index(), icon: ImageIcon },
             { title: 'Testimonials', href: testimonials.index(), icon: QuoteIcon },
             { title: 'FAQs', href: faqs.index(), icon: HelpCircleIcon },
             { title: 'Product Reviews', href: productReviews.index(), icon: MessageSquareIcon },
         ],
     },
-
     {
         heading: 'Order',
         items: [
             { title: 'Orders', href: orders.index(), icon: ReceiptIcon },
             { title: 'Customizations', href: customizations.index(), icon: ScissorsIcon },
-            { title: 'Bank Accounts', href: paymentMethods.index(), icon: CreditCardIcon },
+            ...(isSuperAdmin
+                ? [{ title: 'Bank Accounts', href: paymentMethods.index(), icon: CreditCardIcon }]
+                : []),
         ],
     },
-    {
-        heading: 'User Management',
-        items: [{ title: 'Users', href: users.index(), icon: UserCogIcon }],
-    },
+    ...(isSuperAdmin
+        ? [
+              {
+                  heading: 'User Management',
+                  items: [{ title: 'Users', href: users.index(), icon: UserCogIcon }],
+              },
+          ]
+        : []),
 ];
 
 const footerNavItems: NavItemGroup[] = [
@@ -99,6 +104,12 @@ const footerNavItems: NavItemGroup[] = [
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage().props as any;
+    const userRoles: string[] = auth?.user?.roles || [];
+    const isSuperAdmin = userRoles.includes('superadmin');
+
+    const mainNavItems = getMainNavItems(isSuperAdmin);
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -120,9 +131,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                {/* {footerNavItems.map((group) => (
-                    <NavFooter key={group.heading} group={group} className="mt-auto p-0" />
-                ))} */}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -16,7 +16,7 @@ use Midtrans\Transaction;
 
 class PaymentService
 {
-    public function createOrContinuePayment(int $orderId)
+    public function createOrContinuePayment(string $orderId)
     {
         $order = Order::with(['user', 'items.variant.product'])
             ->lockForUpdate()

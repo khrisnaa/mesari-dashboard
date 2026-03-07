@@ -7,16 +7,17 @@ export interface CompanyProfile {
     phone: string;
     whatsapp: string;
     address: string;
-    city: string;
-    province: string;
+    origin_id: number;
+    province_name: string;
+    city_name: string;
+    district_name?: string | null;
+    subdistrict_name?: string | null;
     postal_code: string;
     google_map_url: string;
     working_hours: string;
     instagram?: string | null;
     tiktok?: string | null;
     facebook?: string | null;
-    shopee?: string | null;
-    tokopedia?: string | null;
     created_at: string;
     updated_at: string;
 }
