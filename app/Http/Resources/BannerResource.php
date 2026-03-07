@@ -35,9 +35,15 @@ class BannerResource extends JsonResource
             'target_name' => $targetName,
             'target_slug' => $targetSlug,
 
-            'target_products' => $this->cta_type === BannerType::PRODUCTS->value
-                                 ? ProductResource::collection($this->whenLoaded('products'))
-                                 : [],
+            'target_products' => $this->when(
+                $this->cta_type === BannerType::PRODUCTS->value,
+                function () {
+                    return $this->whenLoaded('products', function () {
+                        return $this->products->pluck('slug')->toArray();
+                    });
+                },
+                []
+            ),
         ];
     }
 }

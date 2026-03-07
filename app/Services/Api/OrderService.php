@@ -5,6 +5,7 @@ namespace App\Services\Api;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Cart;
+use App\Models\CompanyProfile;
 use App\Models\Customization;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -212,7 +213,11 @@ class OrderService
             return $this->calculateFlatShipping($weight, $courierService);
         }
 
-        $origin = config('rajaongkir.origin');
+        $origin = CompanyProfile::first()?->origin_id ?? config('rajaongkir.origin');
+
+        if (! $origin) {
+            throw new \Exception('Shipping origin has not configured.');
+        }
 
         $validWeight = $weight > 0 ? $weight : 1000;
 
@@ -339,8 +344,12 @@ class OrderService
         int $destination,
     ) {
 
-        $origin = config('rajaongkir.origin');
         $courier = config('rajaongkir.courier');
+        $origin = CompanyProfile::first()?->origin_id ?? config('rajaongkir.origin');
+
+        if (! $origin) {
+            throw new \Exception('Shipping origin has not configured.');
+        }
 
         $response = Http::asForm()
             ->timeout(10)

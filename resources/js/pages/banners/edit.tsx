@@ -38,7 +38,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface PageProps {
-    banner: Banner & { products?: Product[] }; // Memastikan ada relasi products
+    banner: Banner & { products?: Product[]; product_ids?: string[] };
     categories: Category[];
     products: Product[];
 }
@@ -397,21 +397,26 @@ const Edit = ({ banner, categories, products }: PageProps) => {
                                                         <input
                                                             type="checkbox"
                                                             value={product.id}
-                                                            checked={data.product_ids.includes(
-                                                                product.id,
-                                                            )}
+                                                            checked={data.product_ids
+                                                                .map(String)
+                                                                .includes(String(product.id))}
                                                             onChange={(e) => {
                                                                 const checked = e.target.checked;
+                                                                const currentId = String(
+                                                                    product.id,
+                                                                );
+
                                                                 setData(
                                                                     'product_ids',
                                                                     checked
                                                                         ? [
                                                                               ...data.product_ids,
-                                                                              product.id,
+                                                                              currentId,
                                                                           ]
                                                                         : data.product_ids.filter(
                                                                               (id) =>
-                                                                                  id !== product.id,
+                                                                                  String(id) !==
+                                                                                  currentId,
                                                                           ),
                                                                 );
                                                             }}

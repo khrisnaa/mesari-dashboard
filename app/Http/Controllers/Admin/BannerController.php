@@ -50,6 +50,7 @@ class BannerController extends Controller
     public function edit(Banner $banner)
     {
 
+        $banner->load('products');
         $banner->backdrop_path = $banner->backdrop_path
             ? '/storage/'.$banner->backdrop_path
             : null;
@@ -58,19 +59,17 @@ class BannerController extends Controller
             ? '/storage/'.$banner->image_path
             : null;
 
-        $products = Product::all();
-        $categories = Category::all();
+        $banner->product_ids = $banner->products->pluck('id')->toArray();
 
         return Inertia::render('banners/edit', [
             'banner' => $banner,
-            'products' => $products,
-            'categories' => $categories,
+            'products' => Product::all(),
+            'categories' => Category::all(),
         ]);
     }
 
     public function update(UpdateBannerRequest $request, Banner $banner)
     {
-
         $this->bannerService->update($banner, $request->validated());
 
         return redirect()->route('banners.index')

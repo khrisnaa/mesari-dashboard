@@ -60,12 +60,12 @@ class StoreBannerRequest extends FormRequest
             'backdrop.required' => 'Backdrop is required.',
             'backdrop.image' => 'Backdrop must be a valid image.',
             'backdrop.mimes' => 'Backdrop must be JPEG, PNG, JPG, or WEBP.',
-            'backdrop.max' => 'Backdrop file cannot exceed 2MB.',
+            'backdrop.max' => 'Backdrop file cannot exceed 5MB.',
 
             'image.required' => 'Image is required.',
             'image.image' => 'Image must be a valid image.',
             'image.mimes' => 'Image must be JPEG, PNG, JPG, or WEBP.',
-            'image.max' => 'Image file cannot exceed 2MB.',
+            'image.max' => 'Image file cannot exceed 5MB.',
 
             'cta_type.required' => 'Banner type is required.',
             'cta_type.in' => 'Banner type must be one of the allowed values.',

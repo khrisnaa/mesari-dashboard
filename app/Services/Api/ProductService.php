@@ -38,6 +38,13 @@ class ProductService
             });
         }
 
+        if ($request->filled('products')) {
+
+            $slugs = explode(',', $request->products);
+
+            $query->whereIn('slug', $slugs);
+        }
+
         if ($request->filled('is_customizable')) {
             $query->where('is_customizable', $request->boolean('is_customizable'));
         }
