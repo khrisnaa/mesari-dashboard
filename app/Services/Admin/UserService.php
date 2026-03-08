@@ -27,6 +27,7 @@ class UserService
         $direction = ($params['direction'] ?? '') === 'asc' ? 'asc' : 'desc';
 
         return User::query()
+            ->with('roles')
             ->when($params['search'] ?? null, function ($q, $search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");

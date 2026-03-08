@@ -12,6 +12,7 @@ use App\Models\Customization;
 use App\Services\Api\CustomizationService;
 use App\Services\Api\OrderService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CustomizationController extends Controller
 {
@@ -40,6 +41,12 @@ class CustomizationController extends Controller
 
     public function checkout(CustomizationCheckoutRequest $request)
     {
+
+        Log::info('Customization Checkout Initiated', [
+            'user_id' => Auth::id(),
+            'payload' => $request->validated(),
+            'ip_address' => $request->ip(),
+        ]);
 
         $order = $this->orderService->customizationCheckout(
             Auth::user(),

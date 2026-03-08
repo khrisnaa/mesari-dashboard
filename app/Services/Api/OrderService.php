@@ -89,7 +89,7 @@ class OrderService
                     ($product->discount_start_at === null || $now->greaterThanOrEqualTo($product->discount_start_at)) &&
                     ($product->discount_end_at === null || $now->lessThanOrEqualTo($product->discount_end_at));
 
-                $originalPrice = (float) $variant->price;
+                $originalPrice = isset($item->price) ? (float) $item->price : (float) $variant->price;
                 $finalUnitPrice = $originalPrice;
 
                 if ($isDiscountActive) {

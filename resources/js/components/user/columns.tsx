@@ -6,6 +6,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpIcon, BanIcon, CheckCircleIcon, EditIcon, ImageIcon } from 'lucide-react';
 import { ActionIconButton } from '../buttons/action-icon-button';
 import { StatusBadge } from '../status-badge';
+import { Badge } from '../ui/badge';
 import { TooltipProvider } from '../ui/tooltip';
 
 export const getColumns = (
@@ -150,6 +151,48 @@ export const getColumns = (
             );
         },
         meta: { width: { type: 'fixed', px: 200 } },
+    },
+    {
+        accessorFn: (row) => row.roles?.map((role: any) => role.name).join(', '),
+        id: 'roles',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 data-[state=open]:bg-accent"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+                <span>Roles</span>
+                <ArrowUpIcon
+                    className={cn(
+                        'ml-2 h-3 w-3 transition-all',
+                        column.getIsSorted() === 'asc'
+                            ? 'rotate-0 opacity-100'
+                            : column.getIsSorted() === 'desc'
+                              ? '-rotate-180 opacity-100'
+                              : 'opacity-0',
+                    )}
+                />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const roles = row.original.roles || [];
+
+            return (
+                <div className="flex flex-wrap gap-1">
+                    {roles.length > 0 ? (
+                        roles.map((role: any) => (
+                            <Badge key={role.id} variant="secondary" className="capitalize">
+                                {role.name}
+                            </Badge>
+                        ))
+                    ) : (
+                        <span className="text-xs text-muted-foreground italic">No Role</span>
+                    )}
+                </div>
+            );
+        },
+        meta: { width: { type: 'flex', fr: 1 } },
     },
     {
         accessorKey: 'is_active',

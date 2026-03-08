@@ -85,15 +85,21 @@ class ProductService
         $product = Product::with([
             'category',
             'images',
-            'reviews',
+            'reviews' => function ($query) {
+                $query->where('is_published', true);
+            },
             'variants' => function ($query) {
                 $query->where('price', '>', 0)
                     ->orderBy('price', 'asc');
             },
             'variants.attributes',
         ])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
+            ->withCount(['reviews' => function ($query) {
+                $query->where('is_published', true);
+            }])
+            ->withAvg(['reviews' => function ($query) {
+                $query->where('is_published', true);
+            }], 'rating')
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -110,11 +116,16 @@ class ProductService
             'orderItem.variant.product',
         ])
             ->where('product_id', $product->id)
+            ->where('is_published', true)
             ->latest()
             ->paginate($perPage);
 
-        $reviewsCount = ProductReview::where('product_id', $product->id)->count();
-        $reviewsAvg = ProductReview::where('product_id', $product->id)->avg('rating');
+        $reviewsCount = ProductReview::where('product_id', $product->id)
+            ->where('is_published', true)
+            ->count();
+        $reviewsAvg = ProductReview::where('product_id', $product->id)
+            ->where('is_published', true)
+            ->avg('rating');
 
         return [
             'reviews' => $reviews,

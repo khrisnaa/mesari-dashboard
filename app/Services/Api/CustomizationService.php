@@ -48,10 +48,10 @@ class CustomizationService
                                 $multiplier = 1;
                             } elseif ($scale <= 2.0) {
                                 // Medium
-                                $multiplier = 3;
+                                $multiplier = 2;
                             } else {
                                 // Large
-                                $multiplier = 5;
+                                $multiplier = 3;
                             }
 
                             $elementCost = $baseElementPrice * $multiplier;

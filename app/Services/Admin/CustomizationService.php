@@ -21,6 +21,7 @@ class CustomizationService
         $direction = ($params['direction'] ?? '') === 'asc' ? 'asc' : 'desc';
 
         $query = Customization::query()
+            // ->whereHas('orderItem')
             ->with(['user', 'product.images', 'productVariant.attributes', 'orderItem.order']);
 
         $query->when($params['search'] ?? null, function ($q, $search) {

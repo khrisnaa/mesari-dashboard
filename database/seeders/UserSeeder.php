@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,23 +16,23 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'email' => 'superadmin@example.com',
-                'name'  => 'Super Admin',
-                'role'  => 'superadmin',
+                'name' => 'Super Admin',
+                'role' => 'superadmin',
             ],
             [
                 'email' => 'admin@example.com',
-                'name'  => 'Admin User',
-                'role'  => 'admin',
+                'name' => 'Admin User',
+                'role' => 'admin',
             ],
             [
                 'email' => 'member@example.com',
-                'name'  => 'Member User',
-                'role'  => 'member',
+                'name' => 'Member User',
+                'role' => 'member',
             ],
             [
                 'email' => 'guest@example.com',
-                'name'  => 'Guest User',
-                'role'  => 'guest',
+                'name' => 'Former Guest User',
+                'role' => 'member',
             ],
         ];
 
