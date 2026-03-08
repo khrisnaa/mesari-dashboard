@@ -65,13 +65,11 @@ const Edit = ({ banner, categories, products }: PageProps) => {
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // 1. Transform data sesaat sebelum dikirim
         transform((data) => ({
             ...data,
             _method: 'put',
         }));
 
-        // 2. Kirim menggunakan 'post' dari useForm (bukan router)
         post(`/banners/${banner.id}`, {
             forceFormData: true,
             onSuccess: () => console.log('Success update banner'),
@@ -79,12 +77,11 @@ const Edit = ({ banner, categories, products }: PageProps) => {
         });
     };
 
-    // Fungsi untuk mereset field terkait saat mengganti tipe CTA
     const handleCtaTypeChange = (value: string) => {
         setData((prevData) => ({
             ...prevData,
             cta_type: value,
-            // Kembalikan ke nilai asli banner jika kembali ke tipe semula, jika tidak kosongkan
+
             cta_link: value === banner.cta_type ? (banner.cta_link ?? '') : '',
             cta_target_id: value === banner.cta_type ? (banner.cta_target_id ?? '') : '',
             product_ids: value === banner.cta_type ? (banner.products?.map((p) => p.id) ?? []) : [],

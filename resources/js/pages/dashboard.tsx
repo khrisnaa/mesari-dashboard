@@ -2,19 +2,25 @@ import { ActionIconButton } from '@/components/buttons/action-icon-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+    type ChartConfig,
+} from '@/components/ui/chart';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
 import {
     DollarSign,
     Download,
     Eye,
-    Package,
     Scissors,
     ShoppingBag,
     TrendingDown,
     TrendingUp,
     Users,
 } from 'lucide-react';
+import { Bar, CartesianGrid, ComposedChart, Line, XAxis } from 'recharts';
 
 interface OrderData {
     id: string;
@@ -34,13 +40,24 @@ interface TopProduct {
     percent: string;
 }
 
+interface ChartData {
+    day: string;
+    revenue: number;
+    orders: number;
+}
+
 interface DashboardProps {
     metrics: {
         revenue: number;
+        revenue_trend: number;
         orders: number;
+        orders_trend: number;
         custom_orders: number;
+        custom_trend: number;
         users: number;
+        users_trend: number;
     };
+    chart_data: ChartData[];
     recent_orders: OrderData[];
     top_products: TopProduct[];
 }
@@ -64,7 +81,23 @@ const getInitials = (name: string) => {
     );
 };
 
-export default function Dashboard({ metrics, recent_orders, top_products }: DashboardProps) {
+const chartConfig = {
+    revenue: {
+        label: 'Revenue (Rp)',
+        color: '#10b981',
+    },
+    orders: {
+        label: 'Total Orders',
+        color: '#f59e0b',
+    },
+} satisfies ChartConfig;
+
+export default function Dashboard({
+    metrics,
+    recent_orders,
+    top_products,
+    chart_data,
+}: DashboardProps) {
     return (
         <AppLayout>
             <Head title="Dashboard" />
@@ -97,34 +130,35 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                     <MetricCard
                         title="Total Revenue"
                         value={formatCurrency(metrics.revenue)}
-                        trend="+12%"
-                        trendUp={true}
+                        // Jika trend > 0, kasih tanda "+", kalau tidak, biarkan (karena angka minus sudah ada "-" bawaan)
+                        trend={`${metrics.revenue_trend > 0 ? '+' : ''}${metrics.revenue_trend}%`}
+                        trendUp={metrics.revenue_trend >= 0}
                         icon={<DollarSign className="h-4 w-4 text-emerald-600" />}
-                        badge="All Time"
+                        badge="This Month vs Last"
                     />
                     <MetricCard
                         title="Total Orders"
                         value={metrics.orders.toLocaleString('en-US')}
-                        trend="+5%"
-                        trendUp={true}
+                        trend={`${metrics.orders_trend > 0 ? '+' : ''}${metrics.orders_trend}%`}
+                        trendUp={metrics.orders_trend >= 0}
                         icon={<ShoppingBag className="h-4 w-4 text-blue-600" />}
-                        badge="All Time"
+                        badge="This Month vs Last"
                     />
                     <MetricCard
                         title="Custom Orders"
                         value={`${metrics.custom_orders} Projects`}
-                        trend="+2%"
-                        trendUp={true}
+                        trend={`${metrics.custom_trend > 0 ? '+' : ''}${metrics.custom_trend}%`}
+                        trendUp={metrics.custom_trend >= 0}
                         icon={<Scissors className="h-4 w-4 text-orange-600" />}
-                        badge="All Time"
+                        badge="This Month vs Last"
                     />
                     <MetricCard
                         title="Active Customers"
                         value={metrics.users.toLocaleString('en-US')}
-                        trend="+8%"
-                        trendUp={true}
+                        trend={`${metrics.users_trend > 0 ? '+' : ''}${metrics.users_trend}%`}
+                        trendUp={metrics.users_trend >= 0}
                         icon={<Users className="h-4 w-4 text-purple-600" />}
-                        badge="Total Users"
+                        badge="This Month vs Last"
                     />
                 </div>
 
@@ -132,64 +166,51 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                     <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-6">
                         <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-1">
                             <div>
-                                <CardTitle className="text-base font-bold">Revenue Chart</CardTitle>
+                                <CardTitle className="text-base font-bold">
+                                    Revenue & Orders Chart
+                                </CardTitle>
                                 <CardDescription className="text-xs">
                                     Weekly report simulation
                                 </CardDescription>
                             </div>
                         </CardHeader>
-                        <CardContent className="pb-4 pl-0">
-                            <div className="relative mt-2 h-[200px] w-full overflow-hidden px-4">
-                                <svg
-                                    viewBox="0 0 100 40"
-                                    className="h-full w-full"
-                                    preserveAspectRatio="none"
+                        <CardContent className="pt-4 pr-4 pb-4 pl-0">
+                            {/* Komponen Shadcn Chart */}
+                            <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
+                                {/* Gunakan ComposedChart agar bisa menggabungkan Bar dan Line */}
+                                <ComposedChart
+                                    accessibilityLayer
+                                    data={chart_data}
+                                    margin={{ left: 12, right: 12 }}
                                 >
-                                    <defs>
-                                        <linearGradient
-                                            id="fillGradient"
-                                            x1="0"
-                                            y1="0"
-                                            x2="0"
-                                            y2="1"
-                                        >
-                                            <stop
-                                                offset="0%"
-                                                stopColor="#10b981"
-                                                stopOpacity="0.3"
-                                            />
-                                            <stop
-                                                offset="100%"
-                                                stopColor="#10b981"
-                                                stopOpacity="0"
-                                            />
-                                        </linearGradient>
-                                    </defs>
-                                    <path
-                                        d="M0,30 Q10,30 20,20 T40,20 T60,25 T80,10 T100,0 V40 H0 Z"
-                                        fill="url(#fillGradient)"
+                                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                                    <XAxis
+                                        dataKey="day"
+                                        tickLine={false}
+                                        tickMargin={10}
+                                        axisLine={false}
                                     />
-                                    <path
-                                        d="M0,30 Q10,30 20,20 T40,20 T60,25 T80,10 T100,0"
-                                        fill="none"
-                                        stroke="#10b981"
-                                        strokeWidth="0.5"
+
+                                    <ChartTooltip
+                                        cursor={false}
+                                        content={<ChartTooltipContent indicator="dashed" />}
                                     />
-                                </svg>
-                                <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
-                                    <span>MON</span>
-                                    <span>TUE</span>
-                                    <span>WED</span>
-                                    <span>THU</span>
-                                    <span>FRI</span>
-                                    <span>SAT</span>
-                                    <span>SUN</span>
-                                </div>
-                            </div>
+
+                                    <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
+
+                                    <Line
+                                        dataKey="orders"
+                                        stroke="transparent"
+                                        dot={false}
+                                        activeDot={false}
+                                        strokeWidth={0}
+                                    />
+                                </ComposedChart>
+                            </ChartContainer>
                         </CardContent>
                     </Card>
 
-                    <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-3">
+                    {/* <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-3">
                         <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-2">
                             <div>
                                 <CardTitle className="text-base font-bold">Report</CardTitle>
@@ -218,9 +239,9 @@ export default function Dashboard({ metrics, recent_orders, top_products }: Dash
                                 bg="bg-amber-100"
                             />
                         </CardContent>
-                    </Card>
+                    </Card> */}
 
-                    <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-3">
+                    <Card className="col-span-1 rounded-md border-border shadow-none lg:col-span-6">
                         <CardHeader className="flex flex-row items-center justify-between px-4 pt-4 pb-2">
                             <div>
                                 <CardTitle className="text-base font-bold">Top Products</CardTitle>

@@ -1,4 +1,4 @@
-import { StatusBadge } from '@/components/status-badge'; // Pastikan path ini benar
+import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -43,7 +43,6 @@ export const ShowDialog = ({
                 </DialogHeader>
 
                 <div className="grid gap-8 py-4">
-                    {/* 1. Basic & Customer Info */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div className="space-y-4">
                             <SectionHeader icon={Calendar} title="General Info" />
@@ -79,7 +78,6 @@ export const ShowDialog = ({
 
                     <Separator />
 
-                    {/* 2. Shipping & Address */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div className="space-y-4">
                             <SectionHeader icon={Truck} title="Shipping Info" />
@@ -110,7 +108,6 @@ export const ShowDialog = ({
                         </div>
                     </div>
 
-                    {/* 3. Items List */}
                     <div className="space-y-4">
                         <SectionHeader icon={Package} title="Ordered Items" />
                         <div className="overflow-hidden rounded-lg border">
@@ -159,7 +156,6 @@ export const ShowDialog = ({
                         </div>
                     </div>
 
-                    {/* 4. Notes */}
                     {order.note && (
                         <div className="space-y-2 rounded-md border border-amber-200 bg-amber-50 p-3">
                             <div className="text-xs font-bold text-amber-700 uppercase">

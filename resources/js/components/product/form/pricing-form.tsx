@@ -83,10 +83,9 @@ const PricingForm = ({ colors, sizes }: PricingFormProps) => {
         let currentBlacklist = deletedKeys;
         let dbData = initialVariants;
 
-        // 1. INISIALISASI BLACKLIST (Hanya jalan sekali saat load data API)
         if (!hasInitializedBlacklist && formVariants.length > 0) {
             const dbKeys = formVariants.map(getKey);
-            // Cari kombinasi yang harusnya ada tapi ga ada di DB (berarti dulu dihapus)
+
             const missingFromDb = possibleKeys.filter((k) => !dbKeys.includes(k));
 
             currentBlacklist = missingFromDb;
@@ -97,8 +96,6 @@ const PricingForm = ({ colors, sizes }: PricingFormProps) => {
             setHasInitializedBlacklist(true);
         }
 
-        // 2. CLEANSING BLACKLIST (Syarat: Kalau tombol color/size di-uncheck lalu dicheck lagi)
-        // Kita hanya menyimpan deletedKey yang masih mungkin dibuat (ada di possibleKeys)
         const activeDeletedKeys = currentBlacklist.filter((k) => possibleKeys.includes(k));
         if (hasInitializedBlacklist && activeDeletedKeys.length !== deletedKeys.length) {
             setDeletedKeys(activeDeletedKeys);
@@ -113,13 +110,10 @@ const PricingForm = ({ colors, sizes }: PricingFormProps) => {
                 const inPrev = prev.find((v) => getKey(v) === key);
                 const inDb = dbData.find((v: Variant) => getKey(v) === key);
 
-                // --- LOGIKA UTAMA: CEK BLACKLIST ---
-                // Jika varian ini tidak sedang tampil (inPrev) DAN ada di daftar blacklist, SKIP!
                 if (!inPrev && activeDeletedKeys.includes(key)) {
                     return;
                 }
 
-                // Recovery data DB jika sempat ter-reset karena delay render
                 if (
                     inDb &&
                     inPrev &&
@@ -131,19 +125,16 @@ const PricingForm = ({ colors, sizes }: PricingFormProps) => {
                     return;
                 }
 
-                // Pakai data Database
                 if (inDb && !inPrev) {
                     newVariants.push(inDb);
                     return;
                 }
 
-                // Pertahankan ketikan aktif form
                 if (inPrev) {
                     newVariants.push(inPrev);
                     return;
                 }
 
-                // Varian benar-benar baru digenerate
                 newVariants.push({
                     ...co,
                     price: form.getValues('base_price') ?? 0,
@@ -162,7 +153,6 @@ const PricingForm = ({ colors, sizes }: PricingFormProps) => {
     useEffect(() => {
         const currentVariants: Variant[] = JSON.parse(variantsStr);
 
-        // Guard mencegah wipeout data saat initial load
         if (sizes.length === 0 && colors.length === 0 && currentVariants.length === 0) {
             return;
         }
@@ -193,13 +183,11 @@ const PricingForm = ({ colors, sizes }: PricingFormProps) => {
         setVariants(updated);
     };
 
-    // FUNGSI HAPUS: Hapus baris DAN masukkan ke Blacklist
     const handleRemove = (variant: Variant) => {
         const keyToRemove = getKey(variant);
 
         setVariants((prev) => prev.filter((v) => getKey(v) !== keyToRemove));
 
-        // Ingat key ini agar tidak digenerate ulang
         setDeletedKeys((prev) => {
             if (!prev.includes(keyToRemove)) {
                 return [...prev, keyToRemove];

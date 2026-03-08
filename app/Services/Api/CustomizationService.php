@@ -40,7 +40,21 @@ class CustomizationService
                         foreach ($designData as $key => $element) {
 
                             $scale = isset($element['scale']) ? (float) $element['scale'] : 1;
-                            $elementCost = $baseElementPrice * $scale;
+
+                            $multiplier = 1;
+
+                            if ($scale <= 1.0) {
+                                // Small
+                                $multiplier = 1;
+                            } elseif ($scale <= 2.0) {
+                                // Medium
+                                $multiplier = 3;
+                            } else {
+                                // Large
+                                $multiplier = 5;
+                            }
+
+                            $elementCost = $baseElementPrice * $multiplier;
                             $totalAdditionalPrice += $elementCost;
 
                             if (

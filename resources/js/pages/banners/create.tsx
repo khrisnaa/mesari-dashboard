@@ -66,12 +66,11 @@ const Create = ({ products, categories }: PageProps) => {
         });
     };
 
-    // Fungsi untuk mereset field terkait saat mengganti tipe CTA
     const handleCtaTypeChange = (value: string) => {
         setData((prevData) => ({
             ...prevData,
             cta_type: value,
-            // Reset state agar bersih saat tipe diubah
+
             cta_link: value === BannerType.EXTERNAL ? prevData.cta_link : '',
             cta_target_id: [BannerType.PRODUCT, BannerType.CATEGORY].includes(value as BannerType)
                 ? prevData.cta_target_id

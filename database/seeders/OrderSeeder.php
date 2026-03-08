@@ -25,7 +25,6 @@ class OrderSeeder extends Seeder
 
         foreach ($data as $entry) {
 
-            // Ambil user berdasarkan email
             $user = \App\Models\User::where('email', $entry['user_email'])->first();
             if (! $user) {
                 continue;
@@ -33,7 +32,6 @@ class OrderSeeder extends Seeder
 
             foreach ($entry['orders'] as $orderData) {
 
-                // Buat order baru
                 $order = Order::create([
                     'id' => Str::uuid(),
                     'user_id' => $user->id,
@@ -91,7 +89,6 @@ class OrderSeeder extends Seeder
                     ]);
                 }
 
-                // Update total order
                 $order->update([
                     'subtotal' => $subtotal,
                     'shipping_weight' => $weightTotal,

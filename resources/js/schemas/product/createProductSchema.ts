@@ -53,7 +53,6 @@ export const createProductSchema = z.object({
                         return `${size}-${color}`;
                     }
 
-                    // kalau color tidak ada → pakai size saja
                     return size;
                 });
 

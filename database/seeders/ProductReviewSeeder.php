@@ -36,7 +36,6 @@ class ProductReviewSeeder extends Seeder
                     continue;
                 }
 
-                // Ambil order_item milik user yang produknya sesuai
                 $orderItem = OrderItem::whereHas('variant', function ($q) use ($product) {
                     $q->where('product_id', $product->id);
                 })
@@ -46,10 +45,7 @@ class ProductReviewSeeder extends Seeder
                     ->inRandomOrder()
                     ->first();
 
-                // Fallback biar seeder tidak error
                 if (! $orderItem) {
-                    // Kalau tidak ada order item yang valid, skip review
-                    // atau bisa dibuat dummy UUID untuk sementara
                     continue;
                 }
 

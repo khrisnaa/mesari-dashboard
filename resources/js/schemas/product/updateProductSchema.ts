@@ -39,7 +39,7 @@ export const updateProductSchema = z.object({
         .max(200, 'Too many variants')
         .refine(
             (variants) => {
-                if (!variants || variants.length === 0) return true; // skip jika tidak ada update variant
+                if (!variants || variants.length === 0) return true;
 
                 const combos = variants.map((v) => {
                     const size = v.size?.name?.trim().toLowerCase() || '';

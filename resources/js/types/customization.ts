@@ -31,7 +31,6 @@ export interface CustomDetails {
     rightSleeve: CustomSide;
 }
 
-// Tambahkan interface ini untuk menampung data dari Controller
 export interface BaseImages {
     front?: string | null;
     back?: string | null;
@@ -47,7 +46,6 @@ export interface Customization {
     total_custom_sides: number;
     custom_details: CustomDetails;
 
-    // Properti ini ditambahkan karena Controller mengirimkannya
     base_images?: BaseImages;
 
     additional_price: number;
@@ -55,7 +53,6 @@ export interface Customization {
     created_at: string;
     updated_at: string;
 
-    // Relations (Disarankan dipisah jika User/Product dipakai di tempat lain)
     user?: {
         id: string;
         name: string;
@@ -64,7 +61,7 @@ export interface Customization {
     product?: {
         id: string;
         name: string;
-        // Jika butuh mengakses relasi gambar aslinya secara utuh
+
         images?: Array<{ type: string; path: string }>;
     };
     product_variant?: {

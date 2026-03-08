@@ -1,6 +1,6 @@
 'useclient';
 
-import { Button } from '@/components/ui/button'; // Sesuaikan path
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { GripVertical, Plus, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -25,7 +25,7 @@ export interface ImageState {
 }
 
 interface GalleryUploaderProps {
-    isCustomizable: boolean; // 👈 Props baru
+    isCustomizable: boolean;
     existingImages?: ImageState[] | [];
     onChange: (files: ImageState[]) => void;
     onRemove: (tempId: string) => void;

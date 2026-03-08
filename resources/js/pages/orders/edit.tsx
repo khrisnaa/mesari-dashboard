@@ -104,7 +104,6 @@ const Edit = ({ order }: PageProps) => {
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* LEFT COLUMN: Order Details & Address */}
                     <div className="space-y-8 lg:col-span-2">
-                        {/* 1. Recipient Information */}
                         <Card>
                             <CardHeader className="flex flex-row items-center gap-4">
                                 <div className="rounded-full bg-primary/10 p-2 text-primary">
@@ -178,7 +177,6 @@ const Edit = ({ order }: PageProps) => {
                             </CardContent>
                         </Card>
 
-                        {/* 2. Order Items Table */}
                         <Card>
                             <CardHeader className="flex flex-row items-center gap-4">
                                 <div className="rounded-full bg-primary/10 p-2 text-primary">
@@ -259,7 +257,6 @@ const Edit = ({ order }: PageProps) => {
 
                     {/* RIGHT COLUMN: Status & Payment */}
                     <div className="space-y-8">
-                        {/* 3. Order Status */}
                         <Card className="border-primary/20 bg-primary/5">
                             <CardHeader>
                                 <CardTitle className="text-base">Order Status</CardTitle>
@@ -305,7 +302,6 @@ const Edit = ({ order }: PageProps) => {
                             </CardContent>
                         </Card>
 
-                        {/* 4. Payment Status */}
                         <Card>
                             <CardHeader className="flex flex-row items-center gap-3">
                                 <CreditCard className="h-5 w-5 text-muted-foreground" />

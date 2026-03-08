@@ -87,7 +87,6 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                 : undefined,
         };
     });
-    // console.log('🚀 ~ Edit ~ formattedvariants:', formattedvariants);
 
     // react hook form handler
     const form = useForm<UpdateProductInput>({

@@ -67,11 +67,10 @@ class OrderService
 
             $totalItemPrice = 0;
             $totalWeight = 0;
-            $totalDiscountAmount = 0; // Tambahan: untuk merekam total diskon
+            $totalDiscountAmount = 0;
 
-            $processedItems = []; // Menyimpan kalkulasi harga agar tidak diulang di loop kedua
+            $processedItems = [];
 
-            // LOOPING 1: Pengecekan stok, perhitungan harga final & berat
             foreach ($items as $item) {
                 $variant = $variants[$item->product_variant_id];
                 $product = $variant->product;
@@ -82,7 +81,6 @@ class OrderService
 
                 $variant->decrement('stock', $item->quantity);
 
-                // 1. Validasi Diskon Langsung dari Database (Real-time)
                 $now = now();
                 $discountValue = (float) $product->discount_value;
                 $discountType = $product->discount_type;
@@ -102,18 +100,15 @@ class OrderService
                     }
                 }
 
-                // 2. Kalkulasi Subtotal & Diskon
                 $lineSubtotal = $finalUnitPrice * $item->quantity;
                 $totalItemPrice += $lineSubtotal;
 
-                // Opsional: Hitung berapa rupiah yang dihemat pembeli
                 $discountSaved = ($originalPrice - $finalUnitPrice) * $item->quantity;
                 $totalDiscountAmount += $discountSaved;
 
                 $productWeight = $product->weight ?? 0;
                 $totalWeight += $productWeight * $item->quantity;
 
-                // 3. Simpan data yang sudah dihitung untuk di-insert ke OrderItem nanti
                 $processedItems[] = [
                     'item' => $item,
                     'variant' => $variant,
@@ -137,17 +132,15 @@ class OrderService
 
             $grandTotal = $totalItemPrice + $shippingPrice;
 
-            // BUAT ORDER
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_number' => $this->generateOrderNumber(),
                 'order_status' => OrderStatus::PENDING->value,
                 'payment_status' => PaymentStatus::PENDING->value,
 
-                // Subtotal sekarang adalah total harga BARANG yang sudah dipotong diskon
                 'subtotal' => $totalItemPrice,
                 'shipping_cost' => $shippingPrice,
-                // Rekam berapa diskon yang didapat (berguna untuk laporan & resi)
+
                 'discount_amount' => $totalDiscountAmount,
                 'grand_total' => $grandTotal,
 
@@ -171,7 +164,6 @@ class OrderService
                 'note' => $data['note'] ?? null,
             ]);
 
-            // LOOPING 2: Buat Order Item menggunakan harga yang sudah valid
             foreach ($processedItems as $processed) {
                 $item = $processed['item'];
                 $variant = $processed['variant'];
@@ -184,7 +176,6 @@ class OrderService
                     'product_name' => $item->product_name ?? $variant->product->name,
                     'variant_name' => $item->variant_name ?? $variant->attributes->pluck('name')->implode(' / '),
 
-                    // Gunakan harga dan subtotal hasil kalkulasi backend, BUKAN dari frontend
                     'price' => $processed['final_price'],
                     'quantity' => $item->quantity,
                     'subtotal' => $processed['subtotal'],
@@ -230,7 +221,6 @@ class OrderService
             // 'destinationType' => 'subdistrict',
         ];
 
-        // 2. LOG DATA REQUEST (Sebelum dikirim ke API)
         Log::info('--- RAJAONGKIR REQUEST ---');
         Log::info('URL Endpoint: '.config('rajaongkir.cost_api_url'));
         Log::info('Payload Data:', $payload);
@@ -250,23 +240,19 @@ class OrderService
         Log::info('Status HTTP: '.$response->status());
         Log::info('Body Response:', $responseBody ?? ['raw' => $response->body()]);
 
-        // 1. Sesuaikan penanganan error jika HTTP gagal
         if (! $response->successful()) {
             $errorMessage = $responseBody['meta']['message'] ?? 'Unknown API Error';
             Log::error('API Failed: '.$errorMessage);
             throw new \Exception('Gagal menghitung ongkir: '.$errorMessage);
         }
 
-        // 2. Sesuaikan pengecekan data kosong menggunakan key ['data']
         if (! isset($responseBody['data']) || empty($responseBody['data'])) {
             Log::warning('RajaOngkir (Komerce): Kurir tidak mendukung rute ini atau data kosong.');
             throw new \Exception('Layanan pengiriman tidak ditemukan untuk rute ini.');
         }
 
-        // 3. Masukkan data ke collection
         $services = collect($responseBody['data']);
 
-        // 4. Cari service yang sesuai (contoh: 'REG')
         $selected = $services->first(function ($service) use ($courierService) {
             return strtoupper($service['service']) === strtoupper($courierService);
         });
@@ -277,7 +263,6 @@ class OrderService
             throw new \Exception("Layanan '{$courierService}' tidak tersedia. Pilih layanan lain.");
         }
 
-        // 5. Ambil nilai cost secara langsung (Komerce tidak menggunakan array bersarang untuk cost)
         Log::info('Ongkir Berhasil Dihitung: Rp'.$selected['cost']);
 
         return [
