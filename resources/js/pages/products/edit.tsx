@@ -302,7 +302,9 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
 
             <Form {...form}>
                 <form
-                    onSubmit={form.handleSubmit(onSubmit)}
+                    onSubmit={form.handleSubmit(onSubmit, (errors) =>
+                        console.log('GAGAL VALIDASI:', errors),
+                    )}
                     className="container mx-auto space-y-6 p-4"
                 >
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
