@@ -17,7 +17,14 @@ class ProductReview extends Model
     protected $guarded = [];
 
     protected $casts = [
+
+        'rating' => 'integer',
+
         'is_published' => 'boolean',
+
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function product()

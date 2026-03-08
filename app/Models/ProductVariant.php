@@ -22,6 +22,11 @@ class ProductVariant extends Model
 
     protected $casts = [
         'price' => 'float',
+        'stock' => 'integer',
+
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function product()

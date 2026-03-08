@@ -18,4 +18,13 @@ class PaymentMethod extends Model
     public $incrementing = false;
 
     protected $guarded = [];
+
+    protected $casts = [
+
+        'is_active' => 'boolean',
+
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
 }

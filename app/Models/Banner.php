@@ -19,6 +19,12 @@ class Banner extends Model
 
     protected $casts = [
         'is_published' => 'boolean',
+
+        'sort_order' => 'integer',
+
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function product()

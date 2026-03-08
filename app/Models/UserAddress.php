@@ -9,20 +9,32 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserAddress extends Model
 {
-    use HasUuids, SoftDeletes, HasFactory;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
+
+    protected $casts = [
+
+        'ro_subdistrict_id' => 'integer',
+
+        'is_default' => 'boolean',
+
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function city()
-    {
-        return $this->belongsTo(City::class, 'city_id');
-    }
+    // public function city()
+    // {
+    //     return $this->belongsTo(City::class, 'city_id');
+    // }
 }

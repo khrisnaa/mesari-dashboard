@@ -8,10 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompanyProfile extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'origin_id' => 'integer',
+
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 }
