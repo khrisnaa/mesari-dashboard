@@ -109,7 +109,7 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
             discount_value: product.discount_value ? Number(product.discount_value) : 0,
             discount_start_at: product.discount_start_at ?? '',
             discount_end_at: product.discount_end_at ?? '',
-            weight: product.weight ?? 0,
+            weight: Number(product.weight) ?? 0,
         },
     });
 

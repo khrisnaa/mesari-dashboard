@@ -23,7 +23,7 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'category_id' => ['required', 'uuid', 'exists:categories,id'],
 
             'weight' => ['nullable', 'integer'],
@@ -54,7 +54,6 @@ class StoreProductRequest extends FormRequest
             'name.max' => 'Product name cannot exceed 255 characters.',
 
             'description.string' => 'Description must be a valid string.',
-            'description.max' => 'Description cannot exceed 255 characters.',
 
             'category_id.required' => 'Category is required.',
             'category_id.uuid' => 'Category ID must be a valid UUID.',
