@@ -23,6 +23,9 @@ class Product extends Model
         'is_highlighted' => 'boolean',
         'discount_start_at' => 'datetime',
         'discount_end_at' => 'datetime',
+        'custom_additional_price' => 'decimal:2',
+        'discount_value' => 'decimal:2',
+        'weight' => 'integer',
     ];
 
     public function category()

@@ -15,6 +15,19 @@ class Payment extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+
+        'payload' => 'array',
+
+        'gross_amount' => 'decimal:2',
+
+        'transaction_time' => 'datetime',
+        'settlement_time' => 'datetime',
+
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function order()
     {
         return $this->belongsTo(Order::class);

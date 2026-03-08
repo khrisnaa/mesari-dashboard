@@ -8,12 +8,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'subtotal' => 'decimal:2',
+        'shipping_cost' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'grand_total' => 'decimal:2',
+
+        'shipping_weight' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     public function user()
     {

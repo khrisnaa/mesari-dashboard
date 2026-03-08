@@ -18,8 +18,15 @@ class Customization extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'is_draft' => 'boolean',
         'custom_details' => 'array',
+
+        'total_custom_sides' => 'integer',
+        'additional_price' => 'decimal:2',
+        'is_draft' => 'boolean',
+
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function user()

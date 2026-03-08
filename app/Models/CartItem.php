@@ -8,12 +8,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class CartItem extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
+
+    protected $casts = [
+
+        'price' => 'decimal:2',
+        'subtotal' => 'decimal:2',
+
+        'quantity' => 'integer',
+
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     public function cart()
     {
