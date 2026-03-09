@@ -16,40 +16,26 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->string('order_number')->unique()->comment('Format: ORD-20260214-001');
-
-            // status
-            $table->enum('order_status', array_column(OrderStatus::cases(), 'value'))
-                ->default(OrderStatus::PENDING->value);
-            $table->enum('payment_status', array_column(PaymentStatus::cases(), 'value'))
-                ->default(PaymentStatus::PENDING->value);
-
-            // pricing snapshot
-            $table->decimal('subtotal', 16, 2);
-            $table->decimal('shipping_cost', 16, 2);
-            $table->decimal('discount_amount', 16, 2)->default(0);
-            $table->decimal('grand_total', 16, 2);
-
-            // shipping snapshot
-            $table->string('shipping_courier_code');
-            $table->string('shipping_courier_service');
-            $table->string('shipping_estimation')->nullable();
-            $table->string('shipping_tracking_number')->nullable();
-
-            // weight
+            $table->string('order_number', 50)->unique();
+            $table->enum('order_status', array_column(OrderStatus::cases(), 'value'))->default(OrderStatus::PENDING->value);
+            $table->enum('payment_status', array_column(PaymentStatus::cases(), 'value'))->default(PaymentStatus::PENDING->value);
+            $table->decimal('subtotal', 12, 2);
+            $table->decimal('shipping_cost', 12, 2);
+            $table->decimal('discount_amount', 12, 2)->default(0);
+            $table->decimal('grand_total', 12, 2);
+            $table->string('shipping_courier_code', 20);
+            $table->string('shipping_courier_service', 50);
+            $table->string('shipping_estimation', 50)->nullable();
+            $table->string('shipping_tracking_number', 50)->nullable();
             $table->unsignedInteger('shipping_weight');
-
-            // address snapshot
-            $table->string('recipient_name');
-            $table->string('recipient_phone');
+            $table->string('recipient_name', 100);
+            $table->string('recipient_phone', 20);
             $table->text('recipient_address_line');
-            $table->string('recipient_province');
-            $table->string('recipient_city');
-            $table->string('recipient_district');
-            $table->string('recipient_subdistrict')->nullable();
-            $table->string('postal_code')->nullable();
-
-            // note
+            $table->string('recipient_province', 100);
+            $table->string('recipient_city', 100);
+            $table->string('recipient_district', 100);
+            $table->string('recipient_subdistrict', 100)->nullable();
+            $table->string('postal_code', 10)->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
         });

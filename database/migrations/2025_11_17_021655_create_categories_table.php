@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
-            $table->string('slug')->unique();
+            $table->string('name', 50);
+            $table->string('slug', 60)->unique();
             $table->timestamps();
             $table->softDeletes();
         });

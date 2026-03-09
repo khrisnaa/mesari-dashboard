@@ -15,9 +15,8 @@ class PreviewShippingRequest extends FormRequest
     {
         return [
             'address_id' => ['required', 'uuid', 'exists:user_addresses,id'],
-
             'product_variant_id' => ['nullable', 'uuid', 'exists:product_variants,id'],
-            'quantity' => ['nullable', 'integer', 'min:1'],
+            'quantity' => ['nullable', 'integer', 'min:1', 'max:999'],
         ];
     }
 
@@ -33,6 +32,7 @@ class PreviewShippingRequest extends FormRequest
 
             'quantity.integer' => 'The quantity must be an integer.',
             'quantity.min' => 'The quantity must be at least 1.',
+            'quantity.max' => 'The quantity cannot exceed 999 units.',
         ];
     }
 }

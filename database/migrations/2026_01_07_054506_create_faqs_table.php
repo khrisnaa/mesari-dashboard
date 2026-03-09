@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('faqs', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('question');
-            $table->string('answer');
+            $table->string('question', 200);
+            $table->text('answer');
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_published');
             $table->timestamps();

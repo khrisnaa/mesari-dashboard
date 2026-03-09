@@ -14,9 +14,9 @@ class ManualPaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => 'required|exists:orders,id',
-            'payment_method_id' => 'required|exists:bank_accounts,id',
-            'payment_proof' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'order_id' => ['required', 'exists:orders,id'],
+            'payment_method_id' => ['required', 'exists:bank_accounts,id'],
+            'payment_proof' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
 

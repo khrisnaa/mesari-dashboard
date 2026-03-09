@@ -15,25 +15,19 @@ class UpdateBannerRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-
-            'title' => ['required', 'string'],
-            'description' => ['required', 'string'],
+            'title' => ['required', 'string', 'max:100'],
+            'description' => ['required', 'string', 'max:200'],
 
             'backdrop' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5048'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5048'],
 
             'cta_type' => ['nullable', 'string', 'in:'.implode(',', array_column(BannerType::cases(), 'value'))],
-            'cta_text' => ['nullable', 'string'],
+            'cta_text' => ['nullable', 'string', 'max:50'],
             'cta_target_id' => ['nullable', 'uuid'],
-            'cta_link' => ['nullable', 'string'],
+            'cta_link' => ['nullable', 'string', 'max:255'],
 
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_published' => ['required', 'boolean'],
@@ -48,11 +42,11 @@ class UpdateBannerRequest extends FormRequest
         return [
             'title.required' => 'Title is required.',
             'title.string' => 'Title must be a valid string.',
-            'title.max' => 'Title cannot exceed 255 characters.',
+            'title.max' => 'Title cannot exceed 100 characters.',
 
             'description.required' => 'Description is required.',
             'description.string' => 'Description must be a valid string.',
-            'description.max' => 'Description cannot exceed 255 characters.',
+            'description.max' => 'Description cannot exceed 200 characters.',
 
             'backdrop.image' => 'Backdrop must be a valid image.',
             'backdrop.mimes' => 'Backdrop must be JPEG, PNG, JPG, or WEBP.',
@@ -66,7 +60,7 @@ class UpdateBannerRequest extends FormRequest
             'cta_type.in' => 'Banner type must be one of the allowed values.',
 
             'cta_text.string' => 'CTA text must be a valid string.',
-            'cta_text.max' => 'CTA text cannot exceed 255 characters.',
+            'cta_text.max' => 'CTA text cannot exceed 50 characters.',
 
             'cta_target_id.uuid' => 'CTA target ID must be a valid UUID.',
 

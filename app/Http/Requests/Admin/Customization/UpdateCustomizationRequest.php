@@ -14,8 +14,7 @@ class UpdateCustomizationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'additional_price' => ['required', 'numeric', 'min:0'],
-            // 'is_draft' => ['required', 'boolean'],
+            'additional_price' => ['required', 'numeric', 'min:0', 'max:9999999999.99'],
         ];
     }
 
@@ -25,8 +24,7 @@ class UpdateCustomizationRequest extends FormRequest
             'additional_price.required' => 'Additional price is required.',
             'additional_price.numeric' => 'Additional price must be a valid number.',
             'additional_price.min' => 'Additional price cannot be negative.',
-            // 'is_draft.required' => 'Draft status is required.',
-            // 'is_draft.boolean' => 'Draft status must be true or false.',
+            'additional_price.max' => 'Additional price exceeds the maximum allowed limit.',
         ];
     }
 }

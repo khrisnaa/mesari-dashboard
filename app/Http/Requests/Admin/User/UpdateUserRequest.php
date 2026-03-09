@@ -15,20 +15,15 @@ class UpdateUserRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:100'],
 
             'email' => [
                 'required',
                 'email',
-                'max:255',
+                'max:50',
                 Rule::unique('users', 'email')->ignore($this->user->id),
             ],
 
@@ -49,14 +44,12 @@ class UpdateUserRequest extends FormRequest
         return [
             'name.required' => 'Name is required.',
             'name.string' => 'Name must be a valid string.',
-            'name.max' => 'Name cannot exceed 255 characters.',
-
+            'name.max' => 'Name cannot exceed 100 characters.',
             'email.required' => 'Email is required.',
             'email.email' => 'Email must be a valid email address.',
+            'email.max' => 'Email cannot exceed 50 characters.',
             'email.unique' => 'This email is already registered.',
-
-            'phone.max' => 'Phone cannot exceed 255 characters.',
-
+            'phone.max' => 'Phone cannot exceed 20 characters.',
             'is_active.required' => 'Active status is required.',
             'is_active.in' => 'Active status value is not valid.',
         ];

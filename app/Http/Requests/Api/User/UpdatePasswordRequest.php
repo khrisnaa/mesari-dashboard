@@ -15,14 +15,19 @@ class UpdatePasswordRequest extends FormRequest
     {
         return [
             'password' => ['required', 'current_password'],
-            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
+            'new_password' => ['required', 'string', 'min:8', 'max:60', 'confirmed'],
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
+            'password.required' => 'Old password is required.',
             'password.current_password' => 'Old password is incorrect.',
+            'new_password.required' => 'New password is required.',
+            'new_password.min' => 'New password must be at least 8 characters.',
+            'new_password.max' => 'New password is too long.',
+            'new_password.confirmed' => 'Password confirmation does not match.',
         ];
     }
 }

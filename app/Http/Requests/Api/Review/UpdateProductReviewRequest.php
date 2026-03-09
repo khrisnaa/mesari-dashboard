@@ -14,9 +14,9 @@ class UpdateProductReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rating' => 'sometimes|required|integer|min:1|max:5',
-            'title' => 'nullable|string|max:255',
-            'content' => 'nullable|string',
+            'rating' => ['sometimes', 'required', 'integer', 'min:1', 'max:5'],
+            'title' => ['nullable', 'string', 'max:100'],
+            'content' => ['nullable', 'string'],
         ];
     }
 
@@ -28,7 +28,7 @@ class UpdateProductReviewRequest extends FormRequest
             'rating.min' => 'Rating must be at least 1.',
             'rating.max' => 'Rating may not be greater than 5.',
 
-            'title.max' => 'Title may not exceed 255 characters.',
+            'title.max' => 'Title may not exceed 100 characters.',
             'content.string' => 'Content must be a valid string.',
         ];
     }

@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('product_variants', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('product_id')->constrained();
+            $table->foreignUuid('product_id')->constrained()->cascadeOnDelete();
             $table->decimal('price', 12, 2);
-            $table->integer('stock')->default(0);
+            $table->unsignedInteger('stock')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
 
-        Schema::create('product_variant_attributes', function (Blueprint $table) {
+        Schema::create('product_variant_attribute', function (Blueprint $table) {
             $table->foreignUuid('product_variant_id')->constrained()->onDelete('cascade');
             $table->foreignUuid('variant_attribute_id')->constrained()->onDelete('cascade');
             $table->primary(['product_variant_id', 'variant_attribute_id']);
@@ -33,6 +33,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('product_variants');
-        Schema::dropIfExists('product_variant_attributes');
+        Schema::dropIfExists('product_variant_attribute');
     }
 };

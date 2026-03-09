@@ -14,8 +14,8 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'email'                 => ['required', 'email'],
-            'password'              => ['required']
+            'email' => ['required', 'email', 'max:50'],
+            'password' => ['required', 'string'],
         ];
     }
 
@@ -23,8 +23,8 @@ class LoginRequest extends FormRequest
     {
         return [
             'email.required' => 'Email is required.',
-            'email.email'    => 'Please enter a valid email address.',
-
+            'email.email' => 'Please enter a valid email address.',
+            'email.max' => 'Email cannot exceed 50 characters.',
             'password.required' => 'Password is required.',
         ];
     }

@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignUuid('order_id')->constrained()->onDelete('cascade');
             $table->foreignUuid('customization_id')->nullable()->constrained('customizations')->nullOnDelete();
             $table->foreignUuid('product_variant_id')->constrained();
-            $table->string('product_name');
-            $table->string('variant_name');
+            $table->string('product_name', 150);
+            $table->string('variant_name', 150);
             $table->decimal('price', 12, 2);
-            $table->integer('quantity');
+            $table->unsignedInteger('quantity');
             $table->decimal('subtotal', 12, 2);
             $table->timestamps();
         });

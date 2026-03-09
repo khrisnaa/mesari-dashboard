@@ -14,11 +14,6 @@ class UpdateUserStatusRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -30,7 +25,7 @@ class UpdateUserStatusRequest extends FormRequest
     {
         return [
             'is_active.required' => 'Active status is required.',
-            'is_active.in'       => 'Active status value is not valid.',
+            'is_active.in' => 'Active status value is not valid.',
         ];
     }
 }

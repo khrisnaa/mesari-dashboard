@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
             $table->foreignUuid('product_id')->constrained()->onDelete('cascade');
             $table->foreignUuid('product_variant_id')->constrained('product_variants')->onDelete('cascade');
-            $table->integer('total_custom_sides')->default(0);
+            $table->unsignedInteger('total_custom_sides')->default(0);
             $table->json('custom_details');
             $table->decimal('additional_price', 12, 2)->default(0);
             $table->boolean('is_draft')->default(true);

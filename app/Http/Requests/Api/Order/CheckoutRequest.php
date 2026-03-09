@@ -15,9 +15,9 @@ class CheckoutRequest extends FormRequest
     {
         return [
             'address_id' => ['required', 'uuid', 'exists:user_addresses,id'],
-            'shipping_courier_code' => ['required', 'string'],
-            'shipping_courier_service' => ['required', 'string'],
-            'note' => ['nullable', 'string'],
+            'shipping_courier_code' => ['required', 'string', 'max:20'],
+            'shipping_courier_service' => ['required', 'string', 'max:50'],
+            'note' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -30,11 +30,14 @@ class CheckoutRequest extends FormRequest
 
             'shipping_courier_code.required' => 'The shipping courier code is required.',
             'shipping_courier_code.string' => 'The shipping courier code must be a string.',
+            'shipping_courier_code.max' => 'The courier code is too long.',
 
             'shipping_courier_service.required' => 'The shipping courier service is required.',
             'shipping_courier_service.string' => 'The shipping courier service must be a string.',
+            'shipping_courier_service.max' => 'The service name is too long.',
 
             'note.string' => 'The note must be a valid string.',
+            'note.max' => 'The note cannot exceed 1000 characters.',
         ];
     }
 }

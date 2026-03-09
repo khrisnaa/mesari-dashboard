@@ -15,11 +15,11 @@ class DirectCheckoutRequest extends FormRequest
     {
         return [
             'product_variant_id' => ['required', 'uuid', 'exists:product_variants,id'],
-            'quantity' => ['required', 'integer'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:999'],
             'address_id' => ['required', 'uuid', 'exists:user_addresses,id'],
-            'shipping_courier_code' => ['required', 'string'],
-            'shipping_courier_service' => ['required', 'string'],
-            'note' => ['nullable', 'string'],
+            'shipping_courier_code' => ['required', 'string', 'max:20'],
+            'shipping_courier_service' => ['required', 'string', 'max:50'],
+            'note' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -32,6 +32,8 @@ class DirectCheckoutRequest extends FormRequest
 
             'quantity.required' => 'The quantity is required.',
             'quantity.integer' => 'The quantity must be an integer.',
+            'quantity.min' => 'The quantity must be at least 1.',
+            'quantity.max' => 'The quantity cannot exceed 999 units.',
 
             'address_id.required' => 'The address ID is required.',
             'address_id.uuid' => 'The address ID must be a valid UUID.',
@@ -39,11 +41,14 @@ class DirectCheckoutRequest extends FormRequest
 
             'shipping_courier_code.required' => 'The shipping courier code is required.',
             'shipping_courier_code.string' => 'The shipping courier code must be a string.',
+            'shipping_courier_code.max' => 'The courier code is too long.',
 
             'shipping_courier_service.required' => 'The shipping courier service is required.',
             'shipping_courier_service.string' => 'The shipping courier service must be a string.',
+            'shipping_courier_service.max' => 'The service name is too long.',
 
             'note.string' => 'The note must be a valid string.',
+            'note.max' => 'The note cannot exceed 1000 characters.',
         ];
     }
 }

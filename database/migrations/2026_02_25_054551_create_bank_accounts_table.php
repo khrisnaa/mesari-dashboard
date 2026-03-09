@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('bank_accounts', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('bank_name');
-            $table->string('account_number');
-            $table->string('account_owner');
+            $table->string('bank_name', 50);
+            $table->string('account_number', 30);
+            $table->string('account_owner', 100);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();

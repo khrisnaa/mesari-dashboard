@@ -1,7 +1,6 @@
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -83,7 +82,7 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center space-x-2">
+                            {/* <div className="flex items-center space-x-2">
                                 <Checkbox id="remember" name="remember" tabIndex={3} />
                                 <Label
                                     htmlFor="remember"
@@ -91,7 +90,7 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
                                 >
                                     Remember me for 30 days
                                 </Label>
-                            </div>
+                            </div> */}
 
                             <Button
                                 type="submit"

@@ -16,8 +16,8 @@ class ProductFilterRequest extends FormRequest
         return [
             'search' => ['nullable', 'string', 'max:100'],
             'category_id' => ['nullable', 'uuid'],
-            'min_price' => ['nullable', 'numeric', 'min:0'],
-            'max_price' => ['nullable', 'numeric', 'min:0'],
+            'min_price' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
+            'max_price' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
             'sort' => ['nullable', 'in:newest,price_asc,price_desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'is_customizable' => ['nullable', 'boolean'],
@@ -34,11 +34,13 @@ class ProductFilterRequest extends FormRequest
 
             'min_price.numeric' => 'The minimum price must be a number.',
             'min_price.min' => 'The minimum price must be at least 0.',
+            'min_price.max' => 'The minimum price exceeds the maximum limit.',
 
             'max_price.numeric' => 'The maximum price must be a number.',
             'max_price.min' => 'The maximum price must be at least 0.',
+            'max_price.max' => 'The maximum price exceeds the maximum limit.',
 
-            'sort.in' => 'The sort option is invalid. Allowed values: newest, price_asc, price_desc.',
+            'sort.in' => 'The sort option is invalid.',
 
             'per_page.integer' => 'The per page value must be an integer.',
             'per_page.min' => 'The per page value must be at least 1.',

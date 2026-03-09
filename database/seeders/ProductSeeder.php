@@ -3,11 +3,11 @@
 namespace Database\Seeders;
 
 use App\Enums\VariantAttributeType;
-use App\Models\VariantAttribute;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use App\Models\VariantAttribute;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -99,7 +99,7 @@ class ProductSeeder extends Seeder
                         'stock' => rand(10, 50),
                     ]);
 
-                    DB::table('product_variant_attributes')->insert([
+                    DB::table('product_variant_attribute')->insert([
                         [
                             'product_variant_id' => $variant->id,
                             'variant_attribute_id' => $colorsMap[$colorName],

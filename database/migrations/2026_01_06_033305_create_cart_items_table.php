@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('cart_id')->constrained()->onDelete('cascade');
             $table->foreignUuid('product_variant_id')->constrained();
             $table->decimal('price', 12, 2);
-            $table->integer('quantity');
+            $table->unsignedInteger('quantity');
             $table->decimal('subtotal', 12, 2);
             $table->timestamps();
         });

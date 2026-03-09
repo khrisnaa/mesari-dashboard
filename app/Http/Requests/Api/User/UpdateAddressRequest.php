@@ -15,19 +15,15 @@ class UpdateAddressRequest extends FormRequest
     {
         return [
             'ro_subdistrict_id' => ['sometimes', 'integer'],
-
-            'recipient_name' => ['sometimes', 'string'],
-            'phone' => ['sometimes', 'string'],
-            'label' => ['sometimes', 'string'],
+            'recipient_name' => ['sometimes', 'string', 'max:100'],
+            'phone' => ['sometimes', 'string', 'max:20'],
+            'label' => ['sometimes', 'string', 'max:50'],
             'address_line' => ['sometimes', 'string'],
-
-            'province_name' => ['sometimes', 'string'],
-            'city_name' => ['sometimes', 'string'],
-            'district_name' => ['sometimes', 'string'],
-
-            'subdistrict_name' => ['nullable', 'string'],
-            'postal_code' => ['nullable', 'integer'],
-
+            'province_name' => ['sometimes', 'string', 'max:100'],
+            'city_name' => ['sometimes', 'string', 'max:100'],
+            'district_name' => ['sometimes', 'string', 'max:100'],
+            'subdistrict_name' => ['nullable', 'string', 'max:100'],
+            'postal_code' => ['nullable', 'string', 'max:10'],
             'is_default' => ['nullable', 'boolean'],
         ];
     }
@@ -35,21 +31,15 @@ class UpdateAddressRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'ro_subdistrict_id.integer' => 'The subdistrict ID must be an integer.',
-
-            'recipient_name.string' => 'The recipient name must be a valid string.',
-            'phone.string' => 'The phone number must be a valid string.',
-            'label.string' => 'The address label must be a valid string.',
-            'address_line.string' => 'The address line must be a valid string.',
-
-            'province_name.string' => 'The province name must be a valid string.',
-            'city_name.string' => 'The city name must be a valid string.',
-            'district_name.string' => 'The district name must be a valid string.',
-
-            'subdistrict_name.string' => 'The subdistrict name must be a valid string.',
-
-            'postal_code.integer' => 'The postal code must be an integer.',
-
+            'ro_subdistrict_id.integer' => 'The subdistrict ID must be a valid integer.',
+            'recipient_name.max' => 'The recipient name cannot exceed 100 characters.',
+            'phone.max' => 'The phone number cannot exceed 20 characters.',
+            'label.max' => 'The label cannot exceed 50 characters.',
+            'province_name.max' => 'The province name cannot exceed 100 characters.',
+            'city_name.max' => 'The city name cannot exceed 100 characters.',
+            'district_name.max' => 'The district name cannot exceed 100 characters.',
+            'subdistrict_name.max' => 'The subdistrict name cannot exceed 100 characters.',
+            'postal_code.max' => 'The postal code cannot exceed 10 characters.',
             'is_default.boolean' => 'The default flag must be true or false.',
         ];
     }

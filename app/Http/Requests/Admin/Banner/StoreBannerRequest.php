@@ -15,24 +15,19 @@ class StoreBannerRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string'],
-            'description' => ['required', 'string'],
+            'title' => ['required', 'string', 'max:100'],
+            'description' => ['required', 'string', 'max:200'],
 
             'backdrop' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5048'],
             'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5048'],
 
             'cta_type' => ['required', 'string', 'in:'.implode(',', array_column(BannerType::cases(), 'value'))],
-            'cta_text' => ['nullable', 'string'],
+            'cta_text' => ['nullable', 'string', 'max:50'],
             'cta_target_id' => ['nullable', 'uuid'],
-            'cta_link' => ['nullable', 'string'],
+            'cta_link' => ['nullable', 'string', 'max:255'],
 
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_published' => ['required', 'boolean'],
@@ -42,20 +37,16 @@ class StoreBannerRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get the custom messages for validation errors.
-     *
-     * @return array<string, string>
-     */
     public function messages(): array
     {
         return [
             'title.required' => 'Title is required.',
             'title.string' => 'Title must be a valid string.',
+            'title.max' => 'Title cannot exceed 100 characters.',
 
             'description.required' => 'Description is required.',
             'description.string' => 'Description must be a valid string.',
-            'description.max' => 'Description cannot exceed 255 characters.',
+            'description.max' => 'Description cannot exceed 200 characters.',
 
             'backdrop.required' => 'Backdrop is required.',
             'backdrop.image' => 'Backdrop must be a valid image.',
@@ -71,7 +62,7 @@ class StoreBannerRequest extends FormRequest
             'cta_type.in' => 'Banner type must be one of the allowed values.',
 
             'cta_text.string' => 'CTA text must be a valid string.',
-            'cta_text.max' => 'CTA text cannot exceed 255 characters.',
+            'cta_text.max' => 'CTA text cannot exceed 50 characters.',
 
             'cta_target_id.uuid' => 'CTA target ID must be a valid UUID.',
 

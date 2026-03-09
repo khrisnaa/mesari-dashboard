@@ -14,12 +14,13 @@ return new class extends Migration
     {
         Schema::create('variant_attributes', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name')->unique();
-            $table->string('hex')->nullable();
+            $table->string('name', 50)->unique();
+            $table->string('hex', 7)->nullable();
             $table->enum('type', array_column(VariantAttributeType::cases(), 'value'));
             $table->timestamps();
             $table->softDeletes();
         });
+
     }
 
     /**

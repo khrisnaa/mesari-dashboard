@@ -14,9 +14,9 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['nullable', 'string', 'max:255'],
+            'name' => ['nullable', 'string', 'max:100'],
             'phone' => ['nullable', 'string', 'max:20'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ];
     }
 
@@ -24,13 +24,12 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             'name.string' => 'The name must be a valid string.',
-            'name.max' => 'The name may not be longer than 255 characters.',
-
+            'name.max' => 'The name cannot exceed 100 characters.',
             'phone.string' => 'The phone number must be a valid string.',
-            'phone.max' => 'The phone number may not be longer than 20 characters.',
-
+            'phone.max' => 'The phone number cannot exceed 20 characters.',
             'avatar.image' => 'The avatar must be an image file.',
-            'avatar.max' => 'The avatar may not be larger than 2MB.',
+            'avatar.mimes' => 'The avatar must be a file of type: jpeg, png, jpg, or webp.',
+            'avatar.max' => 'The avatar file size cannot exceed 2MB.',
         ];
     }
 }

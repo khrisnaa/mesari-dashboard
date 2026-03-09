@@ -15,8 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('product_id')->constrained();
             $table->foreignUuid('order_item_id')->constrained();
-            $table->tinyInteger('rating');
-            $table->string('title')->nullable();
+            $table->unsignedTinyInteger('rating');
+            $table->string('title', 100)->nullable();
             $table->text('content')->nullable();
             $table->boolean('is_published')->default(true);
             $table->timestamps();

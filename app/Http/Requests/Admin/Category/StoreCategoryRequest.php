@@ -15,15 +15,15 @@ class StoreCategoryRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')->whereNull('deleted_at')],
+            'name' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('categories', 'name')->whereNull('deleted_at'),
+            ],
         ];
     }
 
@@ -32,7 +32,7 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name.required' => 'Category name is required.',
             'name.string' => 'Category name must be a valid string.',
-            'name.max' => 'Category name cannot exceed 255 characters.',
+            'name.max' => 'Category name cannot exceed 50 characters.',
             'name.unique' => 'This category name is already taken.',
         ];
     }

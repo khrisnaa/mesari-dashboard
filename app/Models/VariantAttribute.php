@@ -9,16 +9,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class VariantAttribute extends Model
 {
-    use HasUuids, SoftDeletes, HasFactory;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $guarded = [];
 
-
     public function variants()
     {
-        return $this->belongsToMany(ProductVariant::class, 'product_variant_attributes');
+        return $this->belongsToMany(ProductVariant::class, 'product_variant_attribute');
     }
 }

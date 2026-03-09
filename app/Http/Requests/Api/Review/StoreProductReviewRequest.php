@@ -14,11 +14,11 @@ class StoreProductReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => 'required|uuid|exists:products,id',
-            'order_item_id' => 'required|uuid|exists:order_items,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'title' => 'nullable|string|max:255',
-            'content' => 'nullable|string',
+            'product_id' => ['required', 'uuid', 'exists:products,id'],
+            'order_item_id' => ['required', 'uuid', 'exists:order_items,id'],
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'title' => ['nullable', 'string', 'max:100'],
+            'content' => ['nullable', 'string'],
         ];
     }
 
@@ -38,7 +38,7 @@ class StoreProductReviewRequest extends FormRequest
             'rating.min' => 'Rating must be at least 1.',
             'rating.max' => 'Rating may not be greater than 5.',
 
-            'title.max' => 'Title may not be longer than 255 characters.',
+            'title.max' => 'Title may not be longer than 100 characters.',
             'content.string' => 'Content must be a valid string.',
         ];
     }

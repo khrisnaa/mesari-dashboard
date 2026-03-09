@@ -17,4 +17,12 @@ class UpdateProductReviewRequest extends FormRequest
             'is_published' => ['required', 'boolean'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'is_published.required' => 'The publish status is required.',
+            'is_published.boolean' => 'The publish status must be a boolean value (true or false).',
+        ];
+    }
 }

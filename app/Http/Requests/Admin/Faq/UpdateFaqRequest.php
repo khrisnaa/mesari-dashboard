@@ -14,36 +14,29 @@ class UpdateFaqRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'question'      => ['required', 'string', 'max:255'],
-            'answer'        => ['required', 'string'],
-            'sort_order'    => ['nullable', 'integer', 'min:0'],
-            'is_published'  => ['required', 'boolean'],
+            'question' => ['required', 'string', 'max:200'],
+            'answer' => ['required', 'string'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
+            'is_published' => ['required', 'boolean'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'question.required'     => 'Question is required.',
-            'question.string'       => 'Question must be a valid string.',
-            'question.max'          => 'Question cannot exceed 255 characters.',
-
-            'answer.required'       => 'Answer is required.',
-            'answer.string'         => 'Answer must be a valid string.',
-
-            'sort_order.integer'    => 'Sort order must be an integer.',
-            'sort_order.min'        => 'Sort order cannot be negative.',
-
+            'question.required' => 'Question is required.',
+            'question.string' => 'Question must be a valid string.',
+            'question.max' => 'Question cannot exceed 200 characters.',
+            'answer.required' => 'Answer is required.',
+            'answer.string' => 'Answer must be a valid string.',
+            'sort_order.integer' => 'Sort order must be an integer.',
+            'sort_order.min' => 'Sort order cannot be negative.',
+            'sort_order.max' => 'The sort order cannot exceed 9999.',
             'is_published.required' => 'Publish status is required.',
-            'is_published.boolean'  => 'Publish status must be a boolean value.',
+            'is_published.boolean' => 'Publish status must be a boolean value.',
         ];
     }
 }

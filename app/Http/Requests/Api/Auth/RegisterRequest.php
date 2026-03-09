@@ -14,9 +14,9 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'                  => ['required', 'string', 'max:255'],
-            'email'                 => ['required', 'email', 'unique:users,email'],
-            'password'              => ['required', 'min:8', 'confirmed'],
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:50', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'max:60', 'confirmed'],
         ];
     }
 
@@ -24,15 +24,17 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name.required' => 'Name is required.',
-            'name.string'   => 'Name must be a valid string.',
-            'name.max'      => 'Name must not exceed 255 characters.',
+            'name.string' => 'Name must be a valid string.',
+            'name.max' => 'Name cannot exceed 100 characters.',
 
             'email.required' => 'Email is required.',
-            'email.email'    => 'Please enter a valid email address.',
-            'email.unique'   => 'This email is already registered.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.max' => 'Email cannot exceed 50 characters.',
+            'email.unique' => 'This email is already registered.',
 
-            'password.required'  => 'Password is required.',
-            'password.min'       => 'Password must be at least 8 characters.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.max' => 'Password is too long.',
             'password.confirmed' => 'Password confirmation does not match.',
         ];
     }

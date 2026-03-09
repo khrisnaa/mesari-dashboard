@@ -14,9 +14,9 @@ class ResetPasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'email'                 => ['required', 'email', 'exists:users,email'],
-            'token'                 => ['required', 'string'],
-            'password'              => ['required', 'min:8', 'confirmed'],
+            'email' => ['required', 'email', 'max:50', 'exists:users,email'],
+            'token' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:8', 'max:60', 'confirmed'],
         ];
     }
 
@@ -24,12 +24,15 @@ class ResetPasswordRequest extends FormRequest
     {
         return [
             'email.required' => 'Email is required.',
-            'email.exists'   => 'Email not found.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.max' => 'Email cannot exceed 50 characters.',
+            'email.exists' => 'Email not found.',
 
             'token.required' => 'Reset token is required.',
 
-            'password.required'  => 'Password is required.',
-            'password.min'       => 'Password must be at least 8 characters.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.max' => 'Password is too long.',
             'password.confirmed' => 'Password confirmation does not match.',
         ];
     }
