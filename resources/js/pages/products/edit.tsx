@@ -515,12 +515,10 @@ const Edit = ({ categories, colors, sizes, product }: PageProps) => {
                                             </div>
 
                                             <p className="text-sm leading-relaxed text-muted-foreground">
-                                                Most logistics partners (JNE, J&T) use a{' '}
-                                                <span className="font-semibold text-foreground">
-                                                    1,300g threshold
-                                                </span>{' '}
-                                                for the first kilo. Anything above 1,301g will be
-                                                automatically charged as 2kg.
+                                                Specify the product weight for shipping calculation.
+                                                This value is used to estimate shipping costs during
+                                                checkout. Enter the weight in grams based on the
+                                                packaged item.
                                             </p>
 
                                             <div className="mt-1 w-fit rounded bg-muted px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground uppercase">
