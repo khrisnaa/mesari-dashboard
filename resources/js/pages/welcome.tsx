@@ -25,13 +25,13 @@ export default function Welcome() {
                             </div>
 
                             <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground lg:text-6xl">
-                                Fashion Store <br />
+                                Mesari Production <br />
                                 <span className="text-muted-foreground">Admin Portal</span>
                             </h1>
 
                             <p className="mb-8 max-w-lg text-lg text-muted-foreground">
-                                Manage your products, track custom orders, and analyze sales
-                                performance in one powerful dashboard.
+                                Manage products, handle custom orders, and monitor business
+                                performance for Mesari Production in one powerful dashboard.
                             </p>
 
                             <div className="flex flex-col gap-4 sm:flex-row">
@@ -65,7 +65,7 @@ export default function Welcome() {
                                         </div>
                                     ))}
                                 </div>
-                                <p>Authorized personnel only.</p>
+                                <p>Mesari Production authorized personnel only.</p>
                             </div>
                         </div>
 
