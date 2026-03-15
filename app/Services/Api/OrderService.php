@@ -297,7 +297,7 @@ class OrderService
     {
         $date = now()->format('Ymd');
 
-        $random = strtoupper(Str::random(4));
+        $random = strtoupper(Str::random(6));
 
         return sprintf('ORD-%s-%s', $date, $random);
     }
