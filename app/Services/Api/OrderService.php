@@ -320,6 +320,7 @@ class OrderService
         return Order::where('user_id', $user->id)
             ->with([
                 'items.variant.product.images',
+                'items.customization',
             ])
             ->findOrFail($orderId);
     }

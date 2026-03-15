@@ -57,7 +57,7 @@ class ProductSeeder extends Seeder
             $colorsMap[$item['name']] = $attr->id;
         }
 
-        foreach ($productsJson as $item) {
+        foreach ($productsJson as $index => $item) {
             $product = Product::create([
                 'id' => Str::uuid(),
                 'category_id' => $categoriesMap[$item['category']],
@@ -67,6 +67,7 @@ class ProductSeeder extends Seeder
                 'weight' => 500,
                 'is_published' => true,
                 'is_customizable' => false,
+                'is_highlighted' => $index < 2,
                 'custom_additional_price' => null,
                 'discount_type' => null,
                 'discount_value' => null,

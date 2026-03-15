@@ -89,8 +89,8 @@ class ProductService
                 $query->where('is_published', true);
             },
             'variants' => function ($query) {
-                $query->where('price', '>', 0)
-                    ->orderBy('price', 'asc');
+
+                $query->where('price', '>', 0);
             },
             'variants.attributes',
         ])
@@ -102,6 +102,24 @@ class ProductService
             }], 'rating')
             ->where('slug', $slug)
             ->firstOrFail();
+
+        $sizeOrder = collect(['XS', 'S', 'M', 'L', 'XL', 'XXL', 'ALL'])->flip();
+
+        $sortedVariants = $product->variants->sort(function ($a, $b) use ($sizeOrder) {
+            if ($a->price != $b->price) {
+                return $a->price <=> $b->price;
+            }
+
+            $sizeA = $a->attributes->firstWhere('type', 'size')?->name;
+            $sizeB = $b->attributes->firstWhere('type', 'size')?->name;
+
+            $rankA = $sizeOrder->get($sizeA, 999);
+            $rankB = $sizeOrder->get($sizeB, 999);
+
+            return $rankA <=> $rankB;
+        })->values();
+
+        $product->setRelation('variants', $sortedVariants);
 
         return new ProductResource($product);
     }
