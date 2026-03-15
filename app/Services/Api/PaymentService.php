@@ -46,7 +46,7 @@ class PaymentService
     private function createNewPayment($order)
     {
         return DB::transaction(function () use ($order) {
-            $midtransOrderId = 'TRX-'.explode('-', $order->id)[0].'-'.now()->timestamp;
+            $midtransOrderId = 'ORD-'.explode('-', $order->id)[0].'-'.now()->timestamp;
 
             $itemDetails = $order->items->map(function ($item) {
                 return [
@@ -117,9 +117,23 @@ class PaymentService
         $orderId = $notif->order_id;
         $fraud = $notif->fraud_status;
 
+        $grossAmount = $notif->gross_amount;
+        $statusCode = $payload['status_code'] ?? null;
+        $signatureKey = $payload['signature_key'] ?? null;
+
+        $serverKey = config('midtrans.server_key');
+
+        $validSignatureKey = hash('sha512', $orderId.$statusCode.$grossAmount.$serverKey);
+
+        if ($signatureKey !== $validSignatureKey) {
+            Log::critical("UNAUTHORIZED! Invalid Signature Key for OrderID: {$orderId}");
+
+            return ['status' => 403, 'response' => ['message' => 'Invalid signature key']];
+        }
+
         Log::info("Data → OrderID: {$orderId}, Status: {$transaction}");
 
-        return DB::transaction(function () use ($notif, $transaction, $type, $orderId, $fraud, $payload) {
+        return DB::transaction(function () use ($notif, $transaction, $type, $orderId, $fraud, $payload, $statusCode, $signatureKey) {
 
             $payment = Payment::where('midtrans_order_id', $orderId)
                 ->lockForUpdate()
@@ -160,6 +174,8 @@ class PaymentService
                 'midtrans_transaction_id' => $payload['transaction_id'] ?? null,
                 'payment_type' => $type,
                 'fraud_status' => $fraud,
+                'status_code' => $statusCode,
+                'signature_key' => $signatureKey,
                 'transaction_time' => $notif->transaction_time,
                 'settlement_time' => $notif->settlement_time ?? null,
                 'payload' => json_encode($payload),
