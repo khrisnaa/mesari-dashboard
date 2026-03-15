@@ -2,21 +2,24 @@
     "company_name": "Mesari Apparel",
     "tagline": "Premium Ready-to-Wear & Custom Clothing",
     "description": "Mesari Apparel is your ultimate destination for high-quality fashion. We offer a curated selection of stylish ready-to-wear clothing alongside premium custom apparel services. Whether you need everyday essentials, streetwear, or personalized custom t-shirts and uniforms for your team, we bring your unique style to life with top-notch fabrics and expert craftsmanship.",
-    "email": "hello@mesariapparel.com",
+
+    "email": "info@mesari-production.eivern.com",
     "phone": "02112345678",
     "whatsapp": "081234567890",
-    "address": "Jl. Melati No. 45",
 
-    "origin_id": 26551,
+    "address": "Perum BCA Pesona Jadi, Blok 6.C No.06, Banjar Anyar, Kediri, Tabanan Regency, Bali 82123",
+
+    "origin_id": 26576,
     "province_name": "BALI",
     "city_name": "TABANAN",
-    "district_name": "TABANAN",
-    "subdistrict_name": "BONGAN (BOONGAN)",
-    "postal_code": "82112",
+    "district_name": "KEDIRI",
+    "subdistrict_name": "BANJAR ANYAR",
+    "postal_code": "82123",
 
-    "google_map_url": "https://maps.google.com/?q=Jakarta+Selatan",
-    "working_hours": "Mon–Sun, 09:00–18:00",
-    "instagram": "@mesariproduction",
+    "google_map_url": "https://maps.google.com/?q=Perum+BCA+Pesona+Jadi+Banjar+Anyar+Kediri+Tabanan",
+    "working_hours": "Mon–Sun, 10:00–16:00",
+
+    "instagram": "mesari_production22",
     "tiktok": "@mesariproduction",
     "facebook": "mesariproduction"
 }

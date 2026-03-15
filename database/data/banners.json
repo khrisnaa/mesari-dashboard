@@ -2,8 +2,8 @@
     {
         "title": "Big Sale Weekend",
         "description": "Get up to 50% off selected items.",
-        "backdrop_path": "dummies/image (7).jpeg",
-        "image_path": "dummies/image (14).jpeg",
+        "backdrop_path": "seeder/backdrop-1.webp",
+        "image_path": "seeder/banner-1.webp",
         "cta_text": "Shop Now",
         "cta_link": "/shop",
         "sort_order": 1,
@@ -13,8 +13,8 @@
     {
         "title": "New Arrivals",
         "description": "Fresh new styles now available.",
-        "backdrop_path": "dummies/image (3).jpeg",
-        "image_path": "dummies/image (18).jpeg",
+        "backdrop_path": "seeder/backdrop-2.webp",
+        "image_path": "seeder/banner-2.webp",
         "cta_text": "Explore",
         "cta_link": "/new",
         "sort_order": 2,
@@ -24,8 +24,8 @@
     {
         "title": "Exclusive Offer",
         "description": "Special discount for new members.",
-        "backdrop_path": "dummies/image (12).jpeg",
-        "image_path": "dummies/image (5).jpeg",
+        "backdrop_path": "seeder/backdrop-3.webp",
+        "image_path": "seeder/banner-3.webp",
         "cta_text": "Join Now",
         "cta_link": "/register",
         "sort_order": 3,
@@ -35,23 +35,12 @@
     {
         "title": "Holiday Promo",
         "description": "Celebrate with our limited-time deals.",
-        "backdrop_path": "dummies/image (19).jpeg",
-        "image_path": "dummies/image (9).jpeg",
+        "backdrop_path": "seeder/backdrop-4.webp",
+        "image_path": "seeder/banner-4.webp",
         "cta_text": "See Details",
         "cta_link": "/promo",
         "sort_order": 4,
         "is_published": true,
-        "cta_type": "none"
-    },
-    {
-        "title": "Flash Deal",
-        "description": "Deals end in a few hours. Don't miss it!",
-        "backdrop_path": "dummies/image (2).jpeg",
-        "image_path": "dummies/image (16).jpeg",
-        "cta_text": "Grab Now",
-        "cta_link": "/flash",
-        "sort_order": 5,
-        "is_published": false,
         "cta_type": "none"
     }
 ]
