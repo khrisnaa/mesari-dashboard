@@ -59,11 +59,17 @@ class OrderService
     public function updateStatus(Order $order, array $data): bool
     {
         return DB::transaction(function () use ($order, $data) {
+            $oldStatus = $order->order_status;
+            $newStatus = $data['order_status'];
 
             $order->update([
                 'order_status' => $data['order_status'],
                 'payment_status' => $data['payment_status'],
             ]);
+
+            if ($oldStatus !== 'cancelled' && $newStatus === 'cancelled') {
+                $this->restoreStock($order);
+            }
 
             $payment = $order->payment;
 
@@ -96,6 +102,8 @@ class OrderService
     public function update(Order $order, array $data): bool
     {
         return DB::transaction(function () use ($order, $data) {
+            $oldStatus = $order->order_status;
+            $newStatus = $data['order_status'] ?? $oldStatus;
 
             $paymentProofPath = $order->payment?->payment_proof;
 
@@ -133,7 +141,35 @@ class OrderService
                 'note',
             ])->toArray();
 
-            return $order->update($orderData);
+            $updated = $order->update($orderData);
+
+            if ($oldStatus !== 'cancelled' && $newStatus === 'cancelled') {
+                $this->restoreStock($order);
+            }
+
+            if ($oldStatus === 'cancelled' && $newStatus !== 'cancelled') {
+                $this->reduceStock($order);
+            }
+
+            return $updated;
         });
+    }
+
+    private function restoreStock(Order $order)
+    {
+        foreach ($order->items as $item) {
+            if ($item->variant) {
+                $item->variant->increment('stock', $item->quantity);
+            }
+        }
+    }
+
+    private function reduceStock(Order $order)
+    {
+        foreach ($order->items as $item) {
+            if ($item->variant) {
+                $item->variant->decrement('stock', $item->quantity);
+            }
+        }
     }
 }

@@ -413,14 +413,28 @@ class OrderService
 
     public function cancelOrder(Order $order): Order
     {
-        if ($order->order_status !== OrderStatus::PENDING->value) {
-            throw new Exception("The order cannot be canceled because the current status is {$order->order_status}.");
+        return DB::transaction(function () use ($order) {
+            if ($order->order_status !== OrderStatus::PENDING->value) {
+                throw new Exception("The order cannot be canceled because the current status is {$order->order_status}.");
+            }
+
+            $order->update([
+                'order_status' => OrderStatus::CANCELLED->value,
+            ]);
+
+            $this->restoreStock($order);
+
+            return $order->fresh();
+        });
+    }
+
+    private function restoreStock(Order $order)
+    {
+        foreach ($order->items as $item) {
+
+            if ($item->variant) {
+                $item->variant->increment('stock', $item->quantity);
+            }
         }
-
-        $order->update([
-            'order_status' => OrderStatus::CANCELLED->value,
-        ]);
-
-        return $order->fresh();
     }
 }
