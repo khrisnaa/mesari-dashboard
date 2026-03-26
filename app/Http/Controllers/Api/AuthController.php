@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
@@ -82,13 +83,18 @@ class AuthController extends Controller
     {
         $user = User::findOrFail($request->route('id'));
 
+        Log::info("Started email verification for User ID: {$user->id}");
+
         if (! hash_equals((string) $request->route('hash'), sha1($user->email))) {
             return redirect(env('FRONTEND_URL').'/verify/error');
         }
 
         if (! $user->hasVerifiedEmail()) {
+            Log::info("Success: Email verified for User ID: {$user->id}");
             $user->markEmailAsVerified();
         }
+
+        Log::info("Skipped: Email already verified for User ID: {$user->id}");
 
         return redirect(env('FRONTEND_URL').'/login?verified=1');
     }
