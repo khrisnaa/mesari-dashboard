@@ -70,6 +70,9 @@ class CustomizationService
                             } elseif ($areaCm2 <= 1260) {
                                 // A3 (30x42 cm)
                                 $multiplier = 7;
+                            } elseif ($areaCm2 <= 1890) {
+                                // A3+ (42x45 cm)
+                                $multiplier = 8.5;
                             } else {
                                 // A2 / Oversize
                                 $multiplier = 10;
