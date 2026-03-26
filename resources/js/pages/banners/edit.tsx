@@ -140,7 +140,7 @@ const Edit = ({ banner, categories, products }: PageProps) => {
                                         name="title"
                                         value={data.title}
                                         onChange={(e) => setData('title', e.target.value)}
-                                        placeholder="e.g. Special Summer Promo"
+                                        placeholder="Special Summer Promo"
                                     />
                                     <InputError message={errors.title} />
                                 </div>
@@ -314,7 +314,7 @@ const Edit = ({ banner, categories, products }: PageProps) => {
                                         name="cta_text"
                                         value={data.cta_text}
                                         onChange={(e) => setData('cta_text', e.target.value)}
-                                        placeholder="e.g. Shop Now"
+                                        placeholder="Shop Now"
                                     />
                                     <InputError message={errors.cta_text} />
                                 </div>

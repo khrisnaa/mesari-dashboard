@@ -59,7 +59,7 @@ export const CreateDialog = ({ isOpen, close, onOpenChange }: DialogComponentPro
                                             id="role"
                                             name="role"
                                             type="text"
-                                            placeholder="e.g. CEO - Company Inc"
+                                            placeholder="Admin"
                                         />
                                         <InputError message={errors.role} />
                                     </div>

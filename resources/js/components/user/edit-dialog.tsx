@@ -77,7 +77,7 @@ export const EditDialog = ({
                                         name="phone"
                                         defaultValue={user.phone ?? ''}
                                         autoComplete="off"
-                                        placeholder="e.g. +62..."
+                                        placeholder="08123456789"
                                     />
                                     <InputError message={errors.phone} />
                                 </div>

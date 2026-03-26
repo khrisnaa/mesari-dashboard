@@ -27,7 +27,7 @@ export const StatusBadge = ({ variant = 'default', label, dot = true }: StatusBa
     return (
         <Badge
             className={cn(
-                'gap-1 rounded-full border-none px-2 py-1 capitalize focus-visible:ring-0 focus-visible:outline-none',
+                'gap-1 rounded-full border-none px-2 py-1 uppercase focus-visible:ring-0 focus-visible:outline-none',
                 styles[variant],
             )}
         >

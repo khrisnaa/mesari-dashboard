@@ -290,7 +290,7 @@ const Edit = ({ order }: PageProps) => {
                                         <Truck className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
                                         <Input
                                             className="bg-background pl-9"
-                                            placeholder="e.g. JNE123456789"
+                                            placeholder="JNE123456789"
                                             value={data.shipping_tracking_number}
                                             onChange={(e) =>
                                                 setData('shipping_tracking_number', e.target.value)

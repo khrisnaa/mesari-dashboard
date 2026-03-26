@@ -73,7 +73,7 @@ export const InviteDialog = ({
                                         id="phone"
                                         name="phone"
                                         autoComplete="off"
-                                        placeholder="e.g. +62..."
+                                        placeholder="08123456789"
                                     />
                                     <InputError message={errors.phone} />
                                 </div>

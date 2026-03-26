@@ -67,7 +67,7 @@ export const getColumns = (
                 />
             );
         },
-        meta: { width: { type: 'fixed', px: 110 } },
+        meta: { width: { type: 'fixed', px: 180 } },
     },
     {
         id: 'order_status',
@@ -84,7 +84,7 @@ export const getColumns = (
                 />
             );
         },
-        meta: { width: { type: 'fixed', px: 150 } },
+        meta: { width: { type: 'fixed', px: 180 } },
     },
     {
         id: 'additional_price',

@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CustomSide, Customization } from '@/types/customization';
 import { DialogComponentProps } from '@/types/dialog';
 import { Download, Image as ImageIcon, Loader2, Type } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 export const SIZE_GUIDE_LIST = {
     XS: { label: 'Extra Small', range: '55 - 59 cm', min: 55, max: 59 },
@@ -58,227 +58,274 @@ const SideDetail = ({
     name: string;
     baseImageUrl?: string | null;
     size: string | null;
-}) => (
-    <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="relative flex h-[380px] w-full items-center justify-center overflow-hidden rounded-lg border bg-muted/50 p-2">
-                {side.mockup_url ? (
-                    <div className="relative flex h-full w-full items-center justify-center">
-                        <LoadedImage
-                            src={side.mockup_url}
-                            alt={`${name} Custom Mockup`}
-                            className="h-full w-full rounded-md object-contain drop-shadow-sm"
-                        />
-                        <a
-                            href={side.mockup_url}
-                            download={`mockup-${name.toLowerCase().replace(/\s+/g, '-')}.png`}
-                            target="_blank"
-                            rel="noreferrer"
-                            title="Download Full Mockup"
-                            className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:bg-primary hover:text-primary-foreground"
-                        >
-                            <Download className="h-4 w-4" />
-                        </a>
-                    </div>
-                ) : baseImageUrl ? (
-                    <div className="relative flex h-full w-full flex-col items-center justify-center">
-                        <LoadedImage
-                            src={baseImageUrl}
-                            alt={`${name} Base Product`}
-                            className="h-full w-full rounded-md object-contain opacity-70 mix-blend-multiply"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="rounded-full bg-background/90 px-4 py-1.5 text-sm font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
-                                No Custom Design
-                            </span>
+}) => {
+    const mockupRef = useRef<HTMLDivElement | null>(null);
+    return (
+        <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div
+                    ref={mockupRef}
+                    className="relative flex h-[380px] w-full items-center justify-center overflow-hidden rounded-lg border bg-muted/50 p-2"
+                >
+                    {side.mockup_url ? (
+                        <div className="relative flex h-full w-full items-center justify-center">
+                            <LoadedImage
+                                src={side.mockup_url}
+                                alt={`${name} Custom Mockup`}
+                                className="h-full w-full rounded-md object-contain drop-shadow-sm"
+                            />
+                            <a
+                                href={side.mockup_url}
+                                download={`mockup-${name.toLowerCase().replace(/\s+/g, '-')}.png`}
+                                target="_blank"
+                                rel="noreferrer"
+                                title="Download Full Mockup"
+                                className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:bg-primary hover:text-primary-foreground"
+                            >
+                                <Download className="h-4 w-4" />
+                            </a>
                         </div>
-                    </div>
-                ) : (
-                    <div className="flex h-full w-full items-center justify-center rounded-lg border border-dashed text-muted-foreground">
-                        No image available
-                    </div>
-                )}
-            </div>
-
-            <div className="flex flex-col space-y-3">
-                <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold tracking-tight text-foreground">
-                        DESIGN ELEMENTS
-                    </h4>
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                        {side.design_data?.length || 0} items
-                    </span>
+                    ) : baseImageUrl ? (
+                        <div className="relative flex h-full w-full flex-col items-center justify-center">
+                            <LoadedImage
+                                src={baseImageUrl}
+                                alt={`${name} Base Product`}
+                                className="h-full w-full rounded-md object-contain opacity-70 mix-blend-multiply"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="rounded-full bg-background/90 px-4 py-1.5 text-sm font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
+                                    No Custom Design
+                                </span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex h-full w-full items-center justify-center rounded-lg border border-dashed text-muted-foreground">
+                            No image available
+                        </div>
+                    )}
                 </div>
 
-                {side.has_design && side.design_data && side.design_data.length > 0 ? (
-                    <div className="custom-scrollbar max-h-[340px] space-y-3 overflow-y-auto pr-2">
-                        {side.design_data.map((el, i) => {
-                            const imgSrc = el.src || el.url;
-                            const MOCKUP_SHIRT_HEIGHT_PX = 450;
-                            const BASE_SHIRT_LENGTH_CM = size ? getSizeGuide(size) : 70;
-                            const currentScale = el.scale ?? 1;
+                <div className="flex flex-col space-y-3">
+                    <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-bold tracking-tight text-foreground">
+                            DESIGN ELEMENTS
+                        </h4>
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                            {side.design_data?.length || 0} items
+                        </span>
+                    </div>
 
-                            let baseWidthPx = 100;
-                            let baseHeightPx = 100;
+                    {side.has_design && side.design_data && side.design_data.length > 0 ? (
+                        <div className="custom-scrollbar max-h-[340px] space-y-3 overflow-y-auto pr-2">
+                            {side.design_data.map((el, i) => {
+                                // const imgSrc = el.src || el.url;
+                                // const MOCKUP_SHIRT_HEIGHT_PX = 560;
+                                // // const MOCKUP_SHIRT_HEIGHT_PX =
+                                // //     mockupRef.current?.offsetHeight || 450;
+                                // const BASE_SHIRT_LENGTH_CM = size ? getSizeGuide(size) : 70;
+                                // const currentScale = el.scale ?? 1;
 
-                            if (el.type === 'text') {
-                                baseWidthPx = el.width ?? el.fontSize ?? 100;
-                                baseHeightPx = el.height ?? el.fontSize ?? 100;
-                            } else if (el.type === 'image') {
-                                baseWidthPx = el.width ?? 100;
-                                baseHeightPx = el.height ?? 100;
-                            }
+                                // let baseWidthPx = 100;
+                                // let baseHeightPx = 100;
 
-                            const actualWidthPx = baseWidthPx * currentScale;
-                            const actualHeightPx = baseHeightPx * currentScale;
+                                // if (el.type === 'text') {
+                                //     baseWidthPx = el.width ?? el.fontSize ?? 100;
+                                //     baseHeightPx = el.height ?? el.fontSize ?? 100;
+                                // } else if (el.type === 'image') {
+                                //     baseWidthPx = el.width ?? 100;
+                                //     baseHeightPx = el.height ?? 100;
+                                // }
 
-                            const estWidthCm =
-                                (actualWidthPx / MOCKUP_SHIRT_HEIGHT_PX) * BASE_SHIRT_LENGTH_CM;
-                            const estHeightCm =
-                                (actualHeightPx / MOCKUP_SHIRT_HEIGHT_PX) * BASE_SHIRT_LENGTH_CM;
+                                // const actualWidthPx = baseWidthPx * currentScale;
+                                // const actualHeightPx = baseHeightPx * currentScale;
 
-                            return (
-                                <div
-                                    key={i}
-                                    className="rounded-lg border bg-card p-3.5 shadow-sm transition-all hover:shadow-md"
-                                >
-                                    <div className="mb-3 flex items-center justify-between border-b pb-2">
-                                        <div className="flex items-center gap-2">
-                                            {el.type === 'text' ? (
-                                                <Type className="h-4 w-4 text-blue-500" />
-                                            ) : (
-                                                <ImageIcon className="h-4 w-4 text-emerald-500" />
-                                            )}
-                                            <span className="text-xs font-bold tracking-wider text-foreground uppercase">
-                                                {el.type}
+                                // const estWidthCm =
+                                //     (actualWidthPx / MOCKUP_SHIRT_HEIGHT_PX) * BASE_SHIRT_LENGTH_CM;
+                                // const estHeightCm =
+                                //     (actualHeightPx / MOCKUP_SHIRT_HEIGHT_PX) *
+                                //     BASE_SHIRT_LENGTH_CM;
+
+                                const imgSrc = el.src || el.url;
+                                // 1. Acuan Lebar Layar (Wrapper)
+                                const REFERENCE_WRAPPER_WIDTH_PX = 450;
+
+                                // 2. Ambil Panjang Baju Berdasarkan Size yang dipilih (M=68, XXL=80, dst)
+                                const BASE_SHIRT_LENGTH_CM = size ? getSizeGuide(size) : 70;
+
+                                // Mengambil acuan panjang baju terkecil (XS) langsung dari object, bukan hardcode 59
+                                const BASELINE_SHIRT_LENGTH_CM = SIZE_GUIDE_LIST.XS.max;
+
+                                // 3. MAGIC FIX: Buat Lebar Wrapper Dinamis!
+                                // Jika panjang baju sama dengan XS, maka lebarnya 98.
+                                // Jika panjang baju lebih besar, maka lebarnya akan ikut membesar secara proporsional.
+                                const PHYSICAL_WRAPPER_WIDTH_CM =
+                                    (BASE_SHIRT_LENGTH_CM / BASELINE_SHIRT_LENGTH_CM) * 98;
+
+                                // 4. Kalkulasi Ukuran Pixel Gambar
+                                const currentScale = el.scale ?? 1;
+                                let baseWidthPx =
+                                    el.type === 'text'
+                                        ? (el.width ?? el.fontSize ?? 100)
+                                        : (el.width ?? 100);
+                                let baseHeightPx =
+                                    el.type === 'text'
+                                        ? (el.height ?? el.fontSize ?? 100)
+                                        : (el.height ?? 100);
+
+                                const actualWidthPx = baseWidthPx * currentScale;
+                                const actualHeightPx = baseHeightPx * currentScale;
+
+                                // 5. RUMUS: 1 Pixel = Berapa CM? (Berdasarkan rasio lebar yang sudah dinamis)
+                                const pixelToCmRatio =
+                                    PHYSICAL_WRAPPER_WIDTH_CM / REFERENCE_WRAPPER_WIDTH_PX;
+
+                                // 6. Hitung Estimasi (Tinggi dan Lebar pakai rasio yang SAMA agar tidak gepeng)
+                                const estWidthCm = actualWidthPx * pixelToCmRatio;
+                                const estHeightCm = actualHeightPx * pixelToCmRatio;
+
+                                return (
+                                    <div
+                                        key={i}
+                                        className="rounded-lg border bg-card p-3.5 shadow-sm transition-all hover:shadow-md"
+                                    >
+                                        <div className="mb-3 flex items-center justify-between border-b pb-2">
+                                            <div className="flex items-center gap-2">
+                                                {el.type === 'text' ? (
+                                                    <Type className="h-4 w-4 text-blue-500" />
+                                                ) : (
+                                                    <ImageIcon className="h-4 w-4 text-emerald-500" />
+                                                )}
+                                                <span className="text-xs font-bold tracking-wider text-foreground uppercase">
+                                                    {el.type}
+                                                </span>
+                                            </div>
+                                            <span className="font-mono text-[10px] text-muted-foreground">
+                                                {el.id}
                                             </span>
                                         </div>
-                                        <span className="font-mono text-[10px] text-muted-foreground">
-                                            {el.id}
-                                        </span>
-                                    </div>
 
-                                    <div className="space-y-2 text-xs">
-                                        {el.type === 'text' && (
-                                            <>
-                                                <div className="flex items-start justify-between">
-                                                    <span className="text-muted-foreground">
-                                                        Text:
-                                                    </span>
-                                                    <span className="max-w-[180px] text-right font-semibold break-words">
-                                                        "{el.text}"
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-muted-foreground">
-                                                        Font:
-                                                    </span>
-                                                    <span className="font-medium">
-                                                        {el.fontFamily}
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-muted-foreground">
-                                                        Color:
-                                                    </span>
-                                                    <div className="flex items-center gap-2">
-                                                        <div
-                                                            className="h-3.5 w-3.5 rounded-full border shadow-sm"
-                                                            style={{ backgroundColor: el.fill }}
-                                                        />
-                                                        <span className="font-medium uppercase">
-                                                            {el.fill}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
-
-                                        {el.type === 'image' && (
-                                            <>
-                                                <div className="flex items-center justify-between rounded-md border bg-muted/50 p-2">
-                                                    <div className="flex flex-col gap-1 overflow-hidden">
-                                                        <span className="text-[10px] font-medium text-muted-foreground uppercase">
-                                                            Source File
-                                                        </span>
-                                                        <span className="max-w-[140px] truncate font-mono text-primary">
-                                                            {imgSrc?.split('/').pop() ||
-                                                                'image_asset'}
-                                                        </span>
-                                                    </div>
-
-                                                    {imgSrc && (
-                                                        <a
-                                                            href={imgSrc}
-                                                            download={`asset-${el.id}.jpg`}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            title="Download Raw Asset"
-                                                            className="flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1.5 text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-                                                        >
-                                                            <Download className="h-3 w-3" />
-                                                            <span className="text-[10px] font-medium">
-                                                                Save
-                                                            </span>
-                                                        </a>
-                                                    )}
-                                                </div>
-                                                {el.width && el.height ? (
-                                                    <div className="flex justify-between pt-1">
+                                        <div className="space-y-2 text-xs">
+                                            {el.type === 'text' && (
+                                                <>
+                                                    <div className="flex items-start justify-between">
                                                         <span className="text-muted-foreground">
-                                                            Original Size:
+                                                            Text:
+                                                        </span>
+                                                        <span className="max-w-[180px] text-right font-semibold break-words">
+                                                            "{el.text}"
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-muted-foreground">
+                                                            Font:
                                                         </span>
                                                         <span className="font-medium">
-                                                            {Math.round(el.width)} ×{' '}
-                                                            {Math.round(el.height)} px
+                                                            {el.fontFamily}
                                                         </span>
                                                     </div>
-                                                ) : null}
-                                            </>
-                                        )}
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-muted-foreground">
+                                                            Color:
+                                                        </span>
+                                                        <div className="flex items-center gap-2">
+                                                            <div
+                                                                className="h-3.5 w-3.5 rounded-full border shadow-sm"
+                                                                style={{ backgroundColor: el.fill }}
+                                                            />
+                                                            <span className="font-medium uppercase">
+                                                                {el.fill}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
 
-                                        <div className="mt-2 flex flex-col gap-1.5 border-t pt-2">
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">
-                                                    Coord / Transform:
-                                                </span>
-                                                <span className="font-medium">
-                                                    X:{Math.round(el.x ?? 0)} Y:
-                                                    {Math.round(el.y ?? 0)} | {currentScale}x /{' '}
-                                                    {el.rotation ?? 0}°
-                                                </span>
-                                            </div>
+                                            {el.type === 'image' && (
+                                                <>
+                                                    <div className="flex items-center justify-between rounded-md border bg-muted/50 p-2">
+                                                        <div className="flex flex-col gap-1 overflow-hidden">
+                                                            <span className="text-[10px] font-medium text-muted-foreground uppercase">
+                                                                Source File
+                                                            </span>
+                                                            <span className="max-w-[140px] truncate font-mono text-primary">
+                                                                {imgSrc?.split('/').pop() ||
+                                                                    'image_asset'}
+                                                            </span>
+                                                        </div>
 
-                                            <div className="mt-1 flex items-center justify-between rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-amber-800">
-                                                <span className="font-medium">
-                                                    📏 Est. Print Size:
-                                                </span>
-                                                <span className="font-bold">
-                                                    ~{estWidthCm.toFixed(1)} cm ×{' '}
-                                                    {estHeightCm.toFixed(1)} cm
-                                                </span>
+                                                        {imgSrc && (
+                                                            <a
+                                                                href={imgSrc}
+                                                                download={`asset-${el.id}.jpg`}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                title="Download Raw Asset"
+                                                                className="flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1.5 text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                                                            >
+                                                                <Download className="h-3 w-3" />
+                                                                <span className="text-[10px] font-medium">
+                                                                    Save
+                                                                </span>
+                                                            </a>
+                                                        )}
+                                                    </div>
+                                                    {el.width && el.height ? (
+                                                        <div className="flex justify-between pt-1">
+                                                            <span className="text-muted-foreground">
+                                                                Original Size:
+                                                            </span>
+                                                            <span className="font-medium">
+                                                                {Math.round(el.width)} ×{' '}
+                                                                {Math.round(el.height)} px
+                                                            </span>
+                                                        </div>
+                                                    ) : null}
+                                                </>
+                                            )}
+
+                                            <div className="mt-2 flex flex-col gap-1.5 border-t pt-2">
+                                                <div className="flex justify-between">
+                                                    <span className="text-muted-foreground">
+                                                        Coord / Transform:
+                                                    </span>
+                                                    <span className="font-medium">
+                                                        X:{Math.round(el.x ?? 0)} Y:
+                                                        {Math.round(el.y ?? 0)} | {currentScale}x /{' '}
+                                                        {el.rotation ?? 0}°
+                                                    </span>
+                                                </div>
+
+                                                <div className="mt-1 flex items-center justify-between rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-amber-800">
+                                                    <span className="font-medium">
+                                                        📏 Est. Print Size:
+                                                    </span>
+                                                    <span className="font-bold">
+                                                        ~{estWidthCm.toFixed(1)} cm ×{' '}
+                                                        {estHeightCm.toFixed(1)} cm
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <div className="flex h-full flex-col items-center justify-center rounded-lg border border-dashed bg-muted/30 p-6 text-center">
-                        <ImageIcon className="mb-2 h-8 w-8 text-muted-foreground/50" />
-                        <p className="text-sm font-medium text-muted-foreground">
-                            No Elements Added
-                        </p>
-                        <p className="mt-1 text-xs text-muted-foreground/70">
-                            Customer left this side blank.
-                        </p>
-                    </div>
-                )}
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="flex h-full flex-col items-center justify-center rounded-lg border border-dashed bg-muted/30 p-6 text-center">
+                            <ImageIcon className="mb-2 h-8 w-8 text-muted-foreground/50" />
+                            <p className="text-sm font-medium text-muted-foreground">
+                                No Elements Added
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground/70">
+                                Customer left this side blank.
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 export const ShowDialog = ({
     isOpen,

@@ -45,11 +45,7 @@ export const CreateDialog = ({
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="bank_name">Bank Name</Label>
-                                        <Input
-                                            id="bank_name"
-                                            name="bank_name"
-                                            placeholder="e.g., BCA, Mandiri"
-                                        />
+                                        <Input id="bank_name" name="bank_name" placeholder="BCA" />
                                         <InputError message={errors.bank_name} />
                                     </div>
                                     <div className="space-y-2">
@@ -57,7 +53,7 @@ export const CreateDialog = ({
                                         <Input
                                             id="account_owner"
                                             name="account_owner"
-                                            placeholder="e.g., John Doe"
+                                            placeholder="John Doe"
                                         />
                                         <InputError message={errors.account_owner} />
                                     </div>
@@ -67,7 +63,7 @@ export const CreateDialog = ({
                                     <Input
                                         id="account_number"
                                         name="account_number"
-                                        placeholder="e.g., 1234567890"
+                                        placeholder="1234567890"
                                     />
                                     <InputError message={errors.account_number} />
                                 </div>

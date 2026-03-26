@@ -253,7 +253,7 @@ export const getColumns = (
 
             return <StatusBadge variant={variant} label={status.split('_').join(' ')} />;
         },
-        meta: { width: { type: 'fixed', px: 140 } },
+        meta: { width: { type: 'fixed', px: 180 } },
     },
 
     {
@@ -296,7 +296,7 @@ export const getColumns = (
                 />
             );
         },
-        meta: { width: { type: 'fixed', px: 140 } },
+        meta: { width: { type: 'fixed', px: 180 } },
     },
 
     {

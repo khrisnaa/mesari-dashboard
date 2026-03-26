@@ -65,7 +65,7 @@ export const EditDialog = ({
                                             id="role"
                                             name="role"
                                             type="text"
-                                            placeholder="e.g. CEO - Company Inc"
+                                            placeholder="Admin"
                                             defaultValue={testimonial.role}
                                         />
                                         <InputError message={errors.role} />
