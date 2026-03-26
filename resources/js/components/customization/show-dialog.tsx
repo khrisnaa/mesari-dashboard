@@ -6,12 +6,36 @@ import { Download, Image as ImageIcon, Loader2, Type } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 export const SIZE_GUIDE_LIST = {
-    XS: { label: 'Extra Small', range: '55 - 59 cm', min: 55, max: 59 },
-    S: { label: 'Small', range: '60 - 65 cm', min: 60, max: 65 },
-    M: { label: 'Medium', range: '66 - 68 cm', min: 66, max: 68 },
-    L: { label: 'Large', range: '69 - 71 cm', min: 69, max: 71 },
-    XL: { label: 'Extra Large', range: '72 - 75 cm', min: 72, max: 75 },
-    XXL: { label: 'Extra Extra Large', range: '76 - 80 cm', min: 76, max: 80 },
+    XS: {
+        label: 'Extra Small',
+        length: { min: 55, max: 59 },
+        width: { min: 42, max: 45 },
+    },
+    S: {
+        label: 'Small',
+        length: { min: 60, max: 65 },
+        width: { min: 45, max: 48 },
+    },
+    M: {
+        label: 'Medium',
+        length: { min: 66, max: 68 },
+        width: { min: 48, max: 52 },
+    },
+    L: {
+        label: 'Large',
+        length: { min: 69, max: 71 },
+        width: { min: 52, max: 55 },
+    },
+    XL: {
+        label: 'Extra Large',
+        length: { min: 72, max: 75 },
+        width: { min: 55, max: 58 },
+    },
+    XXL: {
+        label: 'Extra Extra Large',
+        length: { min: 76, max: 80 },
+        width: { min: 58, max: 62 },
+    },
 } as const;
 
 export type SizeKey = keyof typeof SIZE_GUIDE_LIST;
@@ -20,7 +44,7 @@ export const getSizeGuide = (size: string) => {
     const normalized = size.trim().toUpperCase() as SizeKey;
 
     if (normalized in SIZE_GUIDE_LIST) {
-        return SIZE_GUIDE_LIST[normalized].max;
+        return SIZE_GUIDE_LIST[normalized].length.max;
     }
 
     return 70;
@@ -118,50 +142,17 @@ const SideDetail = ({
                     {side.has_design && side.design_data && side.design_data.length > 0 ? (
                         <div className="custom-scrollbar max-h-[340px] space-y-3 overflow-y-auto pr-2">
                             {side.design_data.map((el, i) => {
-                                // const imgSrc = el.src || el.url;
-                                // const MOCKUP_SHIRT_HEIGHT_PX = 560;
-                                // // const MOCKUP_SHIRT_HEIGHT_PX =
-                                // //     mockupRef.current?.offsetHeight || 450;
-                                // const BASE_SHIRT_LENGTH_CM = size ? getSizeGuide(size) : 70;
-                                // const currentScale = el.scale ?? 1;
-
-                                // let baseWidthPx = 100;
-                                // let baseHeightPx = 100;
-
-                                // if (el.type === 'text') {
-                                //     baseWidthPx = el.width ?? el.fontSize ?? 100;
-                                //     baseHeightPx = el.height ?? el.fontSize ?? 100;
-                                // } else if (el.type === 'image') {
-                                //     baseWidthPx = el.width ?? 100;
-                                //     baseHeightPx = el.height ?? 100;
-                                // }
-
-                                // const actualWidthPx = baseWidthPx * currentScale;
-                                // const actualHeightPx = baseHeightPx * currentScale;
-
-                                // const estWidthCm =
-                                //     (actualWidthPx / MOCKUP_SHIRT_HEIGHT_PX) * BASE_SHIRT_LENGTH_CM;
-                                // const estHeightCm =
-                                //     (actualHeightPx / MOCKUP_SHIRT_HEIGHT_PX) *
-                                //     BASE_SHIRT_LENGTH_CM;
-
                                 const imgSrc = el.src || el.url;
-                                // 1. Acuan Lebar Layar (Wrapper)
+
                                 const REFERENCE_WRAPPER_WIDTH_PX = 450;
 
-                                // 2. Ambil Panjang Baju Berdasarkan Size yang dipilih (M=68, XXL=80, dst)
-                                const BASE_SHIRT_LENGTH_CM = size ? getSizeGuide(size) : 70;
+                                const SHIRT_PHYSICAL_WIDTH_CM =
+                                    size && size in SIZE_GUIDE_LIST
+                                        ? SIZE_GUIDE_LIST[size as SizeKey].width.min
+                                        : 42;
 
-                                // Mengambil acuan panjang baju terkecil (XS) langsung dari object, bukan hardcode 59
-                                const BASELINE_SHIRT_LENGTH_CM = SIZE_GUIDE_LIST.XS.max;
+                                const PHYSICAL_WRAPPER_WIDTH_CM = SHIRT_PHYSICAL_WIDTH_CM * 2;
 
-                                // 3. MAGIC FIX: Buat Lebar Wrapper Dinamis!
-                                // Jika panjang baju sama dengan XS, maka lebarnya 98.
-                                // Jika panjang baju lebih besar, maka lebarnya akan ikut membesar secara proporsional.
-                                const PHYSICAL_WRAPPER_WIDTH_CM =
-                                    (BASE_SHIRT_LENGTH_CM / BASELINE_SHIRT_LENGTH_CM) * 98;
-
-                                // 4. Kalkulasi Ukuran Pixel Gambar
                                 const currentScale = el.scale ?? 1;
                                 let baseWidthPx =
                                     el.type === 'text'
@@ -175,11 +166,9 @@ const SideDetail = ({
                                 const actualWidthPx = baseWidthPx * currentScale;
                                 const actualHeightPx = baseHeightPx * currentScale;
 
-                                // 5. RUMUS: 1 Pixel = Berapa CM? (Berdasarkan rasio lebar yang sudah dinamis)
                                 const pixelToCmRatio =
                                     PHYSICAL_WRAPPER_WIDTH_CM / REFERENCE_WRAPPER_WIDTH_PX;
 
-                                // 6. Hitung Estimasi (Tinggi dan Lebar pakai rasio yang SAMA agar tidak gepeng)
                                 const estWidthCm = actualWidthPx * pixelToCmRatio;
                                 const estHeightCm = actualHeightPx * pixelToCmRatio;
 

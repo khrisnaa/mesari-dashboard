@@ -39,19 +39,40 @@ class CustomizationService
                     if (is_array($designData)) {
                         foreach ($designData as $key => $element) {
 
+                            $baseWidth = isset($element['width']) ? (float) $element['width'] : 100;
+                            $baseHeight = isset($element['height']) ? (float) $element['height'] : 100;
                             $scale = isset($element['scale']) ? (float) $element['scale'] : 1;
+
+                            $actualWidthPx = $baseWidth * $scale;
+                            $actualHeightPx = $baseHeight * $scale;
+
+                            $referenceWrapperWidthPx = 450;
+
+                            $shirtPhysicalWidthCm = 42;
+
+                            $physicalWrapperWidthCm = $shirtPhysicalWidthCm * 2;
+
+                            $pixelToCmRatio = $physicalWrapperWidthCm / $referenceWrapperWidthPx;
+
+                            $estWidthCm = $actualWidthPx * $pixelToCmRatio;
+                            $estHeightCm = $actualHeightPx * $pixelToCmRatio;
+
+                            $areaCm2 = $estWidthCm * $estHeightCm;
 
                             $multiplier = 1;
 
-                            if ($scale <= 1.0) {
-                                // Small
+                            if ($areaCm2 <= 100) {
+                                // Logo (10x10 cm)
                                 $multiplier = 1;
-                            } elseif ($scale <= 2.0) {
-                                // Medium
-                                $multiplier = 2;
+                            } elseif ($areaCm2 <= 630) {
+                                // A4 (21x30 cm)
+                                $multiplier = 4;
+                            } elseif ($areaCm2 <= 1260) {
+                                // A3 (30x42 cm)
+                                $multiplier = 7;
                             } else {
-                                // Large
-                                $multiplier = 3;
+                                // A2 / Oversize
+                                $multiplier = 10;
                             }
 
                             $elementCost = $baseElementPrice * $multiplier;
